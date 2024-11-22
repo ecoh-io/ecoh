@@ -1,9 +1,8 @@
 import Screen from '@/src/UI/Screen';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { Slot, Stack } from 'expo-router';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Stack } from 'expo-router';
 
-export default function Layout() {
+export default function FeedStack() {
   const { colors, isDark } = useTheme();
   return (
     <Screen
@@ -16,14 +15,12 @@ export default function Layout() {
       statusBarStyle={isDark ? 'light' : 'dark'}
     >
       <Stack
-        initialRouteName="index"
         screenOptions={{
-          headerShown: false,
+          headerShown: false, // Show header to include back button
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="login" />
-        <Stack.Screen name="register" />
+        <Stack.Screen name="details" />
       </Stack>
     </Screen>
   );

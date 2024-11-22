@@ -7,6 +7,7 @@ import axios from 'axios';
 import { ConfrimRegistrationResponse } from '../types/confirm.response';
 import { ConfirmUserRegistrationData } from '../types/confirm.data';
 import { confrimUser } from '../api/confirm.api';
+import { useAuthStore } from '../store/AuthStore';
 
 /**
  * APIError interface represents the structure of error responses from the API.
@@ -33,6 +34,7 @@ export const useConfrimUser = (
   APIError,
   ConfirmUserRegistrationData
 > => {
+  const login = useAuthStore((state) => state.login);
   return useMutation<
     ConfrimRegistrationResponse,
     APIError,
@@ -73,6 +75,15 @@ export const useConfrimUser = (
      * You can customize this based on your application's needs.
      */
     onSuccess: async (data: any, variables: any, context: any) => {
+      try {
+        await login(
+          data.tokens.AccessToken,
+          data.tokens.RefreshToken,
+          data.user,
+        );
+      } catch (error) {
+        console.error('Login error:', error);
+      }
       if (options?.onSuccess) {
         options.onSuccess(data, variables, context);
       }

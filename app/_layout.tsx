@@ -1,35 +1,36 @@
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
+import { Slot } from 'expo-router';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { useFonts } from 'expo-font';
 import { ThemeProvider } from '@/src/theme/ThemeContext';
-import { fonts } from '@/src/theme/typography';
 import { QueryClientProvider } from '@tanstack/react-query';
 import queryClient from '@/src/utils/queryClient';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { useAuthStore } from '@/src/store/AuthStore';
+import { ActivityIndicator, View } from 'react-native';
+import { WithFonts } from './components/WithFonts';
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts(fonts);
+  const loading = useAuthStore((state) => state.loading);
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
+    initializeAuth();
+  }, [initializeAuth]);
 
-  if (!fontsLoaded) {
-    return null;
+  if (loading) {
+    // Show a loading indicator or keep the splash screen
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <Stack>
-          <Stack.Screen name="auth" options={{ headerShown: false }} />
-        </Stack>
+        <WithFonts>
+          <Slot />
+        </WithFonts>
       </QueryClientProvider>
     </ThemeProvider>
   );

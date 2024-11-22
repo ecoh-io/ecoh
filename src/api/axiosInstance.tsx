@@ -11,7 +11,7 @@ import {
   getAuthToken,
   getRefreshToken,
   setAuthToken,
-} from '../utils/secureStore';
+} from '../store/secureStore';
 
 // Define the shape of your error response
 interface ErrorResponse {

@@ -8,7 +8,7 @@ const Index: React.FC = () => {
   const { colors, toggleTheme } = useTheme();
 
   const registerPressed = () => {
-    router.push('/auth/register/name');
+    router.push('/(auth)/register');
   };
 
   // const loginPressed = () => {

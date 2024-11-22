@@ -182,18 +182,18 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
   // Function to navigate to the appropriate screen
   const goToNextScreen = useCallback(() => {
     const stepRoutes: Record<number, Href> = {
-      0: '/auth/register/username',
-      1: '/auth/register/date-of-birth',
-      2: '/auth/register/password',
-      3: '/auth/register/identifier',
-      4: '/auth/register/one-time-passcode',
+      0: '/(auth)/register/username',
+      1: '/(auth)/register/date-of-birth',
+      2: '/(auth)/register/password',
+      3: '/(auth)/register/identifier',
+      4: '/(auth)/register/one-time-passcode',
     };
 
     const nextRoute = stepRoutes[state.currentStep];
     if (nextRoute) {
       router.push(nextRoute);
     } else {
-      // router.replace('/app/profile');
+      router.replace('/(authenticated)/(tabs)/dashboard');
     }
   }, [router, state.currentStep]);
 

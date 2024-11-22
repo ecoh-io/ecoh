@@ -7,7 +7,7 @@ import OTPInput from '@/src/UI/OTPInput';
 import { useConfrimUser } from '@/src/hooks/useConfirmUser';
 import Button from '@/src/UI/Button';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { Header } from '@/src/components/atoms';
+import { Footer, Header } from '@/src/components/atoms';
 
 interface FormValues {
   OTP: string;
@@ -87,14 +87,7 @@ export default function OneTimePasscode() {
             formik.touched.OTP && formik.errors.OTP ? formik.errors.OTP : ''
           }
         />
-        <Button
-          title="Continue"
-          onPress={handleContinuePress}
-          variant="primary"
-          gradientColors={['#00c6ff', '#0072ff']}
-          size="large"
-          loading={formik.isSubmitting}
-        />
+
         <Button
           title="Didn't receive code?"
           onPress={() => {}}
@@ -102,6 +95,11 @@ export default function OneTimePasscode() {
           size="large"
         />
       </View>
+      <Footer
+        onPress={handleContinuePress}
+        isDisabled={!formik.isValid || formik.isSubmitting}
+        isLoading={formik.isSubmitting}
+      />
     </View>
   );
 }

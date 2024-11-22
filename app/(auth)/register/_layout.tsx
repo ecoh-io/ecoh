@@ -7,12 +7,12 @@ export default function Layout() {
     <RegistrationProvider>
       <RegistrationHeader />
       <Stack
-        initialRouteName="name"
+        initialRouteName="index"
         screenOptions={{
           headerShown: false,
         }}
       >
-        <Stack.Screen name="name" />
+        <Stack.Screen name="index" />
         <Stack.Screen name="username" />
         <Stack.Screen name="date-of-birth" />
         <Stack.Screen name="password" />
