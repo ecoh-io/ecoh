@@ -20,7 +20,6 @@ export default function ProfileStack() {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="details" />
       </Stack>
     </Screen>
   );

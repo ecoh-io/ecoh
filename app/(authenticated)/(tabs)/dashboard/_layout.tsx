@@ -20,7 +20,6 @@ export default function DashboardStack() {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="details" />
       </Stack>
     </Screen>
   );

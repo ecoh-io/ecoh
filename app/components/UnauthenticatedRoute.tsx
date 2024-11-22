@@ -29,3 +29,5 @@ export const UnauthenticatedRoute = ({
 
   return <>{children}</>;
 };
+
+export default UnauthenticatedRoute;

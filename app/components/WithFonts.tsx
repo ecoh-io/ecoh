@@ -26,3 +26,5 @@ export function WithFonts({ children }: WithFontsProps) {
 
   return <>{children}</>;
 }
+
+export default WithFonts;
