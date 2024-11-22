@@ -24,7 +24,7 @@ export const UnauthenticatedRoute = ({
 
   if (isAuthenticated) {
     // Redirect authenticated users to the authenticated area
-    return <Redirect href="/(authenticated)/(tabs)/dashboard" />;
+    return <Redirect href="/(authenticated)/(tabs)/feed" />;
   }
 
   return <>{children}</>;

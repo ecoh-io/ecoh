@@ -6,8 +6,8 @@ export default function FeedStack() {
   const { colors, isDark } = useTheme();
   return (
     <Screen
-      preset="fixed"
-      safeAreaEdges={['top', 'bottom']}
+      preset="auto"
+      safeAreaEdges={['top']}
       backgroundColor={colors.background}
       contentContainerStyle={{
         flex: 1,
