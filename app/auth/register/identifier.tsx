@@ -9,33 +9,38 @@ import { useTheme } from '@/src/theme/ThemeContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFormik } from 'formik';
 import { CountryCode } from 'libphonenumber-js/types';
-import { AsYouType, parsePhoneNumber } from 'libphonenumber-js';
+import { AsYouType, parsePhoneNumberWithError } from 'libphonenumber-js';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { CountryPicker } from 'react-native-country-codes-picker';
 import * as yup from 'yup';
 import { typography } from '@/src/theme/typography';
+import IdentifierInput from '@/src/UI/IdentifierInput';
 
 // Validation schema using Yup
-const emailSchema = yup
-  .string()
-  .email('Invalid email address')
-  .required('Email is required');
+const emailSchema = yup.object().shape({
+  identifier: yup
+    .string()
+    .email('Invalid email address')
+    .required('Email is required'),
+});
 
 // Mobile number validation schema as a function to accept dynamic country codes
 const mobileSchema = (countryCode: CountryCode) =>
-  yup
-    .string()
-    .required('Mobile number is required')
-    .test('is-valid-mobile', 'Invalid mobile number', function (value) {
-      if (!value) return false;
-      try {
-        const phoneNumber = parsePhoneNumber(value, countryCode);
-        return phoneNumber.isValid();
-      } catch {
-        return false;
-      }
-    });
+  yup.object().shape({
+    identifier: yup
+      .string()
+      .required('Mobile number is required')
+      .test('is-valid-mobile', 'Invalid mobile number', function (value) {
+        if (!value) return false;
+        try {
+          const phoneNumber = parsePhoneNumberWithError(value, countryCode);
+          return phoneNumber.isValid();
+        } catch {
+          return false;
+        }
+      }),
+  });
 
 interface FormValues {
   identifier: string;
@@ -44,7 +49,7 @@ interface FormValues {
 export default function Identifier() {
   const { state, handleSubmitStep } = useRegistration();
   const { colors } = useTheme();
-  const [isEmail, setIsEmail] = useState<Boolean>(false);
+  const [isEmail, setIsEmail] = useState<boolean>(false);
   const [showCountryPicker, setShowCountryPicker] = useState<boolean>(false);
   const [countryCode, setCountryCode] = useState<ICountryCode>({
     code: '+44',
@@ -54,9 +59,25 @@ export default function Identifier() {
   const emailRef = useRef<TextInput>(null);
   const mobileRef = useRef<TextInput>(null);
 
-  const validationSchema = isEmail
-    ? emailSchema
-    : mobileSchema(countryCode.country);
+  const validationSchema = useMemo(() => {
+    return isEmail ? emailSchema : mobileSchema(countryCode.country);
+  }, [isEmail, countryCode]);
+
+  const { mutateAsync } = useRegisterUser({
+    onError: (error) => {
+      if (error?.status === 409) {
+        formik.setErrors({
+          identifier: isEmail
+            ? 'Email is already in use'
+            : 'Mobile number is already in use',
+        });
+      } else {
+        formik.setStatus({
+          formError: 'Registration failed. Please try again.',
+        });
+      }
+    },
+  });
 
   // Formik setup using the useFormik hook
   const formik = useFormik({
@@ -70,6 +91,7 @@ export default function Identifier() {
         const registrationData = {
           identifier: values.identifier,
           password: state.formData.password,
+          isEmail,
         };
 
         await mutateAsync(registrationData);
@@ -96,18 +118,7 @@ export default function Identifier() {
     },
     validateOnChange: false,
     validateOnBlur: true,
-  });
-
-  const { mutateAsync } = useRegisterUser({
-    onError: (error: any) => {
-      if (error?.status === 409) {
-        formik.setErrors({ identifier: 'Identifier is already in use' });
-      } else {
-        formik.setStatus({
-          formError: 'Registration failed. Please try again.',
-        });
-      }
-    },
+    enableReinitialize: true,
   });
 
   const iconColor = useMemo(() => {
@@ -118,10 +129,9 @@ export default function Identifier() {
   }, [formik.errors.identifier, formik.touched.identifier, colors]);
 
   const toggleInputMode = useCallback(() => {
-    formik.setFieldValue('identifier', '');
-    formik.setFieldError('identifier', '');
+    formik.resetForm();
     setIsEmail((prev) => !prev);
-  }, [formik]);
+  }, [formik, setIsEmail]);
 
   // Handle country code picker visibility
   const handleCountryCodePress = useCallback(() => {
@@ -133,7 +143,6 @@ export default function Identifier() {
     (country: ICountryCode) => {
       setCountryCode(country);
       setShowCountryPicker(false);
-      // Re-validate the mobile number with the new country code
       formik.validateField('identifier');
     },
     [formik],
@@ -157,64 +166,6 @@ export default function Identifier() {
     [formatPhoneNumber, formik],
   );
 
-  // Format phone number as user types
-
-  const IdentifierInput = () => {
-    if (isEmail) {
-      return (
-        <>
-          <Input
-            ref={emailRef}
-            placeholder="Email"
-            LeftAccessory={() => (
-              <Ionicons
-                name="mail"
-                size={26}
-                color={iconColor}
-                style={styles.icon}
-              />
-            )}
-            value={formik.values.identifier}
-            onChangeText={formik.handleChange('identifier')}
-            onBlur={formik.handleBlur('identifier')}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            error={
-              formik.touched.identifier ? formik.errors.identifier : undefined
-            }
-          />
-          <Button
-            variant="secondary"
-            onPress={toggleInputMode}
-            title="Continue with mobile"
-            size="large"
-          />
-        </>
-      );
-    } else {
-      return (
-        <>
-          <MobileNumberInput
-            value={formik.values.identifier}
-            countryCode={countryCode}
-            onCountryCodePress={handleCountryCodePress}
-            onChangeText={(text) => handleMobileChange(text)}
-            onBlur={formik.handleBlur('identifier')}
-            error={
-              formik.touched.identifier ? formik.errors.identifier : undefined
-            }
-          />
-          <Button
-            variant="secondary"
-            onPress={toggleInputMode}
-            title="Continue with email"
-            size="large"
-          />
-        </>
-      );
-    }
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header
@@ -226,7 +177,17 @@ export default function Identifier() {
         }
       />
       <View style={styles.formContainer}>
-        <IdentifierInput />
+        <IdentifierInput
+          countryCode={countryCode}
+          emailRef={emailRef}
+          formik={formik}
+          handleCountryCodePress={handleCountryCodePress}
+          handleMobileChange={handleMobileChange}
+          iconColor={iconColor}
+          isEmail={isEmail}
+          mobileRef={mobileRef}
+          toggleInputMode={toggleInputMode}
+        />
       </View>
       <CountryPicker
         lang="en"
@@ -269,6 +230,7 @@ export default function Identifier() {
       <Footer
         onPress={formik.handleSubmit}
         isDisabled={!formik.isValid || formik.isSubmitting}
+        isLoading={formik.isSubmitting}
       />
     </View>
   );

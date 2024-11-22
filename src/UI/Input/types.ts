@@ -1,4 +1,3 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { ComponentType } from 'react';
 import { TextInput } from 'react-native';
 import { TextInputProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
@@ -22,5 +21,4 @@ export interface InputProps extends TextInputProps {
   errorStyle?: StyleProp<TextStyle>;
   helperTextStyle?: StyleProp<TextStyle>;
   disabled?: boolean;
-  ref?: React.RefObject<TextInput>;
 }

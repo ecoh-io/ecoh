@@ -1,99 +1,108 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, forwardRef } from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
 import { InputProps } from './types';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 
-const Input: React.FC<InputProps> = ({
-  label,
-  error,
-  helperText,
-  placeholder,
-  LeftAccessory,
-  RightAccessory,
-  secureTextEntry = false,
-  secureTextEntryToggle = false,
-  containerStyle,
-  inputStyle,
-  labelStyle,
-  errorStyle,
-  helperTextStyle,
-  value,
-  onChangeText,
-  disabled,
-  ...rest
-}) => {
-  const { colors } = useTheme();
-  const [isFocused, setIsFocused] = useState(false);
+const Input = forwardRef<TextInput, InputProps>(
+  (
+    {
+      label,
+      error,
+      helperText,
+      placeholder,
+      LeftAccessory,
+      RightAccessory,
+      secureTextEntry = false,
+      secureTextEntryToggle = false,
+      containerStyle,
+      inputStyle,
+      labelStyle,
+      errorStyle,
+      helperTextStyle,
+      value,
+      onChangeText,
+      disabled,
+      ...rest
+    },
+    ref,
+  ) => {
+    const { colors } = useTheme();
+    const [isFocused, setIsFocused] = useState(false);
 
-  // Handlers
-  const handleFocus = useCallback(() => setIsFocused(true), []);
-  const handleBlur = useCallback(() => setIsFocused(false), []);
+    // Handlers
+    const handleFocus = useCallback(() => setIsFocused(true), []);
+    const handleBlur = useCallback(() => setIsFocused(false), []);
 
-  return (
-    <View style={[styles.container, containerStyle]}>
-      {!!label && (
-        <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
-      )}
-      <View
-        style={[
-          styles.inputContainer,
-          {
-            borderColor: error
-              ? colors.error
-              : isFocused
-              ? colors.highlight
-              : colors.secondary,
-          },
-        ]}
-      >
-        {!!LeftAccessory && (
-          <LeftAccessory style={styles.leftAccessory} editable={!disabled} />
+    return (
+      <View style={[styles.container, containerStyle]}>
+        {!!label && (
+          <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
         )}
-        <TextInput
+        <View
           style={[
-            styles.input,
-            inputStyle,
+            styles.inputContainer,
             {
-              color: colors.text,
-              paddingRight: secureTextEntryToggle || RightAccessory ? 40 : 12,
+              borderColor: error
+                ? colors.error
+                : isFocused
+                ? colors.highlight
+                : colors.secondary,
             },
           ]}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          secureTextEntry={secureTextEntry}
-          onChangeText={onChangeText}
-          value={value}
-          placeholder={isFocused ? undefined : placeholder}
-          placeholderTextColor={colors.secondary}
-          accessibilityLabel={label}
-          accessibilityHint={helperText || error}
-          {...rest}
-        />
-        {!!RightAccessory && (
-          <RightAccessory style={styles.rightAccessory} editable={!disabled} />
+        >
+          {!!LeftAccessory && (
+            <LeftAccessory style={styles.leftAccessory} editable={!disabled} />
+          )}
+          <TextInput
+            ref={ref}
+            style={[
+              styles.input,
+              inputStyle,
+              {
+                color: colors.text,
+                paddingRight: secureTextEntryToggle || RightAccessory ? 40 : 12,
+              },
+            ]}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            secureTextEntry={secureTextEntry}
+            onChangeText={onChangeText}
+            value={value}
+            placeholder={isFocused ? undefined : placeholder}
+            placeholderTextColor={colors.secondary}
+            accessibilityLabel={label}
+            accessibilityHint={helperText || error}
+            {...rest}
+          />
+          {!!RightAccessory && (
+            <RightAccessory
+              style={styles.rightAccessory}
+              editable={!disabled}
+            />
+          )}
+        </View>
+        {error ? (
+          <Text style={[styles.errorText, errorStyle, { color: colors.error }]}>
+            {error}
+          </Text>
+        ) : (
+          helperText && (
+            <Text
+              style={[
+                styles.helperText,
+                helperTextStyle,
+                { color: colors.placeholder },
+              ]}
+            >
+              {helperText}
+            </Text>
+          )
         )}
       </View>
-      {error ? (
-        <Text style={[styles.errorText, errorStyle, { color: colors.error }]}>
-          {error}
-        </Text>
-      ) : (
-        helperText && (
-          <Text
-            style={[
-              styles.helperText,
-              helperTextStyle,
-              { color: colors.placeholder },
-            ]}
-          >
-            {helperText}
-          </Text>
-        )
-      )}
-    </View>
-  );
-};
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

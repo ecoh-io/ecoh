@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import { MobileNumberInputProps } from './types';
 import { CountryCode } from 'libphonenumber-js/types';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native';
 import Input from '../Input';
 import { useTheme } from '@/src/theme/ThemeContext';
@@ -13,69 +13,76 @@ export interface ICountryCode {
   country: CountryCode;
 }
 
-interface EnhancedMobileNumberInput extends MobileNumberInputProps {
+interface EnhancedMobileNumberInput
+  extends Omit<MobileNumberInputProps, 'ref'> {
   countryCode: ICountryCode;
   onCountryCodePress: () => void;
 }
 
-const MobileNumberInputField: React.FC<EnhancedMobileNumberInput> = ({
-  label,
-  error,
-  helperText,
-  leftIcon,
-  rightIcon,
-  containerStyle,
-  inputStyle,
-  labelStyle,
-  errorStyle,
-  helperTextStyle,
-  countryCode,
-  onCountryCodePress,
-  ref,
-  ...rest
-}) => {
-  const { colors } = useTheme();
+const MobileNumberInputField = forwardRef<TextInput, EnhancedMobileNumberInput>(
+  (
+    {
+      label,
+      error,
+      helperText,
+      leftIcon,
+      rightIcon,
+      containerStyle,
+      inputStyle,
+      labelStyle,
+      errorStyle,
+      helperTextStyle,
+      countryCode,
+      onCountryCodePress,
+      ...rest
+    },
+    ref,
+  ) => {
+    const { colors } = useTheme();
 
-  const dividerStyle = useMemo(
-    () => ({
-      width: 3,
-      backgroundColor: colors.secondary,
-      borderRadius: 12,
-      paddingVertical: 15,
-    }),
-    [],
-  );
+    const dividerStyle = useMemo(
+      () => ({
+        width: 3,
+        backgroundColor: colors.secondary,
+        borderRadius: 12,
+        paddingVertical: 15,
+      }),
+      [],
+    );
 
-  return (
-    <View style={styles.wrapper}>
-      <View style={containerStyle}>
-        <Input
-          ref={ref}
-          label={label}
-          error={error}
-          LeftAccessory={() => (
-            <TouchableOpacity
-              style={styles.countryCodeContainer}
-              onPress={onCountryCodePress}
-            >
-              <Text style={styles.countryCodeText}>{countryCode.flag}</Text>
-              <Text style={styles.countryCodeText}>{countryCode.code}</Text>
-              <View style={dividerStyle} />
-            </TouchableOpacity>
-          )}
-          helperText={helperText}
-          placeholder="Mobile number"
-          keyboardType="number-pad"
-          inputStyle={[inputStyle, { color: colors.text }]}
-          labelStyle={labelStyle}
-          errorStyle={errorStyle}
-          helperTextStyle={helperTextStyle}
-          {...rest}
-        />
+    return (
+      <View style={styles.wrapper}>
+        <View style={containerStyle}>
+          <Input
+            ref={ref}
+            label={label}
+            error={error}
+            LeftAccessory={() => (
+              <TouchableOpacity
+                style={styles.countryCodeContainer}
+                onPress={onCountryCodePress}
+              >
+                <Text style={styles.countryFlag}>{countryCode.flag}</Text>
+                <Text style={[styles.countryCodeText, { color: colors.text }]}>
+                  {countryCode.code}
+                </Text>
+                <View style={dividerStyle} />
+              </TouchableOpacity>
+            )}
+            helperText={helperText}
+            placeholder="Mobile number"
+            keyboardType="number-pad"
+            inputStyle={[inputStyle, { color: colors.text }]}
+            labelStyle={labelStyle}
+            errorStyle={errorStyle}
+            helperTextStyle={helperTextStyle}
+            {...rest}
+          />
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -84,6 +91,11 @@ const styles = StyleSheet.create({
   countryCodeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  countryFlag: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontFamily: typography.Poppins.medium,
   },
   countryCodeText: {
     textAlign: 'center',

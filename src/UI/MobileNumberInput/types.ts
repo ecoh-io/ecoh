@@ -1,4 +1,3 @@
-import { TextInput } from 'react-native';
 import { TextInputProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 export interface MobileNumberInputProps extends TextInputProps {
@@ -12,5 +11,4 @@ export interface MobileNumberInputProps extends TextInputProps {
   labelStyle?: StyleProp<TextStyle>;
   errorStyle?: StyleProp<TextStyle>;
   helperTextStyle?: StyleProp<TextStyle>;
-  ref?: React.RefObject<TextInput>;
 }

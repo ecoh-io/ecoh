@@ -192,7 +192,7 @@ axiosInstance.interceptors.response.use(
           Alert.alert('Server Error', 'Something went wrong on our end.');
           break;
         default:
-          Alert.alert('Error', data.message || 'An error occurred.');
+          '';
       }
     } else if (error.request) {
       Alert.alert('Network Error', 'Please check your internet connection.');

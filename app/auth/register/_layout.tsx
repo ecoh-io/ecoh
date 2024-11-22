@@ -17,7 +17,7 @@ export default function Layout() {
         <Stack.Screen name="date-of-birth" />
         <Stack.Screen name="password" />
         <Stack.Screen name="identifier" />
-        <Stack.Screen name="one-time-password" />
+        <Stack.Screen name="one-time-passcode" />
       </Stack>
     </RegistrationProvider>
   );

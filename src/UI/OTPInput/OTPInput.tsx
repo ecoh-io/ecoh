@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { OTPInputProps } from './types';
 import { useTheme } from '@/src/theme/ThemeContext';
+import { typography } from '@/src/theme/typography';
 
 const OTPInput: React.FC<OTPInputProps> = ({
   length = 6,
@@ -103,7 +104,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: 14,
+    fontFamily: typography.Poppins.medium,
   },
 });
 

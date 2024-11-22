@@ -27,7 +27,7 @@ interface FormValues {
   dateOfBirth: string;
 }
 
-export default function Dob() {
+export default function DateOfBirth() {
   const { state, handleSubmitStep } = useRegistration();
   const { colors } = useTheme();
 

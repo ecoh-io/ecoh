@@ -20,7 +20,7 @@ const otpSchema = Yup.object().shape({
     .matches(/^\d+$/, 'OTP must be a number'),
 });
 
-export default function Otp() {
+export default function OneTimePasscode() {
   const { state, handleSubmitStep } = useRegistration();
   const { colors } = useTheme();
 
@@ -89,10 +89,11 @@ export default function Otp() {
         />
         <Button
           title="Continue"
-          onPress={() => handleContinuePress}
+          onPress={handleContinuePress}
           variant="primary"
           gradientColors={['#00c6ff', '#0072ff']}
           size="large"
+          loading={formik.isSubmitting}
         />
         <Button
           title="Didn't receive code?"
