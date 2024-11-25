@@ -6,7 +6,6 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { ScrollContext } from '@/src/context/ScrollContext';
-import { useTheme } from '@/src/theme/ThemeContext';
 
 // Define your icon mappings based on route names
 const ICONS: Record<
@@ -17,8 +16,8 @@ const ICONS: Record<
   }
 > = {
   dashboard: {
-    focused: 'view-dashboard',
-    unfocused: 'view-dashboard-outline',
+    focused: 'home',
+    unfocused: 'home-outline',
   },
   feed: {
     focused: 'newspaper-variant',
@@ -39,7 +38,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const { isTabBarVisible } = useContext(ScrollContext);
-  const { colors } = useTheme();
 
   // Animated values for opacity and translateY
   const translateY = useRef(new Animated.Value(0)).current;
@@ -159,16 +157,19 @@ const styles = StyleSheet.create({
   animatedTabBar: {
     position: 'absolute',
     bottom: 0,
-    marginHorizontal: 20,
-    marginBottom: 25,
+    left: 0,
+    right: 0, // Ensure full width
     height: 80, // Adjusted height to accommodate slide animation
-    borderRadius: 40,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     overflow: 'hidden',
+    paddingBottom: 15,
 
-    // Subtle Shadow for iOS
+    // Removed borderRadius for sharp corners
+    // borderRadius: 40,
+
+    // Shadow adjustments for subtlety
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 }, // Reduced offset
     shadowOpacity: 0.05, // Very subtle opacity
@@ -177,12 +178,10 @@ const styles = StyleSheet.create({
     // Subtle Shadow for Android
     elevation: 2, // Lower elevation for softer shadow
 
-    width: width - 40, // Adjust based on marginHorizontal
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent for blur effect
+    backgroundColor: 'rgba(255, 255, 255, 1)', // Fully opaque background
   },
   blurView: {
     flex: 1,
-    borderRadius: 40,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
