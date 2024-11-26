@@ -26,7 +26,7 @@ import { VideoPost } from '@/src/types/post';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import AnimatedHeart from './AnimatedHeart';
+import AnimatedHeart from '../Animated/AnimatedHeart';
 import Slider from '@react-native-community/slider';
 
 interface VideoPostProps {

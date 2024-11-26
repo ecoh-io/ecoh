@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { User } from '@/src/types/post';
-import AnimatedOptionsButton from './AnimatedOptionsButton';
+import AnimatedOptionsButton from './Animated/AnimatedOptionsButton';
 import VerifiedBadge from './VerifiedBadge';
 import Badge from './Badge';
 import { useTheme } from '@/src/theme/ThemeContext';

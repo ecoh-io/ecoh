@@ -13,14 +13,14 @@ import {
   Platform,
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import AnimatedHeart from './AnimatedHeart';
+import AnimatedHeart from '../Animated/AnimatedHeart';
 import { TextPost } from '@/src/types/post';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import ParsedText from 'react-native-parsed-text';
 import { extractUrls } from '@/src/utils/extractUrls'; // Utility to extract URLs
 import { useLinkPreviews } from '@/src/hooks/useLinkPreviews'; // Custom hook to fetch metadata
-import LinkPreviewComponent from './LinkPreviewComponent'; // Component to render previews
+import LinkPreviewComponent from '../LinkPreviewComponent'; // Component to render previews
 
 // Enable LayoutAnimation on Android
 if (

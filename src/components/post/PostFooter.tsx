@@ -1,23 +1,15 @@
 import React, { useMemo, memo } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  GestureResponderEvent,
-} from 'react-native';
-import { Feather, FontAwesome } from '@expo/vector-icons';
-import AnimatedLikeButton from './AnimatedLikeButton';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import AnimatedLikeButton from './Animated/AnimatedLikeButton';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import MaskedView from '@react-native-masked-view/masked-view';
-import { LinearGradient } from 'expo-linear-gradient';
-import AnimatedSaveButton from './AnimatedSaveButton';
+import AnimatedSaveButton from './Animated/AnimatedSaveButton';
 
 interface PostFooterProps {
   likes: number;
   commentsCount: number;
-  sharesCount?: number; // Made optional
+  sharesCount?: number;
   isLiked: boolean;
   isSaved: boolean;
   onLike: () => void;

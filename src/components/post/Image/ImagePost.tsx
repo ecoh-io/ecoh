@@ -10,8 +10,8 @@ import {
 import Carousel from 'react-native-reanimated-carousel';
 import { ImagePost, MediaContent } from '@/src/types/post';
 import { useTheme } from '@/src/theme/ThemeContext';
-import AnimatedHeart from './AnimatedHeart';
-import PaginationIndicator from './PaginationIndicator';
+import AnimatedHeart from '../Animated/AnimatedHeart';
+import PaginationIndicator from '../PaginationIndicator';
 
 interface ImagePostProps {
   post: ImagePost;
@@ -85,7 +85,7 @@ const ImagePostComponent: React.FC<ImagePostProps> = ({
 
   const { images } = post;
 
-  const itemWidth = useMemo(() => width * 0.92, [width]); // Full screen width
+  const itemWidth = useMemo(() => width, [width]); // Full screen width
   const itemHeight = useMemo(() => width, [width]); // Square aspect ratio
 
   // Handler for double-tap gesture
@@ -201,6 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000', // Solid black background for better image contrast
     overflow: 'hidden', // Prevent shadow bleed with borderRadius
     marginHorizontal: 10,
+    marginVertical: 8,
     borderRadius: 32,
   },
 

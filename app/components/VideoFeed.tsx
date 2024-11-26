@@ -1,6 +1,6 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import Post, { PostType } from './Post';
+import Post, { PostType } from '../../src/components/post/Post';
 import { PostData } from '@/src/types/post';
 
 interface VideoFeedProps {

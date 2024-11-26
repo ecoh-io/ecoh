@@ -2,9 +2,9 @@ import React, { useCallback, memo, useMemo, useReducer } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import PostFooter from './PostFooter';
 import PostHeader from './PostHeader';
-import ImagePostComponent from './ImagePost';
-import VideoPostComponent from './VideoPost';
-import TextPostComponent from './TextPost';
+import ImagePostComponent from './Image/ImagePost';
+import VideoPostComponent from './Video/VideoPost';
+import TextPostComponent from './Text/TextPost';
 import { ImagePost, PostData, TextPost, VideoPost } from '@/src/types/post';
 
 export enum PostType {
