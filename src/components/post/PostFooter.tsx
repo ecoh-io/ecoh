@@ -12,6 +12,7 @@ import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
+import AnimatedSaveButton from './AnimatedSaveButton';
 
 interface PostFooterProps {
   likes: number;
@@ -67,8 +68,12 @@ const PostFooter: React.FC<PostFooterProps> = ({
   // Memoize the formatCount function to avoid recreating it on every render
   const formatCount = useMemo(
     () => (count: number) => {
-      if (count >= 1000) {
-        return `${(count / 1000).toFixed(1)}k`;
+      if (count >= 1_000_000_000) {
+        return `${(count / 1_000_000_000).toFixed(1)}B`;
+      } else if (count >= 1_000_000) {
+        return `${(count / 1_000_000).toFixed(1)}M`;
+      } else if (count >= 1_000) {
+        return `${(count / 1_000).toFixed(1)}k`;
       }
       return count.toString();
     },
@@ -122,30 +127,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
         />
 
         {/* Save Button */}
-        <TouchableOpacity
-          onPress={onSave}
-          style={styles.saveButton}
-          activeOpacity={0.7}
-          accessibilityLabel={isSaved ? 'Unsave post' : 'Save post'}
-          accessibilityRole="button"
-        >
-          {isSaved ? (
-            <MaskedView
-              maskElement={
-                <FontAwesome name="bookmark" size={24} color="#000" />
-              }
-            >
-              <LinearGradient
-                colors={['#00c6ff', '#0072ff']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gradientIconBackground}
-              />
-            </MaskedView>
-          ) : (
-            <FontAwesome name="bookmark-o" size={24} color="#828282" />
-          )}
-        </TouchableOpacity>
+        <View style={styles.saveButton}>
+          <AnimatedSaveButton isSaved={isSaved} onSave={onSave} />
+        </View>
       </View>
     </View>
   );
@@ -154,10 +138,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
 // Stylesheet
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 18,
-    backgroundColor: '#fff', // Ensure background color for consistency
   },
   actionsRow: {
     flexDirection: 'row',
@@ -174,12 +156,8 @@ const styles = StyleSheet.create({
   countText: {
     marginLeft: 6,
     fontSize: 14,
-    fontFamily: typography.Poppins.regular,
+    fontFamily: typography.Poppins.medium,
     color: '#000', // Default color, overridden by dynamic color if needed
-  },
-  gradientIconBackground: {
-    width: 24,
-    height: 24,
   },
 });
 

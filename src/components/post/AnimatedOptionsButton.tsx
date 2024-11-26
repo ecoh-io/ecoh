@@ -45,7 +45,7 @@ const AnimatedOptionsButton: React.FC<AnimatedOptionsButtonProps> = ({
 
 const styles = StyleSheet.create({
   iconContainer: {
-    paddingHorizontal: 8,
+    paddingLeft: 8,
     paddingVertical: 4,
   },
 });

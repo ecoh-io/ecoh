@@ -231,9 +231,7 @@ const TextPostComponent: React.FC<TextPostProps> = ({
         onAccessibilityAction={handleAccessibilityAction}
         accessibilityActions={[{ name: 'activate' }]}
       >
-        <View
-          style={[styles.container, { backgroundColor: colors.background }]}
-        >
+        <View style={[styles.container]}>
           {/* Parsed Text with Read More/Less */}
           <View>
             {renderParsedText}
@@ -260,10 +258,9 @@ const TextPostComponent: React.FC<TextPostProps> = ({
 // Stylesheet
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 4,
     paddingVertical: 8,
     position: 'relative', // Ensure heart can be positioned absolutely if needed
-    borderRadius: 8,
   },
   textContent: {
     fontSize: 16,

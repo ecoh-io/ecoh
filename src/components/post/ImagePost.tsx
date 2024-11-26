@@ -6,7 +6,6 @@ import {
   useWindowDimensions,
   ActivityIndicator,
   TouchableWithoutFeedback,
-  AccessibilityProps,
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { ImagePost, MediaContent } from '@/src/types/post';
@@ -44,7 +43,7 @@ const ImageItem: React.FC<ImageItemProps> = memo(
       <View
         style={[
           styles.imageItemContainer,
-          { width: itemWidth, height: itemHeight },
+          { width: itemWidth - 20, height: itemHeight },
         ]}
       >
         {loading && (
@@ -86,10 +85,8 @@ const ImagePostComponent: React.FC<ImagePostProps> = ({
 
   const { images } = post;
 
-  // Determine if the post has a single image
-  const isSingleImage = images.length === 1;
-  const itemWidth = useMemo(() => width * 0.94, [width]); // 94% of screen width
-  const itemHeight = useMemo(() => width, [width]); // Adjust height based on image count
+  const itemWidth = useMemo(() => width * 0.92, [width]); // Full screen width
+  const itemHeight = useMemo(() => width, [width]); // Square aspect ratio
 
   // Handler for double-tap gesture
   const handleDoubleTap = useCallback(() => {
@@ -108,9 +105,6 @@ const ImagePostComponent: React.FC<ImagePostProps> = ({
     setShowHeart(false);
   }, []);
 
-  // Memoized gesture handler to prevent re-creation on each render
-  const doubleTapGesture = useMemo(() => handleDoubleTap, [handleDoubleTap]);
-
   return (
     <View style={styles.wrapper}>
       <View
@@ -120,12 +114,20 @@ const ImagePostComponent: React.FC<ImagePostProps> = ({
         ]}
       >
         <TouchableWithoutFeedback
-          onPress={doubleTapGesture}
+          onPress={handleDoubleTap}
           accessibilityLabel="Double-tap to like"
           accessibilityRole="button"
         >
           <View style={styles.carouselWrapper}>
-            {images.length > 0 && (
+            {images.length === 1 ? (
+              // Render single image without Carousel
+              <ImageItem
+                item={images[0]}
+                itemWidth={itemWidth}
+                itemHeight={itemHeight}
+              />
+            ) : images.length > 1 ? (
+              // Render Carousel for multiple images
               <Carousel
                 width={itemWidth}
                 height={itemHeight}
@@ -140,19 +142,12 @@ const ImagePostComponent: React.FC<ImagePostProps> = ({
                   />
                 )}
                 style={{
-                  overflow: 'visible', // Adjust overflow for single image
-                  marginHorizontal: isSingleImage ? 12 : 0,
-                  marginVertical: isSingleImage ? 12 : 0,
+                  overflow: 'visible',
                 }}
-                mode={isSingleImage ? undefined : 'parallax'} // Disable parallax for single image
-                modeConfig={
-                  !isSingleImage
-                    ? {
-                        parallaxScrollingScale: 0.95,
-                        parallaxScrollingOffset: 15,
-                      }
-                    : undefined
-                }
+                mode={'horizontal-stack'} // Changed to 'horizontal-snap' for better single-item handling
+                modeConfig={{
+                  snapDirection: 'left',
+                }}
                 panGestureHandlerProps={{
                   activeOffsetX: [-10, 10],
                 }}
@@ -160,10 +155,10 @@ const ImagePostComponent: React.FC<ImagePostProps> = ({
                   type: 'positive',
                   viewCount: 1,
                 })}
-                loop={false} // Disable looping for single image
+                loop={false} // Disable looping
                 pagingEnabled={true}
               />
-            )}
+            ) : null}
           </View>
         </TouchableWithoutFeedback>
         {showHeart && (
@@ -191,7 +186,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'relative',
     overflow: 'hidden', // Ensure child elements don't overflow
-    borderRadius: 0, // Optional: Add border radius if desired
+    backgroundColor: '#000', // Dark background for better contrast
   },
   carouselWrapper: {
     flex: 1,
@@ -203,21 +198,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25, // Balanced opacity for a subtle shadow
     shadowRadius: 10, // Larger radius for a smoother shadow
     elevation: 12, // High elevation for Android
-    borderRadius: 32, // Match imageContainer's border radius
-    marginBottom: 20, // Space below each image
-    backgroundColor: '#fff', // Solid white background
+    backgroundColor: '#000', // Solid black background for better image contrast
     overflow: 'hidden', // Prevent shadow bleed with borderRadius
+    marginHorizontal: 10,
+    borderRadius: 32,
   },
+
   galleryImage: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover', // Preserve aspect ratio
-    borderRadius: 32, // Match the container’s rounded corners
     backgroundColor: 'lightgray',
   },
   loadingIndicator: {
     position: 'absolute',
     alignSelf: 'center', // Center the loader
+    top: '50%',
+    transform: [{ translateY: -25 }],
+  },
+  pagination: {
+    position: 'absolute',
+    bottom: 10,
+    alignSelf: 'center',
   },
 });
 
@@ -225,5 +227,8 @@ export default memo(
   ImagePostComponent,
   (prevProps, nextProps) =>
     prevProps.post.id === nextProps.post.id &&
-    prevProps.post.images === nextProps.post.images,
+    prevProps.post.images.length === nextProps.post.images.length &&
+    prevProps.post.images.every(
+      (img, index) => img.uri === nextProps.post.images[index].uri,
+    ),
 );

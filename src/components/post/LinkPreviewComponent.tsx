@@ -24,8 +24,6 @@ interface LinkPreviewComponentProps {
   };
 }
 
-const { width } = Dimensions.get('window');
-
 const LinkPreviewComponent: React.FC<LinkPreviewComponentProps> = ({
   preview,
 }) => {
@@ -60,7 +58,10 @@ const LinkPreviewComponent: React.FC<LinkPreviewComponentProps> = ({
   return (
     <TouchableOpacity
       onPress={handlePress}
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[
+        styles.container,
+        { backgroundColor: colors.background, borderColor: colors.secondary },
+      ]}
       accessible
       accessibilityRole="link"
       accessibilityLabel={`Link preview for ${title || getDomain(url)}`}
@@ -129,11 +130,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 16,
     borderRadius: 12,
-    shadowColor: '#888', // Subtle gray
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2, // Slightly higher to compensate for the lighter color
-    shadowRadius: 5,
-    elevation: 1,
+    borderWidth: 1,
   },
   imageContainer: {
     width: IMAGE_WIDTH,

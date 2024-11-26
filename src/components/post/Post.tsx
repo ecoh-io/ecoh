@@ -167,10 +167,7 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     alignSelf: 'center',
     overflow: 'hidden',
-    borderBottomColor: '#bbb',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: '#fff', // Ensures a consistent background
-    paddingVertical: 10, // Adds vertical spacing
+    paddingVertical: 5, // Adds vertical spacing
     paddingHorizontal: 10, // Adds horizontal padding for better content spacing
   },
 });

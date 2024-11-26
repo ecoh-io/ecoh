@@ -12,7 +12,6 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   View,
-  Dimensions,
   Text,
   Animated,
   Easing,
@@ -49,7 +48,8 @@ type Action =
   | { type: 'HIDE_CONTROLS' }
   | { type: 'SET_FULLSCREEN'; payload: boolean }
   | { type: 'SET_DURATION'; payload: number }
-  | { type: 'SET_POSITION'; payload: number };
+  | { type: 'SET_POSITION'; payload: number }
+  | { type: 'SET_ASPECT_RATIO'; payload: number };
 
 // Define state shape
 interface State {
@@ -61,6 +61,7 @@ interface State {
   isFullscreen: boolean;
   duration: number;
   position: number;
+  aspectRatio: number;
 }
 
 // Reducer function to manage state
@@ -90,6 +91,8 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, duration: action.payload };
     case 'SET_POSITION':
       return { ...state, position: action.payload };
+    case 'SET_ASPECT_RATIO':
+      return { ...state, aspectRatio: action.payload };
     default:
       return state;
   }
@@ -102,8 +105,6 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
 }) => {
   const [showHeart, setShowHeart] = useState<boolean>(false);
   const { colors } = useTheme();
-  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
-    Dimensions.get('window');
 
   const videoRef = useRef<Video>(null);
 
@@ -117,6 +118,7 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
     isFullscreen: false,
     duration: 0,
     position: 0,
+    aspectRatio: 16 / 9, // Default aspect ratio
   });
 
   const {
@@ -128,6 +130,7 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
     isFullscreen,
     duration,
     position,
+    aspectRatio,
   } = state;
 
   // Animated values
@@ -190,9 +193,6 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
         dispatch({ type: 'SET_POSITION', payload: status.positionMillis });
       }
 
-      if (status.isBuffering) {
-      }
-
       if (status.didJustFinish && !status.isLooping) {
         dispatch({ type: 'PAUSE' });
         videoRef.current?.setPositionAsync(0);
@@ -223,7 +223,10 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
         useNativeDriver: true,
         easing: Easing.ease,
       }),
-    ]).start();
+    ]).start(() => {
+      setShowHeart(false);
+    });
+    setShowHeart(true);
   }, [heartScale]);
 
   const toggleMute = useCallback(async () => {
@@ -367,8 +370,19 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
     setShowHeart(false);
   }, []);
 
+  // Handler to capture video dimensions and set aspect ratio
+  const handleVideoLoad = useCallback(async (status: AVPlaybackStatus) => {
+    if (status.isLoaded && status.videoSize) {
+      const { width, height } = status.videoSize;
+      if (width && height) {
+        const ratio = width / height;
+        dispatch({ type: 'SET_ASPECT_RATIO', payload: ratio });
+      }
+    }
+  }, []);
+
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, { aspectRatio: aspectRatio }]}>
       <GestureDetector gesture={composedGesture}>
         <TouchableOpacity
           activeOpacity={1}
@@ -382,8 +396,8 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
             style={[
               styles.video,
               {
-                width: isFullscreen ? SCREEN_HEIGHT : SCREEN_WIDTH * 0.94,
-                height: isFullscreen ? SCREEN_WIDTH : SCREEN_WIDTH * 0.56, // Adjust for fullscreen
+                width: '100%', // Full width of the container
+                height: '100%', // Full height of the container
                 backgroundColor: colors.background,
               },
             ]}
@@ -391,7 +405,10 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
             isLooping
             shouldPlay={isPlaying}
             isMuted={isMuted}
-            onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+            onPlaybackStatusUpdate={(status) => {
+              handlePlaybackStatusUpdate(status);
+              handleVideoLoad(status); // Capture video dimensions
+            }}
             accessibilityLabel="Post Video"
             onFullscreenUpdate={(event: VideoFullscreenUpdateEvent) => {
               if (
@@ -402,12 +419,15 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
               }
             }}
           />
+
+          {/* Animated Heart on Double Tap */}
           {showHeart && (
             <AnimatedHeart
               visible={showHeart}
               onAnimationComplete={handleAnimationComplete}
             />
           )}
+
           {/* Overlay Play/Pause Icon */}
           {!isPlaying && !isLoading && !hasError && (
             <View style={styles.overlay}>
@@ -419,6 +439,7 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
               <FontAwesome name="pause-circle" size={64} color="white" />
             </View>
           )}
+
           {/* Loading Indicator */}
           {isLoading && (
             <ActivityIndicator
@@ -428,6 +449,7 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
               accessibilityLabel="Loading video"
             />
           )}
+
           {/* Error Message */}
           {hasError && (
             <View style={styles.errorContainer}>
@@ -447,22 +469,7 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
               </TouchableOpacity>
             </View>
           )}
-          {/* Animated Heart on Double Tap */}
-          <Animated.View
-            style={[
-              styles.animatedHeart,
-              {
-                transform: [{ scale: heartScale }],
-                opacity: heartScale.interpolate({
-                  inputRange: [0, 0.5, 1],
-                  outputRange: [0, 1, 0],
-                }),
-              },
-            ]}
-            pointerEvents="none"
-          >
-            <AnimatedHeart visible={true} onAnimationComplete={() => {}} />
-          </Animated.View>
+
           {/* Custom Controls */}
           {showControls && !hasError && (
             <Animated.View
@@ -481,6 +488,7 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
                   color="white"
                 />
               </TouchableOpacity>
+
               {/* Mute/Unmute Button */}
               <TouchableOpacity
                 onPress={toggleMute}
@@ -494,6 +502,7 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
                   color="white"
                 />
               </TouchableOpacity>
+
               {/* Progress Bar */}
               <View style={styles.progressContainer}>
                 <Slider
@@ -512,6 +521,7 @@ const VideoPostComponent: React.FC<VideoPostProps> = ({
                   {formatTime(position)} / {durationText}
                 </Text>
               </View>
+
               {/* Fullscreen Toggle */}
               <TouchableOpacity
                 onPress={isFullscreen ? exitFullscreen : toggleFullscreen}
@@ -541,13 +551,18 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: 16,
     position: 'relative',
+    width: '100%', // Ensure the wrapper takes the full width of its parent
+    // aspectRatio will be dynamically set based on video aspect ratio
   },
   touchable: {
+    flex: 1, // Allow the touchable to fill the wrapper
     position: 'relative',
   },
   video: {
-    borderRadius: 16,
-    backgroundColor: 'black',
+    borderRadius: 16, // Consistent borderRadius with container
+    backgroundColor: 'black', // Fallback background color
+    width: '100%', // Full width of the container
+    height: '100%', // Full height of the container
   },
   overlay: {
     position: 'absolute',
@@ -558,10 +573,9 @@ const styles = StyleSheet.create({
   },
   loadingIndicator: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginLeft: -18, // Half of ActivityIndicator size
-    marginTop: -18, // Half of ActivityIndicator size
+    alignSelf: 'center', // Center the loader horizontally
+    top: '50%', // Center the loader vertically
+    transform: [{ translateY: -18 }], // Adjust based on ActivityIndicator size (36x36)
   },
   errorContainer: {
     position: 'absolute',
@@ -604,7 +618,7 @@ const styles = StyleSheet.create({
     right: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    // backgroundColor: 'rgba(0,0,0,0.3)', // Optional: Semi-transparent background
+    // Optional: Add background color or blur effect
   },
   controlButton: {
     padding: 8,

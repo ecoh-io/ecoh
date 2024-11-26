@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: HEADER_HEIGHT,
     flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     paddingVertical: 10,
     justifyContent: 'space-between',
     alignItems: 'center',

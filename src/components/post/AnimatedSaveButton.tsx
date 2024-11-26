@@ -10,14 +10,14 @@ import { FontAwesome } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 
-interface AnimatedLikeButtonProps {
-  isLiked: boolean;
-  onLike: () => void;
+interface AnimatedSaveButtonProps {
+  isSaved: boolean;
+  onSave: () => void;
 }
 
-const AnimatedLikeButton: React.FC<AnimatedLikeButtonProps> = ({
-  isLiked,
-  onLike,
+const AnimatedSaveButton: React.FC<AnimatedSaveButtonProps> = ({
+  isSaved,
+  onSave,
 }) => {
   const scale = useSharedValue(1);
 
@@ -26,35 +26,37 @@ const AnimatedLikeButton: React.FC<AnimatedLikeButtonProps> = ({
   }));
 
   useEffect(() => {
-    if (isLiked) {
+    if (isSaved) {
       scale.value = withSequence(
         withTiming(1.5, { duration: 150 }),
         withTiming(1, { duration: 150 }),
       );
     }
-  }, [isLiked]);
+  }, [isSaved]);
 
   return (
     <TouchableWithoutFeedback
-      onPress={onLike}
-      accessibilityLabel="Like Button"
+      onPress={onSave}
+      accessibilityLabel="Save Button"
       accessibilityRole="button"
     >
       <View style={styles.neuomorphicContainer}>
         <Animated.View style={[animatedStyle]}>
-          {isLiked ? (
+          {isSaved ? (
             <MaskedView
-              maskElement={<FontAwesome name="heart" size={28} color="#000" />}
+              maskElement={
+                <FontAwesome name="bookmark" size={24} color="#000" />
+              }
             >
               <LinearGradient
-                colors={['#ff7e5f', '#ff3f81', '#ff0000']}
+                colors={['#00c6ff', '#0072ff']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={styles.gradientBackground}
+                style={styles.gradientIconBackground}
               />
             </MaskedView>
           ) : (
-            <FontAwesome name="heart-o" size={28} color="#555" />
+            <FontAwesome name="bookmark-o" size={24} color="#828282" />
           )}
         </Animated.View>
       </View>
@@ -66,19 +68,19 @@ const styles = StyleSheet.create({
   neuomorphicContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 28,
-    height: 28,
+    width: 18,
+    height: 24,
+    borderRadius: 30, // Perfectly circular
     shadowColor: '#888',
     shadowOffset: { width: 0, height: 6 }, // Downward shadow for depth
     shadowOpacity: 0.3,
     shadowRadius: 4, // Soft spread for shadow
     elevation: 8, // Android shadow effect
   },
-  gradientBackground: {
-    flex: 1,
-    width: 28,
-    height: 28,
+  gradientIconBackground: {
+    width: 18,
+    height: 24,
   },
 });
 
-export default React.memo(AnimatedLikeButton);
+export default React.memo(AnimatedSaveButton);

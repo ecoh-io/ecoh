@@ -16,6 +16,8 @@ export interface User {
   username: string;
   avatarUri: string; // URI for the user's avatar image
   isVerified: boolean; // Whether the user is verified
+  isConnection: boolean;
+  isFollowing: boolean;
 }
 
 /**

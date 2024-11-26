@@ -21,17 +21,21 @@ const createComment = (
 const users: Record<string, User> = {
   u1: {
     id: 'u1',
-    name: 'John Doe',
-    username: 'johndoe',
+    name: 'Anthonymcm',
+    username: 'anthonyamcm',
     avatarUri: 'https://dummyimage.com/600x400/000/fff&text=John',
     isVerified: true,
+    isConnection: true,
+    isFollowing: true,
   },
   u2: {
     id: 'u2',
     name: 'Jane Smith',
-    username: 'janesmith',
+    username: 'janesmithalertygyehasgd',
     avatarUri: 'https://dummyimage.com/600x400/000/fff&text=Jane',
-    isVerified: false,
+    isVerified: true,
+    isConnection: false,
+    isFollowing: true,
   },
   u3: {
     id: 'u3',
@@ -39,6 +43,8 @@ const users: Record<string, User> = {
     username: 'alicej',
     avatarUri: 'https://dummyimage.com/600x400/000/fff&text=Alice',
     isVerified: false,
+    isConnection: false,
+    isFollowing: false,
   },
   u4: {
     id: 'u4',
@@ -46,6 +52,8 @@ const users: Record<string, User> = {
     username: 'bobbrown',
     avatarUri: 'https://dummyimage.com/600x400/000/fff&text=Bob',
     isVerified: false,
+    isConnection: true,
+    isFollowing: true,
   },
   u5: {
     id: 'u5',
@@ -53,6 +61,8 @@ const users: Record<string, User> = {
     username: 'charlied',
     avatarUri: 'https://dummyimage.com/600x400/000/fff&text=Charlie',
     isVerified: false,
+    isConnection: true,
+    isFollowing: true,
   },
 };
 
@@ -70,9 +80,9 @@ export const posts: PostData[] = [
   {
     id: '1',
     type: PostType.IMAGE,
-    user: users.u3,
+    user: users.u1,
     timestamp: getTimeAgo(5), // 5 hours ago
-    likes: 4500,
+    likes: 4900000,
     shares: 300,
     comments: [comments.c2],
     isLiked: true,
@@ -82,7 +92,7 @@ export const posts: PostData[] = [
   {
     id: '2',
     type: PostType.TEXT,
-    user: users.u1,
+    user: users.u2,
     timestamp: getTimeAgo(2), // 2 hours ago
     likes: 12078,
     shares: 1390,
@@ -108,7 +118,7 @@ export const posts: PostData[] = [
   {
     id: '4',
     type: PostType.IMAGE,
-    user: users.u3,
+    user: users.u4,
     timestamp: getTimeAgo(5), // 5 hours ago
     likes: 4500,
     shares: 300,
@@ -123,7 +133,7 @@ export const posts: PostData[] = [
   {
     id: '5',
     type: PostType.VIDEO,
-    user: users.u2,
+    user: users.u5,
     timestamp: getTimeAgo(1), // 1 hour ago
     likes: 3200,
     shares: 450,

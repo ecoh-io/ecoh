@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 import { User } from '@/src/types/post';
 import AnimatedOptionsButton from './AnimatedOptionsButton';
 import VerifiedBadge from './VerifiedBadge';
+import Badge from './Badge';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import { getShortTimeAgo } from '@/src/lib/timeHelpers';
@@ -21,6 +22,14 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   const { colors } = useTheme();
   const timeAgo = getShortTimeAgo(timestamp);
 
+  // Determine which badge to show
+  let badgeType: 'connection' | 'following' | null = null;
+  if (user.isConnection) {
+    badgeType = 'connection';
+  } else if (user.isFollowing) {
+    badgeType = 'following';
+  }
+
   return (
     <View style={styles.container}>
       <Image
@@ -34,6 +43,8 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         <View style={styles.nameRow}>
           <Text
             style={[styles.username, { color: colors.text }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
             accessible
             accessibilityLabel={user.name}
           >
@@ -41,8 +52,11 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           </Text>
           {user.isVerified && <VerifiedBadge />}
         </View>
+
         <Text
           style={[styles.userHandle, { color: colors.highlight }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
           accessible
           accessibilityLabel={`@${user.username}`}
         >
@@ -50,11 +64,15 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         </Text>
       </View>
 
-      <Text style={[styles.timestamp, { color: colors.highlight }]}>
-        {timeAgo}
-      </Text>
-
-      <AnimatedOptionsButton onPress={onOptionsPress} />
+      <View style={styles.rightSection}>
+        {badgeType && <Badge type={badgeType} />}
+        <View style={styles.timestampRow}>
+          <Text style={[styles.timestamp, { color: colors.secondary }]}>
+            {timeAgo}
+          </Text>
+          <AnimatedOptionsButton onPress={onOptionsPress} />
+        </View>
+      </View>
     </View>
   );
 };
@@ -63,35 +81,49 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    position: 'relative',
+    paddingVertical: 8,
   },
   avatar: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 24, // Perfect circle
     marginRight: 12,
   },
   userInfo: {
     flex: 1,
+    justifyContent: 'center',
   },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 2,
   },
   username: {
     fontSize: 16,
     fontFamily: typography.Poppins.medium,
+    maxWidth: '80%',
   },
   userHandle: {
     fontSize: 14,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.Poppins.regular,
     marginTop: 2,
+    color: '#6b6b6b',
+    maxWidth: '50%',
+  },
+  timestampRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 'auto',
   },
   timestamp: {
     fontSize: 14,
-    fontFamily: typography.Poppins.regular,
-    marginLeft: 8,
+    fontFamily: typography.Poppins.light,
+    marginRight: 8,
+  },
+  rightSection: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
   },
 });
 
@@ -99,5 +131,5 @@ export default React.memo(
   PostHeader,
   (prevProps, nextProps) =>
     prevProps.user.id === nextProps.user.id &&
-    prevProps.timestamp === nextProps.timestamp,
+    prevProps.timestamp.getTime() === nextProps.timestamp.getTime(),
 );
