@@ -62,7 +62,6 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ posts }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Optional: Background color for the feed
   },
 });
 

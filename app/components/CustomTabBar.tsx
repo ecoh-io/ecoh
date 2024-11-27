@@ -151,8 +151,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
 
 export default CustomTabBar;
 
-const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   animatedTabBar: {
     position: 'absolute',
