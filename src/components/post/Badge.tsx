@@ -11,7 +11,7 @@ const Badge: React.FC<BadgeProps> = ({ type }) => {
   const badgeText = type === 'connection' ? 'Connection' : 'Following';
 
   // Define solid background color for "following"
-  const followingColor = '#1D9BF0';
+  const followingColor = 'rgba(29, 155, 240,0.3)';
 
   // Styles for the badge text
   const textStyle: TextStyle = {
@@ -24,7 +24,7 @@ const Badge: React.FC<BadgeProps> = ({ type }) => {
   const badgeContainer: ViewStyle = {
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 32,
+    borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
   };
@@ -53,7 +53,8 @@ const Badge: React.FC<BadgeProps> = ({ type }) => {
             backgroundColor: followingColor,
             paddingHorizontal: 6,
             paddingVertical: 2,
-            borderRadius: 32,
+            borderRadius: 4,
+            color: '#1D9BF0',
           },
         ]}
         accessible
@@ -69,7 +70,6 @@ const styles = StyleSheet.create({
   neuomorphicContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-
     shadowColor: '#888',
     shadowOffset: { width: 0, height: 4 }, // Downward shadow for depth
     shadowOpacity: 0.25,

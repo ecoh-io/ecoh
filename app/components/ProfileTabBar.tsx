@@ -1,189 +1,195 @@
-import React, { useRef, useEffect, useLayoutEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  Pressable,
-  Animated,
-  useWindowDimensions,
-} from 'react-native';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
+import { View, StyleSheet, Pressable, Animated, Easing } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@/src/theme/ThemeContext';
+import { Href, useRouter, usePathname } from 'expo-router';
 
-// Define the type for each tab, including outline icon names
 type Tab = {
   name: string;
-  icon: React.ComponentProps<typeof MaterialCommunityIcons>['name']; // Solid icon
-  iconOutline: React.ComponentProps<typeof MaterialCommunityIcons>['name']; // Outline icon
+  path: Href;
+  icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+  iconOutline: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 };
 
-// Define the props for the ProfileTabBar component
-type ProfileTabBarProps = {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-};
-
-// Define the tabs with both solid and outline icons
 const TABS: Tab[] = [
   {
     name: 'Posts',
-    icon: 'file-document',
-    iconOutline: 'file-document-outline',
+    path: '/profile/posts',
+    icon: 'post-outline',
+    iconOutline: 'post-outline',
   },
   {
-    name: 'Images',
-    icon: 'image-multiple',
+    name: 'Media',
+    path: '/profile/images',
+    icon: 'image-multiple-outline',
     iconOutline: 'image-multiple-outline',
   },
-  { name: 'Bookmarks', icon: 'bookmark', iconOutline: 'bookmark-outline' },
+  {
+    name: 'Tags',
+    path: '/profile/tags',
+    icon: 'tag-outline',
+    iconOutline: 'tag-outline',
+  },
+  {
+    name: 'Saved',
+    path: '/profile/saved',
+    icon: 'bookmark-outline',
+    iconOutline: 'bookmark-outline',
+  },
 ];
 
-// Define a constant for the indicator width
-const INDICATOR_WIDTH = 48; // Adjust this value to make the indicator wider or narrower
+const INDICATOR_HEIGHT = 3;
 
-const ProfileTabBar: React.FC<ProfileTabBarProps> = React.memo(
-  ({ activeTab, setActiveTab }) => {
-    // Get current window dimensions
-    const { width: screenWidth } = useWindowDimensions();
+const ProfileTabBar: React.FC = React.memo(() => {
+  const router = useRouter();
+  const currentPath = usePathname();
 
-    // Calculate the width of each tab
-    const tabWidth = screenWidth / TABS.length;
+  const [tabBarWidth, setTabBarWidth] = useState<number>(0);
 
-    // Animated value for the tab indicator's translateX
-    const indicatorPosition = useRef(new Animated.Value(0)).current;
+  // Use useMemo to ensure tabWidth and indicatorWidth are updated when tabBarWidth changes
+  const tabWidth = useMemo(() => tabBarWidth / TABS.length, [tabBarWidth]);
+  const indicatorWidth = useMemo(() => tabWidth * 0.5, [tabWidth]);
 
-    // Ref to track initial mount
-    const isInitialMount = useRef(true);
+  const activeTab = useMemo(() => {
+    const matchedTab = TABS.find((tab) => tab.path === currentPath);
+    return matchedTab ? matchedTab.name : TABS[0].name;
+  }, [currentPath]);
 
-    // Set initial position using useLayoutEffect
-    useLayoutEffect(() => {
+  const indicatorPosition = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (tabWidth > 0 && indicatorWidth > 0) {
       const index = TABS.findIndex((tab) => tab.name === activeTab);
       if (index !== -1) {
-        const initialValue =
-          index * tabWidth + tabWidth / 2 - INDICATOR_WIDTH / 2;
-        indicatorPosition.setValue(initialValue);
-      }
-    }, [activeTab, tabWidth, indicatorPosition]);
-
-    // Animate position when activeTab or tabWidth changes, skipping initial mount
-    useEffect(() => {
-      if (isInitialMount.current) {
-        isInitialMount.current = false;
-        return;
-      }
-
-      const index = TABS.findIndex((tab) => tab.name === activeTab);
-      if (index !== -1) {
-        const toValue = index * tabWidth + tabWidth / 2 - INDICATOR_WIDTH / 2;
-        Animated.spring(indicatorPosition, {
+        const toValue = index * tabWidth + (tabWidth - indicatorWidth) / 2;
+        Animated.timing(indicatorPosition, {
           toValue,
+          duration: 200,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
-          friction: 6, // Adjust for desired smoothness
-          tension: 100, // Adjust for desired responsiveness
         }).start();
       }
-    }, [activeTab, tabWidth, indicatorPosition]);
+    }
+  }, [activeTab, tabWidth, indicatorWidth]);
 
-    return (
-      <View style={styles.tabBarContainer}>
-        <View style={styles.tabBar}>
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.name;
+  const onTabPress = (tabPath: Href) => {
+    if (tabPath !== currentPath) {
+      router.replace(tabPath);
+    }
+  };
 
-            return (
-              <Pressable
-                key={tab.name}
-                style={[styles.tabItem, { width: tabWidth }]}
-                onPress={() => setActiveTab(tab.name)}
-                accessibilityLabel={tab.name}
-                accessibilityRole="button"
-                android_ripple={{
-                  color: 'rgba(0,0,0,0.1)',
-                  borderless: true,
-                }}
-              >
-                <View
-                  style={[
-                    styles.iconContainer,
-                    isActive && styles.activeShadow,
-                  ]}
-                >
-                  {isActive ? (
-                    // Active Tab: Solid Icon with Gradient Fill
-                    <MaskedView
-                      maskElement={
-                        <MaterialCommunityIcons
-                          name={tab.icon}
-                          size={28}
-                          color="black"
-                        />
-                      }
-                    >
-                      <LinearGradient
-                        colors={['#00c6ff', '#0072ff']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.gradient}
+  return (
+    <View style={styles.tabBarContainer}>
+      <View
+        style={styles.tabBar}
+        onLayout={(event) => {
+          const { width } = event.nativeEvent.layout;
+          setTabBarWidth(width);
+        }}
+      >
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.name;
+
+          return (
+            <Pressable
+              key={tab.name}
+              style={[styles.tabItem, { width: tabWidth }]}
+              onPress={() => onTabPress(tab.path)}
+              accessibilityLabel={tab.name}
+              accessibilityRole="button"
+              android_ripple={{
+                color: 'rgba(0,0,0,0.1)',
+                borderless: true,
+              }}
+            >
+              <View style={styles.iconContainer}>
+                {isActive ? (
+                  <MaskedView
+                    maskElement={
+                      <MaterialCommunityIcons
+                        name={tab.icon}
+                        size={26}
+                        color="black"
                       />
-                      {/* Fallback View to ensure gradient fills the mask */}
-                      <View style={styles.gradientOverlay} />
-                    </MaskedView>
-                  ) : (
-                    // Inactive Tab: Outline Icon
-                    <MaterialCommunityIcons
-                      name={tab.iconOutline}
-                      size={28}
-                      color={'#828282'}
+                    }
+                  >
+                    <LinearGradient
+                      colors={['#00c6ff', '#0072ff']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={{ width: 26, height: 26 }}
                     />
-                  )}
-                </View>
-              </Pressable>
-            );
-          })}
-          {/* Sliding Tab Indicator with Gradient */}
-          <Animated.View
-            style={[
-              styles.tabIndicator,
-              {
-                transform: [{ translateX: indicatorPosition }],
-              },
-            ]}
-            pointerEvents="none" // Ensure indicator doesn't intercept touch events
-          >
-            <MaskedView maskElement={<View style={styles.indicatorMask} />}>
-              <LinearGradient
-                colors={['#00c6ff', '#0072ff']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.indicatorGradient}
-              />
-            </MaskedView>
-          </Animated.View>
-        </View>
+                    <View style={StyleSheet.absoluteFill} />
+                  </MaskedView>
+                ) : (
+                  <MaterialCommunityIcons
+                    name={tab.iconOutline}
+                    size={26}
+                    color={'#828282'}
+                  />
+                )}
+              </View>
+            </Pressable>
+          );
+        })}
       </View>
-    );
-  },
-);
+      {tabBarWidth > 0 && (
+        <Animated.View
+          style={[
+            styles.tabIndicator,
+            {
+              transform: [{ translateX: indicatorPosition }],
+              width: indicatorWidth,
+            },
+          ]}
+          pointerEvents="none"
+        >
+          <MaskedView
+            maskElement={
+              <View
+                style={{
+                  width: indicatorWidth,
+                  height: INDICATOR_HEIGHT,
+                  backgroundColor: 'black',
+                  borderRadius: INDICATOR_HEIGHT / 2,
+                }}
+              />
+            }
+          >
+            <LinearGradient
+              colors={['#00c6ff', '#0072ff']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                width: indicatorWidth,
+                height: INDICATOR_HEIGHT,
+                borderRadius: INDICATOR_HEIGHT / 2,
+              }}
+            />
+          </MaskedView>
+        </Animated.View>
+      )}
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   tabBarContainer: {
-    height: 60, // Compact height for the tab bar
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   tabBar: {
     flexDirection: 'row',
-    justifyContent: 'flex-start', // Changed from 'space-around' for accurate positioning
-    alignItems: 'center',
-    width: '100%', // Ensure it takes the full width of the container
+    width: '100%',
     height: '100%',
-    position: 'relative', // Important for absolute positioning of indicator
+    alignItems: 'center',
   },
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
   },
   iconContainer: {
     padding: 8,
@@ -192,44 +198,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  activeShadow: {
-    shadowColor: '#A3B1C6',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5, // Android shadow
-  },
-  gradient: {
-    width: 28,
-    height: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
   tabIndicator: {
     position: 'absolute',
     bottom: 0,
-    height: 3,
-    borderRadius: 1.5,
-    zIndex: -1,
-    width: INDICATOR_WIDTH, // Indicator width matches the mask and gradient
-  },
-  indicatorMask: {
-    width: INDICATOR_WIDTH,
-    height: 3,
-    backgroundColor: 'black',
-    borderRadius: 1.5,
-  },
-  indicatorGradient: {
-    width: INDICATOR_WIDTH,
-    height: 3,
-    borderRadius: 1.5,
+    left: 0,
+    height: INDICATOR_HEIGHT,
+    borderRadius: INDICATOR_HEIGHT / 2,
+    zIndex: 100,
   },
 });
 
