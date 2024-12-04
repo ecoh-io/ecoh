@@ -72,6 +72,7 @@ export default function Identifier() {
             : 'Mobile number is already in use',
         });
       } else {
+        console.log({ error });
         formik.setStatus({
           formError: 'Registration failed. Please try again.',
         });

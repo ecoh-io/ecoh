@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 
 const SavedScreen: React.FC = () => {
   const { colors } = useTheme();
+
+  useEffect(() => {
+    console.log('SavedScreen Mounted');
+    return () => console.log('SavedScreen Unmounted');
+  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

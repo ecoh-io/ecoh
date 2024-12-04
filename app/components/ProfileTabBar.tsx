@@ -75,7 +75,7 @@ const ProfileTabBar: React.FC = React.memo(() => {
 
   const onTabPress = (tabPath: Href) => {
     if (tabPath !== currentPath) {
-      router.replace(tabPath);
+      router.push(tabPath);
     }
   };
 

@@ -46,8 +46,8 @@ const ActionWithCount: React.FC<ActionWithCountProps> = memo(
 );
 
 const PostFooter: React.FC<PostFooterProps> = ({
-  likes,
-  commentsCount,
+  likes = 0,
+  commentsCount = 0,
   sharesCount = 0, // Default to 0 if not provided
   isLiked,
   isSaved,

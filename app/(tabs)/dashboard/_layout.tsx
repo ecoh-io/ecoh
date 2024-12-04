@@ -17,6 +17,8 @@ export default function DashboardStack() {
       <Stack
         screenOptions={{
           headerShown: false, // Show header to include back button
+          gestureDirection: 'horizontal',
+          animation: 'slide_from_right',
         }}
       >
         <Stack.Screen name="index" />

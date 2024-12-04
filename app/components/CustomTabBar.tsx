@@ -1,5 +1,10 @@
-import React, { useRef, useEffect, useContext } from 'react';
-import { Pressable, StyleSheet, Animated, Dimensions } from 'react-native';
+import React, { useEffect, useContext } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
@@ -39,35 +44,26 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
 }) => {
   const { isTabBarVisible } = useContext(ScrollContext);
 
-  // Animated values for opacity and translateY
-  const translateY = useRef(new Animated.Value(0)).current;
-  const opacity = useRef(new Animated.Value(1)).current;
+  // Shared values for opacity and translateY
+  const translateY = useSharedValue(0);
+  const opacity = useSharedValue(1);
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(translateY, {
-        toValue: isTabBarVisible ? 0 : 80, // Adjust slide distance as needed
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: isTabBarVisible ? 1 : 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [isTabBarVisible, translateY, opacity]);
+    translateY.value = withTiming(isTabBarVisible ? 0 : 80, {
+      duration: 200,
+    });
+    opacity.value = withTiming(isTabBarVisible ? 1 : 0, {
+      duration: 200,
+    });
+  }, [isTabBarVisible]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
 
   return (
-    <Animated.View
-      style={[
-        styles.animatedTabBar,
-        {
-          transform: [{ translateY }],
-          opacity,
-        },
-      ]}
-    >
+    <Animated.View style={[styles.animatedTabBar, animatedStyle]}>
       <BlurView tint="light" intensity={50} style={styles.blurView}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
@@ -94,16 +90,17 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
           };
 
           // Animation for scaling the icon when focused
-          const scaleValue = useRef(new Animated.Value(1)).current;
+          const scaleValue = useSharedValue(1);
 
           useEffect(() => {
-            Animated.spring(scaleValue, {
-              toValue: isFocused ? 1.2 : 1,
-              useNativeDriver: true,
-              friction: 4,
-              tension: 160,
-            }).start();
-          }, [isFocused, scaleValue]);
+            scaleValue.value = withTiming(isFocused ? 1.2 : 1, {
+              duration: 300,
+            });
+          }, [isFocused]);
+
+          const iconAnimatedStyle = useAnimatedStyle(() => ({
+            transform: [{ scale: scaleValue.value }],
+          }));
 
           return (
             <Pressable
@@ -115,7 +112,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
               style={styles.tabItem}
               android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true }}
             >
-              <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+              <Animated.View style={[iconAnimatedStyle]}>
                 {isFocused ? (
                   <MaskedView
                     maskElement={

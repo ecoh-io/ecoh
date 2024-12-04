@@ -21,6 +21,7 @@ import ParsedText from 'react-native-parsed-text';
 import { extractUrls } from '@/src/utils/extractUrls'; // Utility to extract URLs
 import { useLinkPreviews } from '@/src/hooks/useLinkPreviews'; // Custom hook to fetch metadata
 import LinkPreviewComponent from '../LinkPreviewComponent'; // Component to render previews
+import { runOnJS } from 'react-native-reanimated'; // Import runOnJS
 
 // Enable LayoutAnimation on Android
 if (
@@ -89,7 +90,13 @@ const TextPostComponent: React.FC<TextPostProps> = ({
 
   // Memoize the double-tap gesture to prevent re-creation on each render
   const doubleTapGesture = useMemo(
-    () => Gesture.Tap().numberOfTaps(2).maxDelay(300).onEnd(handleDoubleTap),
+    () =>
+      Gesture.Tap()
+        .numberOfTaps(2)
+        .maxDelay(300)
+        .onEnd(() => {
+          runOnJS(handleDoubleTap)();
+        }),
     [handleDoubleTap],
   );
 

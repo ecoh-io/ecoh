@@ -140,7 +140,8 @@ export const posts: PostData[] = [
     comments: [comments.c4],
     isLiked: false,
     isSaved: false,
-    videoUri: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    videoUri:
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     thumbnailUri: 'https://dummyimage.com/600x400/000/fff&text=VideoThumbnail',
     duration: 120, // Duration in seconds
   },

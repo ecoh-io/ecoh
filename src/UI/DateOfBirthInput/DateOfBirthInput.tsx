@@ -34,7 +34,7 @@ const DateOfBirthInput: React.FC<EnhancedDateOfBirthInputProps> = ({
 
   const locale = useMemo(() => {
     const locales = Localization.getLocales();
-    return locales.length > 0 ? locales[0].languageTag : 'en-US'; // Fallback to 'en-US' if no locale found
+    return locales.length > 0 ? locales[0].languageTag : 'en-GB'; // Fallback to 'en-US' if no locale found
   }, []);
 
   const handleConfirm = useCallback(
@@ -102,6 +102,11 @@ const DateOfBirthInput: React.FC<EnhancedDateOfBirthInputProps> = ({
         onCancel={handleCancel}
         display={Platform.OS === 'ios' ? 'spinner' : 'default'}
         locale={locale}
+        pickerStyleIOS={{ height: 200 }}
+        pickerContainerStyleIOS={{
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       />
     </View>
   );

@@ -5,10 +5,12 @@ import Animated, {
   useAnimatedStyle,
   withSequence,
   withTiming,
+  runOnJS,
 } from 'react-native-reanimated';
 import { FontAwesome } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 interface AnimatedSaveButtonProps {
   isSaved: boolean;
@@ -34,49 +36,34 @@ const AnimatedSaveButton: React.FC<AnimatedSaveButtonProps> = ({
     }
   }, [isSaved]);
 
+  const tapGesture = Gesture.Tap().onEnd(() => {
+    // Use runOnJS to call the onLike callback on the JS thread
+    runOnJS(onSave)();
+  });
+
   return (
-    <TouchableWithoutFeedback
-      onPress={onSave}
-      accessibilityLabel="Save Button"
-      accessibilityRole="button"
-    >
-      <View style={styles.neuomorphicContainer}>
-        <Animated.View style={[animatedStyle]}>
-          {isSaved ? (
-            <MaskedView
-              maskElement={
-                <FontAwesome name="bookmark" size={24} color="#000" />
-              }
-            >
-              <LinearGradient
-                colors={['#00c6ff', '#0072ff']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gradientIconBackground}
-              />
-            </MaskedView>
-          ) : (
-            <FontAwesome name="bookmark-o" size={24} color="#828282" />
-          )}
-        </Animated.View>
-      </View>
-    </TouchableWithoutFeedback>
+    <GestureDetector gesture={tapGesture}>
+      <Animated.View style={[animatedStyle]}>
+        {isSaved ? (
+          <MaskedView
+            maskElement={<FontAwesome name="bookmark" size={24} color="#000" />}
+          >
+            <LinearGradient
+              colors={['#00c6ff', '#0072ff']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradientIconBackground}
+            />
+          </MaskedView>
+        ) : (
+          <FontAwesome name="bookmark-o" size={24} color="#828282" />
+        )}
+      </Animated.View>
+    </GestureDetector>
   );
 };
 
 const styles = StyleSheet.create({
-  neuomorphicContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 18,
-    height: 24,
-    borderRadius: 30, // Perfectly circular
-    shadowColor: '#888',
-    shadowOffset: { width: 0, height: 6 }, // Downward shadow for depth
-    shadowOpacity: 0.3,
-    shadowRadius: 4, // Soft spread for shadow
-    elevation: 8, // Android shadow effect
-  },
   gradientIconBackground: {
     width: 18,
     height: 24,

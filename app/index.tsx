@@ -18,7 +18,7 @@ export default function Index() {
 
   if (isAuthenticated) {
     // Redirect to authenticated area
-    return <Redirect href="/(authenticated)/(tabs)/dashboard" />;
+    return <Redirect href="/(tabs)/dashboard" />;
   } else {
     // Redirect to login
     return <Redirect href="/(auth)" />;
