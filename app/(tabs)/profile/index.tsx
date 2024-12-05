@@ -5,7 +5,7 @@ const ProfileIndex = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.push('/profile/posts'); // Redirect to 'posts' as the default tab
+    router.push('/profile/tabs/posts'); // Redirect to 'posts' as the default tab
   }, []);
 
   return null; // Render nothing while redirecting

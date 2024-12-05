@@ -52,6 +52,8 @@ const PostsScreen: React.FC = () => {
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
         nestedScrollEnabled
+        scrollEnabled
+        contentContainerStyle={{ padding: 1 }}
       />
     </View>
   );

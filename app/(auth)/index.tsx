@@ -11,15 +11,15 @@ const Index: React.FC = () => {
     router.push('/(auth)/register');
   };
 
-  // const loginPressed = () => {
-  //   router.push('/auth/login');
-  // };
+  const loginPressed = () => {
+    router.push('/(auth)/login');
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Button
         title="Sign in"
-        onPress={() => toggleTheme()}
+        onPress={loginPressed}
         variant="primary"
         gradientColors={['#00c6ff', '#0072ff']}
         size="large"

@@ -3,18 +3,18 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 
-const TagsScreen: React.FC = () => {
+const SavedScreen: React.FC = () => {
   const { colors } = useTheme();
 
   useEffect(() => {
-    console.log('TagsScreen Mounted');
-    return () => console.log('TagsScreen Unmounted');
+    console.log('SavedScreen Mounted');
+    return () => console.log('SavedScreen Unmounted');
   }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.text, { color: colors.text }]}>
-        Tagged content goes here.
+        Saved content goes here.
       </Text>
     </View>
   );
@@ -22,8 +22,7 @@ const TagsScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 400,
-    padding: 20,
+    flex: 1,
   },
   text: {
     fontSize: 16,
@@ -31,4 +30,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TagsScreen;
+export default SavedScreen;

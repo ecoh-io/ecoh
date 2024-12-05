@@ -106,7 +106,6 @@ const Input = forwardRef<TextInput, InputProps>(
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 12,
     position: 'relative',
   },
   inputContainer: {

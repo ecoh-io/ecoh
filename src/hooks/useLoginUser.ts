@@ -4,10 +4,11 @@ import {
   UseMutationResult,
 } from '@tanstack/react-query';
 import axios from 'axios';
-import { ConfirmUserRegistrationData } from '../types/confirm.data';
+import { loginUser } from '../api/login.api';
 import { useAuthStore } from '../store/AuthStore';
-import { confrimUser } from '../api/confirm.api';
+import { router } from 'expo-router';
 import { AuthResponse } from '../types/auth.response';
+import { AuthData } from '../types/auth.data';
 
 /**
  * APIError interface represents the structure of error responses from the API.
@@ -40,54 +41,35 @@ const transformAxiosError = (error: unknown): APIError => {
 };
 
 /**
- * UseConfirmUserOptions interface extends the default UseMutationOptions
- * to provide more specific typing for the confirm user mutation.
+ * UseLoginUserOptions interface extends the default UseMutationOptions
+ * to provide more specific typing for the login mutation.
  */
-interface UseConfirmUserOptions
-  extends UseMutationOptions<
-    AuthResponse,
-    APIError,
-    ConfirmUserRegistrationData
-  > {}
+interface UseLoginUserOptions
+  extends UseMutationOptions<AuthResponse, APIError, AuthData> {}
 
 /**
- * Custom hook to handle user confirmation using React Query's useMutation.
+ * Custom hook to handle user login using React Query's useMutation.
  *
  * @param options - Optional React Query mutation options to customize behavior.
- * @returns The mutation object containing methods and states for the confirmation mutation.
+ * @returns The mutation object containing methods and states for the login mutation.
  */
-export const useConfirmUser = (
-  options?: UseConfirmUserOptions,
-): UseMutationResult<AuthResponse, APIError, ConfirmUserRegistrationData> => {
+export const useLoginUser = (
+  options?: UseLoginUserOptions,
+): UseMutationResult<AuthResponse, APIError, AuthData> => {
   const login = useAuthStore((state) => state.login);
 
-  const mutation = useMutation<
-    AuthResponse,
-    APIError,
-    ConfirmUserRegistrationData
-  >({
-    /**
-     * The mutation function that performs the confirmation API call.
-     *
-     * @param formData - The confirmation data submitted by the user.
-     * @returns A promise resolving to the confirmation response.
-     */
-    mutationFn: (formData: ConfirmUserRegistrationData) =>
-      confrimUser(formData),
+  const mutation = useMutation<AuthResponse, APIError, AuthData>({
+    mutationFn: (formData: AuthData) => loginUser(formData),
 
     /**
      * Default onError handler to transform Axios errors to APIError.
      * Logs the error and invokes any user-provided onError handler.
-     *
-     * @param error - The error thrown during the mutation.
-     * @param variables - The variables passed to the mutation function.
-     * @param context - The context returned from onMutate.
      */
     onError: (error, variables, context) => {
       const apiError = transformAxiosError(error);
 
       // Log the error for debugging purposes
-      console.error('Confirmation failed:', apiError);
+      console.error('Login failed:', apiError);
 
       // Invoke user-provided onError handler if it exists
       if (options?.onError) {
@@ -97,26 +79,19 @@ export const useConfirmUser = (
 
     /**
      * Default onSuccess handler.
-     * Updates authentication state with tokens and user data.
+     * Updates authentication state and navigates to the dashboard.
      * Invokes any user-provided onSuccess handler.
-     *
-     * @param data - The data returned from the mutation function.
-     * @param variables - The variables passed to the mutation function.
-     * @param context - The context returned from onMutate.
      */
     onSuccess: async (data: AuthResponse, variables, context) => {
       try {
         // Update authentication state with tokens and user data
-        await login(
-          data.tokens.AccessToken,
-          data.tokens.RefreshToken,
-          data.user,
-        );
+        login(data.tokens.AccessToken, data.tokens.RefreshToken, data.user);
 
-        console.log('User confirmed and logged in successfully:', data.user);
+        // Navigate to the dashboard
+        router.replace('/(tabs)/dashboard');
       } catch (error) {
-        // Handle any errors that occur during state update
-        console.error('Login error:', error);
+        // Handle any errors that occur during state update or navigation
+        console.error('Error during login success handling:', error);
       }
 
       // Invoke user-provided onSuccess handler if it exists

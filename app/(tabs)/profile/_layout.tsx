@@ -1,5 +1,14 @@
-import React, { useCallback, useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import React, { memo, useCallback, useContext, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Dimensions,
+} from 'react-native';
 import { ScrollContext } from '@/src/context/ScrollContext';
 import ProfileHeader from '@/src/components/Header/ProfileHeader';
 import ProfileTabBar from '@/app/components/ProfileTabBar';
@@ -7,118 +16,190 @@ import { typography } from '@/src/theme/typography';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { useAuthStore } from '@/src/store/AuthStore';
 import Screen from '@/src/UI/Screen';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
+import { SceneMap, TabView } from 'react-native-tab-view';
 
-import { Slot } from 'expo-router';
+import PostsScreen from './tabs/posts';
+import ImageScreen from './tabs/images';
+import TagsScreen from './tabs/tags';
+import SavedScreen from './tabs/saved';
 
-const TAB_BAR_HEIGHT = 60; // Adjust based on your ProfileTabBar height
+const MemoizedProfileHeader = memo(ProfileHeader);
+const MemoizedProfileTabBar = memo(ProfileTabBar);
+
+const initialLayout = { width: Dimensions.get('window').width };
+
+interface User {
+  username: string;
+  displayName: string;
+  bio: string;
+  profileImage: string;
+  connectionsCount: number;
+  followersCount: number;
+  followingCount: number;
+}
+
+const ProfileInfo = memo(
+  ({ user, colors }: { user: User | null; colors: any }) => (
+    <View style={styles.profileInfo}>
+      <View style={styles.userInfo}>
+        <Image
+          source={{
+            uri: user?.profileImage || 'https://via.placeholder.com/100',
+          }}
+          style={styles.profileImage}
+          accessibilityLabel="Profile picture"
+        />
+        <View style={styles.followInfo}>
+          <View style={styles.followCount}>
+            <Text style={[styles.followNumber, { color: colors.text }]}>
+              {user?.connectionsCount || '0'}
+            </Text>
+            <Text style={[styles.followLabel, { color: colors.text }]}>
+              Connections
+            </Text>
+          </View>
+          <View style={styles.followCount}>
+            <Text style={[styles.followNumber, { color: colors.text }]}>
+              {user?.followersCount || '0'}
+            </Text>
+            <Text style={[styles.followLabel, { color: colors.text }]}>
+              Followers
+            </Text>
+          </View>
+          <View style={styles.followCount}>
+            <Text style={[styles.followNumber, { color: colors.text }]}>
+              {user?.followingCount || '0'}
+            </Text>
+            <Text style={[styles.followLabel, { color: colors.text }]}>
+              Following
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  ),
+);
+
+const ProfileDescription = memo(
+  ({ user, colors }: { user: User; colors: any }) => (
+    <View style={styles.profileDescription}>
+      <Text style={[styles.profileName, { color: colors.text }]}>
+        {user?.displayName || ''}
+      </Text>
+      {user.bio ? (
+        <Text style={[styles.profileBio, { color: colors.text }]}>
+          {user.bio}
+        </Text>
+      ) : null}
+    </View>
+  ),
+);
 
 const ProfileLayout: React.FC = () => {
   const { colors, isDark } = useTheme();
   const user = useAuthStore((state) => state.user);
   const { setTabBarVisible } = useContext(ScrollContext);
+  const navigation = useNavigation();
+  const lastVisibilityRef = useRef<boolean>(true);
 
   const handleEditProfile = useCallback(() => {
-    // Implement your profile editing navigation here
-    console.log('Edit Profile Pressed');
-  }, []);
+    // Implement edit profile navigation or functionality here
+    // Example:
+    // navigation.navigate('EditProfile');
+  }, [navigation]);
 
-  const handleScroll = (event: any) => {
-    const currentOffset = event.nativeEvent.contentOffset.y;
-    if (currentOffset > 100) {
-      setTabBarVisible(false);
-    } else {
-      setTabBarVisible(true);
-    }
-  };
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const currentOffset = event.nativeEvent.contentOffset.y;
+      const isVisible = currentOffset <= 100;
+      if (isVisible !== lastVisibilityRef.current) {
+        setTabBarVisible(isVisible);
+        lastVisibilityRef.current = isVisible;
+      }
+    },
+    [setTabBarVisible],
+  );
+
+  // State for TabView
+  const [tabIndex, setTabIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'posts', title: 'Posts' },
+    { key: 'images', title: 'Images' },
+    { key: 'tags', title: 'Tags' },
+    { key: 'saved', title: 'Saved' },
+  ]);
+
+  // Define scenes for each tab
+  const renderScene = SceneMap({
+    posts: PostsScreen,
+    images: ImageScreen,
+    tags: TagsScreen,
+    saved: SavedScreen,
+  });
+
+  const [tabBarWidth, setTabBarWidth] = useState<number>(
+    Dimensions.get('window').width,
+  );
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Screen
-        preset="fixed"
-        safeAreaEdges={['top', 'bottom']}
-        backgroundColor={colors.background}
+    <Screen
+      preset="fixed"
+      safeAreaEdges={['top', 'bottom']}
+      backgroundColor={colors.background}
+      contentContainerStyle={{
+        flex: 1,
+      }}
+      statusBarStyle={isDark ? 'light' : 'dark'}
+    >
+      <ScrollView
         contentContainerStyle={{
-          flex: 1,
+          flexGrow: 1,
         }}
-        statusBarStyle={isDark ? 'light' : 'dark'}
+        scrollEventThrottle={16}
+        onScroll={handleScroll}
+        stickyHeaderIndices={[3]} // Adjust based on component positions
       >
-        {/* Profile Content */}
-        <ScrollView
-          contentContainerStyle={{
-            paddingBottom: TAB_BAR_HEIGHT + 20, // Extra padding to prevent content hiding behind tab bar
-          }}
-          scrollEventThrottle={16}
-          onScroll={handleScroll}
-          stickyHeaderIndices={[0, 3]}
-        >
-          <ProfileHeader
-            colors={colors}
-            username={user?.username || ''}
-            onEditPress={handleEditProfile}
-          />
-          {/* Profile Info */}
-          <View style={styles.profileInfo}>
-            <View style={styles.userInfo}>
-              <Image
-                source={{
-                  uri: 'https://via.placeholder.com/100',
+        {/* Header */}
+        <MemoizedProfileHeader
+          colors={colors}
+          username={user?.username || ''}
+          onEditPress={handleEditProfile}
+        />
+
+        {/* Profile Info */}
+        <ProfileInfo user={user} colors={colors} />
+
+        {/* Profile Description */}
+        <ProfileDescription user={user} colors={colors} />
+
+        {/* Tabs */}
+        <View style={{ flex: 1 }}>
+          <TabView
+            navigationState={{ index: tabIndex, routes }}
+            renderScene={renderScene}
+            onIndexChange={setTabIndex}
+            initialLayout={initialLayout}
+            renderTabBar={() => (
+              <View
+                onLayout={(event) => {
+                  const { width } = event.nativeEvent.layout;
+                  setTabBarWidth(width);
                 }}
-                style={styles.profileImage}
-                accessibilityLabel="Profile picture"
-              />
-
-              <View style={styles.followInfo}>
-                <View style={styles.followCount}>
-                  <Text style={[styles.followLabel, { color: colors.text }]}>
-                    Connections
-                  </Text>
-                  <Text style={[styles.followNumber, { color: colors.text }]}>
-                    250
-                  </Text>
-                </View>
-                <View style={styles.followCount}>
-                  <Text style={[styles.followLabel, { color: colors.text }]}>
-                    Followers
-                  </Text>
-                  <Text style={[styles.followNumber, { color: colors.text }]}>
-                    1.2k
-                  </Text>
-                </View>
-                <View style={styles.followCount}>
-                  <Text style={[styles.followLabel, { color: colors.text }]}>
-                    Following
-                  </Text>
-                  <Text style={[styles.followNumber, { color: colors.text }]}>
-                    250
-                  </Text>
-                </View>
+              >
+                <ProfileTabBar
+                  currentIndex={tabIndex}
+                  onTabPress={setTabIndex}
+                  tabBarWidth={tabBarWidth}
+                />
               </View>
-            </View>
-          </View>
-
-          {/* Profile Description */}
-          <View style={styles.profileDescription}>
-            <Text style={[styles.profileName, { color: colors.text }]}>
-              {user?.displayName || 'Jane Doe'}
-            </Text>
-            <Text style={[styles.profileBio, { color: colors.text }]}>
-              {
-                'This is a short bio about the user. Passionate about technology and design.'
-              }
-            </Text>
-          </View>
-
-          {/* Custom Profile Tab Bar */}
-          <ProfileTabBar />
-
-          {/* Render the current tab's content */}
-          <View style={styles.contentContainer}>
-            <Slot />
-          </View>
-        </ScrollView>
-      </Screen>
-    </GestureHandlerRootView>
+            )}
+            lazy
+            swipeEnabled
+          />
+        </View>
+      </ScrollView>
+    </Screen>
   );
 };
 
@@ -127,21 +208,25 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
   },
+  tabContent: {
+    flex: 1,
+    padding: 10,
+  },
+  tabNavigator: {
+    flex: 1,
+  },
   profileInfo: {
     paddingHorizontal: 10,
     paddingBottom: 10,
-    flexDirection: 'column',
-    alignItems: 'center',
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
   },
   profileImage: {
     width: 90,
     height: 90,
-    borderRadius: 50,
+    borderRadius: 45,
     borderWidth: 2,
     borderColor: 'rgba(0,0,0,0.05)',
   },
@@ -149,10 +234,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   followCount: {
-    fontSize: 16,
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 5,
+    marginHorizontal: 10,
   },
   profileName: {
     fontSize: 21,
@@ -164,10 +248,9 @@ const styles = StyleSheet.create({
     fontFamily: typography.Poppins.regular,
   },
   followInfo: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginLeft: 20, // Adjust based on your layout
+    flex: 1,
   },
   followLabel: {
     fontFamily: typography.Poppins.regular,
@@ -177,6 +260,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: typography.Poppins.medium,
     marginTop: 5,
+  },
+  postsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  postImage: {
+    width: '33.33%',
+    aspectRatio: 1,
+  },
+  connectionsList: {
+    flex: 1,
+  },
+  connectionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+  },
+  connectionImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  connectionName: {
+    marginLeft: 10,
+    fontSize: 16,
   },
 });
 
