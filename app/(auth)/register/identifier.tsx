@@ -208,7 +208,7 @@ export default function Identifier() {
             borderWidth: 2,
             borderRadius: 12,
             borderColor: colors.secondary,
-            fontFamily: typography.Poppins.medium,
+            fontFamily: typography.fontFamilies.poppins.regular,
           },
           countryButtonStyles: {
             height: 52,
@@ -216,9 +216,9 @@ export default function Identifier() {
             marginBottom: 8,
           },
           dialCode: {
-            fontFamily: typography.Poppins.medium,
+            fontFamily: typography.fontFamilies.poppins.medium,
           },
-          countryName: { fontFamily: typography.Poppins.medium },
+          countryName: { fontFamily: typography.fontFamilies.poppins.medium },
         }}
         pickerButtonOnPress={(item) => {
           handleCountrySelect({

@@ -13,22 +13,22 @@ type Tab = {
 const TABS: Tab[] = [
   {
     name: 'Posts',
-    icon: 'post-outline',
+    icon: 'post',
     iconOutline: 'post-outline',
   },
   {
     name: 'Media',
-    icon: 'image-multiple-outline',
+    icon: 'image-multiple',
     iconOutline: 'image-multiple-outline',
   },
   {
     name: 'Tags',
-    icon: 'tag-outline',
+    icon: 'tag',
     iconOutline: 'tag-outline',
   },
   {
     name: 'Saved',
-    icon: 'bookmark-outline',
+    icon: 'bookmark',
     iconOutline: 'bookmark-outline',
   },
 ];
@@ -52,10 +52,10 @@ const ProfileTabBar: React.FC<ProfileTabBarProps> = React.memo(
       if (tabWidth > 0 && indicatorWidth > 0) {
         const toValue =
           currentIndex * tabWidth + (tabWidth - indicatorWidth) / 2;
-        Animated.timing(indicatorPosition, {
+        Animated.spring(indicatorPosition, {
           toValue,
-          duration: 200,
-          easing: Easing.out(Easing.cubic),
+          tension: 300,
+          friction: 20,
           useNativeDriver: true,
         }).start();
       }
@@ -63,12 +63,7 @@ const ProfileTabBar: React.FC<ProfileTabBarProps> = React.memo(
 
     return (
       <View style={styles.tabBarContainer}>
-        <View
-          style={styles.tabBar}
-          onLayout={() => {
-            // Layout is handled in the parent component
-          }}
-        >
+        <View style={styles.tabBar}>
           {TABS.map((tab, index) => {
             const isActive = currentIndex === index;
 
@@ -162,6 +157,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
+    width: '100%', // Ensure it spans the full width
   },
   tabBar: {
     flexDirection: 'row',
@@ -180,6 +176,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  activeIcon: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+  },
   tabIndicator: {
     position: 'absolute',
     bottom: 0,
@@ -187,6 +188,11 @@ const styles = StyleSheet.create({
     height: INDICATOR_HEIGHT,
     borderRadius: INDICATOR_HEIGHT / 2,
     zIndex: 100,
+  },
+  indicatorGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: INDICATOR_HEIGHT / 2,
   },
 });
 

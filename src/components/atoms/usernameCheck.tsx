@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   text: {
-    fontFamily: typography.Poppins.regular,
-    fontSize: 14,
+    fontFamily: typography.fontFamilies.poppins.regular,
+    fontSize: typography.fontSizes.body,
   },
 });
 

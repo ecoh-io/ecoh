@@ -16,8 +16,8 @@ const Badge: React.FC<BadgeProps> = ({ type }) => {
   // Styles for the badge text
   const textStyle: TextStyle = {
     color: '#fff',
-    fontSize: 10,
-    fontFamily: typography.Poppins.medium,
+    fontSize: typography.fontSizes.button,
+    fontFamily: typography.fontFamilies.poppins.medium,
   };
 
   // Styles for the badge container

@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
   icon: {
     marginHorizontal: 4,

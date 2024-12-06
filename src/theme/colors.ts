@@ -16,6 +16,7 @@ export const lightColors = {
   text: '#000000', // Primary text color
   onBackground: '#000000', // Text on background
   onSurface: '#000000', // Text on surface
+  onGradient: '#FFFFFF',
 
   // Disabled States
   disabled: 'rgba(0, 0, 0, 0.38)', // Disabled text and icon color
@@ -45,6 +46,10 @@ export const lightColors = {
   // Additional Semantic Colors
   highlight: '#C8C8C8', // Highlight color for selections
   shadow: 'rgba(0, 0, 0, 0.2)', // Shadow color
+
+  gradient: ['#00c6ff', '#0072ff'],
+
+  testGray: '#ECF2F5',
 };
 
 export const darkColors = {
@@ -94,4 +99,6 @@ export const darkColors = {
   // Additional Semantic Colors
   highlight: '#C8C8C8', // Highlight color for selections
   shadow: 'rgba(255, 255, 255, 0.2)', // Shadow color
+
+  gradient: ['#00c6ff', '#0072ff'],
 };

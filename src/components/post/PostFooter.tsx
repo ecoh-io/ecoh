@@ -133,8 +133,8 @@ const styles = StyleSheet.create({
   },
   countText: {
     marginLeft: 6,
-    fontSize: 14,
-    fontFamily: typography.Poppins.medium,
+    fontSize: typography.fontSizes.button,
+    fontFamily: typography.fontFamilies.poppins.bold,
     color: '#000', // Default color, overridden by dynamic color if needed
   },
 });

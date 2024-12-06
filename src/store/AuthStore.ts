@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
-import { UserData, loadUserData, saveUserData } from './localStorage';
+import { loadUserData, saveUserData } from './localStorage';
 import {
   clearAllTokens,
   getAuthToken,
@@ -8,19 +8,16 @@ import {
   setAuthToken,
   setRefreshToken,
 } from './secureStore';
+import { User } from '../types/user';
 
 interface AuthState {
   authToken: string | null;
   refreshToken: string | null;
-  user: UserData | null;
+  user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
   initializeAuth: () => Promise<void>;
-  login: (
-    authToken: string,
-    refreshToken: string,
-    user: UserData,
-  ) => Promise<void>;
+  login: (authToken: string, refreshToken: string, user: User) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuthToken: () => Promise<void>;
 }
@@ -45,17 +42,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       ]);
 
       if (authToken && refreshToken && user) {
-        // Optionally, fetch user data from API if not stored locally
-        // For this example, we'll assume user data is stored alongside tokens
-
-        // You might need to adjust this based on how you store user data
-        // If using separate services, you need additional storage for user data
-        // For simplicity, let's assume user data is stored in a separate Keychain entry
-
-        // Example: Retrieve user data (if stored separately)
-        // const userData = await getUserData(); // Implement this function as needed
-
-        // For this example, we'll mock user data
         set({
           authToken,
           refreshToken,
@@ -75,7 +61,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   /**
    * Login action to set user data and tokens
    */
-  async login(authToken: string, refreshToken: string, user: UserData) {
+  async login(authToken: string, refreshToken: string, user: User) {
     try {
       await Promise.all([
         setAuthToken(authToken),

@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.regular,
     paddingVertical: 8,
     marginHorizontal: 8,
   },
@@ -138,16 +138,16 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 4,
     fontSize: 14,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   helperText: {
     marginTop: 4,
     fontSize: 12,
-    fontFamily: typography.Poppins.regular,
+    fontFamily: typography.fontFamilies.poppins.regular,
   },
   label: {
     marginBottom: 8,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.medium,
     fontSize: 16,
   },
 });

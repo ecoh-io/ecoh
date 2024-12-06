@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontFamily: typography.Poppins.medium,
-    fontSize: 22,
+    fontFamily: typography.fontFamilies.poppins.bold,
+    fontSize: typography.fontSizes.title,
   },
   headerIcon: {
     padding: 8,

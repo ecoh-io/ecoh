@@ -114,7 +114,10 @@ const Login: React.FC = () => {
         <Text
           style={[
             styles.errorText,
-            { color: colors.error, fontFamily: typography.Poppins.medium },
+            {
+              color: colors.error,
+              fontFamily: typography.fontFamilies.poppins.medium,
+            },
           ]}
           accessibilityRole="alert"
         >
@@ -239,8 +242,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   title: {
-    fontSize: 24,
-    fontFamily: typography.Poppins.medium,
+    fontSize: typography.fontSizes.title,
+    fontFamily: typography.fontFamilies.poppins.medium,
     marginTop: 12,
   },
   formContainer: {
@@ -276,7 +279,7 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     fontSize: 16,
     textDecorationLine: 'underline',
-    fontFamily: typography.Poppins.regular,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   socialContainer: {
     alignItems: 'center',

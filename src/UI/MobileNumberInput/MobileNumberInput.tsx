@@ -95,13 +95,13 @@ const styles = StyleSheet.create({
   countryFlag: {
     textAlign: 'center',
     fontSize: 16,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.bold,
   },
   countryCodeText: {
     textAlign: 'center',
     fontSize: 16,
     marginRight: 8,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
   },
 });
 

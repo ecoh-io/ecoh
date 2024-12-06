@@ -132,48 +132,46 @@ const FeedScreen: React.FC = () => {
   );
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {/* Animated Header */}
-        <Animated.View
-          style={[
-            styles.header,
-            {
-              backgroundColor: colors.background,
-            },
-            animatedHeaderStyle,
-          ]}
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Animated Header */}
+      <Animated.View
+        style={[
+          styles.header,
+          {
+            backgroundColor: colors.background,
+          },
+          animatedHeaderStyle,
+        ]}
+      >
+        <Text style={[styles.title, { color: colors.text }]}>{'Feed'}</Text>
+        <TouchableOpacity
+          accessibilityLabel="Filter options"
+          accessibilityHint="Opens filter options"
+          onPress={() => {
+            // Implement your filter functionality here
+          }}
         >
-          <Text style={[styles.title, { color: colors.text }]}>{'Feed'}</Text>
-          <TouchableOpacity
-            accessibilityLabel="Filter options"
-            accessibilityHint="Opens filter options"
-            onPress={() => {
-              // Implement your filter functionality here
-            }}
-          >
-            <MaterialCommunityIcons
-              name="filter-variant"
-              size={24}
-              color={colors.text}
-            />
-          </TouchableOpacity>
-        </Animated.View>
+          <MaterialCommunityIcons
+            name="filter-variant"
+            size={24}
+            color={colors.text}
+          />
+        </TouchableOpacity>
+      </Animated.View>
 
-        {/* Feed Content */}
-        <AnimatedFlashList
-          data={posts}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          contentContainerStyle={styles.content}
-          estimatedItemSize={300} // Adjust this value based on your item size
-          onScroll={animatedScrollHandler}
-          scrollEventThrottle={16}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
-        />
-      </View>
-    </GestureHandlerRootView>
+      {/* Feed Content */}
+      <AnimatedFlashList
+        data={posts}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        contentContainerStyle={styles.content}
+        estimatedItemSize={300} // Adjust this value based on your item size
+        onScroll={animatedScrollHandler}
+        scrollEventThrottle={16}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+      />
+    </View>
   );
 };
 
@@ -196,8 +194,8 @@ const styles = StyleSheet.create({
     zIndex: 1000, // Ensure the header is above other content
   },
   title: {
-    fontFamily: typography.Poppins.medium,
-    fontSize: 22,
+    fontFamily: typography.fontFamilies.poppins.bold,
+    fontSize: typography.fontSizes.title,
   },
   content: {
     paddingTop: CONTENT_PADDING_TOP, // Space below the header

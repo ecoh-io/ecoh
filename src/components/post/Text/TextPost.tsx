@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   textContent: {
     fontSize: 16,
     lineHeight: 24,
-    fontFamily: typography.Poppins.regular,
+    fontFamily: typography.fontFamilies.poppins.regular,
   },
   boldText: {
     fontWeight: '700', // Adjusted for better readability
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   },
   readMoreText: {
     fontSize: 14,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.bold,
   },
 });
 
