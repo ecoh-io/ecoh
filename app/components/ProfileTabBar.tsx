@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable, Animated, Easing } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '@/src/theme/ThemeContext';
 
 type Tab = {
   name: string;
@@ -43,6 +44,7 @@ interface ProfileTabBarProps {
 
 const ProfileTabBar: React.FC<ProfileTabBarProps> = React.memo(
   ({ currentIndex, onTabPress, tabBarWidth }) => {
+    const { colors } = useTheme();
     const tabWidth = useMemo(() => tabBarWidth / TABS.length, [tabBarWidth]);
     const indicatorWidth = useMemo(() => tabWidth * 0.5, [tabWidth]);
 
@@ -62,7 +64,9 @@ const ProfileTabBar: React.FC<ProfileTabBarProps> = React.memo(
     }, [currentIndex, tabWidth, indicatorWidth]);
 
     return (
-      <View style={styles.tabBarContainer}>
+      <View
+        style={[styles.tabBarContainer, { backgroundColor: colors.background }]}
+      >
         <View style={styles.tabBar}>
           {TABS.map((tab, index) => {
             const isActive = currentIndex === index;

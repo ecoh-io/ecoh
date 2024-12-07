@@ -1,15 +1,14 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { Entypo, Feather } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Entypo } from '@expo/vector-icons';
 import Screen from '@/src/UI/Screen';
-import { User } from '@/src/types/user';
 import { Colors } from '@/src/types/color';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { router } from 'expo-router';
-import { typography } from '@/src/theme/typography';
 import TouchableRow from '@/src/components/Profile/Edit/TouchableRow/TouchableRow';
 import ProfileInfo from '@/src/components/Profile/Edit/ProfileInfo';
+import { typography } from '@/src/theme/typography';
 
 // Constants
 
@@ -24,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ onBackPress, title, colors }) => (
     <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
       <Entypo name="chevron-left" size={32} color={colors.text} />
     </TouchableOpacity>
-    <Text style={styles.headerText}>{title}</Text>
+    <Text style={[styles.headerText, { color: colors.text }]}>{title}</Text>
     <View style={styles.headerSpacer} />
   </View>
 );
@@ -101,6 +100,13 @@ const EditProfileScreen: React.FC = () => {
           onPress={handleEditBio}
           colors={colors}
         />
+        <TouchableRow
+          iconName="map-pin"
+          label="Location"
+          value={user?.bio?.trim() ? user.bio : 'Add location'}
+          onPress={handleEditBio}
+          colors={colors}
+        />
       </View>
     </Screen>
   );
@@ -115,14 +121,15 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
   backButton: {
-    padding: 8,
+    paddingVertical: 8,
   },
   headerText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: typography.fontSizes.title,
     fontWeight: 'bold',
   },
   headerSpacer: {

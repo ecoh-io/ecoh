@@ -44,7 +44,7 @@ export const lightColors = {
   outlined: '#ECF2F5', // Outlined component border color
 
   // Additional Semantic Colors
-  highlight: '#C8C8C8', // Highlight color for selections
+  highlight: 'rgba(0,0,0,0.1)', // Highlight color for selections
   shadow: 'rgba(0, 0, 0, 0.2)', // Shadow color
 
   gradient: ['#00c6ff', '#0072ff'],
@@ -97,7 +97,7 @@ export const darkColors = {
   outlined: '#333333', // Outlined component border color for dark theme
 
   // Additional Semantic Colors
-  highlight: '#C8C8C8', // Highlight color for selections
+  highlight: 'rgba(255,255,255,0.3)', // Highlight color for selections
   shadow: 'rgba(255, 255, 255, 0.2)', // Shadow color
 
   gradient: ['#00c6ff', '#0072ff'],

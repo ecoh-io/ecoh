@@ -90,7 +90,10 @@ const ProfileLayout: React.FC = () => {
           </View>
         )}
         onIndexChange={handleIndexChange}
-        headerContainerStyle={styles.headerContainer}
+        headerContainerStyle={[
+          styles.headerContainer,
+          { backgroundColor: colors.background },
+        ]}
         initialTabName="Posts"
       >
         <Tabs.Tab name="Posts">

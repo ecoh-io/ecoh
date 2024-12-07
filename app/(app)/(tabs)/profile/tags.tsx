@@ -50,7 +50,9 @@ const TagsScreen: React.FC = () => {
 
     return (
       <View style={styles.emptyContainer}>
-        <View style={styles.iconBackground}>
+        <View
+          style={[styles.iconBackground, { backgroundColor: colors.highlight }]}
+        >
           <MaterialCommunityIcons name="tag" size={32} color={colors.text} />
         </View>
         <Text style={[styles.emptyText, { color: colors.text }]}>
@@ -94,11 +96,10 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   emptyText: {
     fontSize: typography.fontSizes.body,
-    fontFamily: typography.fontFamilies.poppins.bold,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
     textAlign: 'center',
   },
   emptyListContainer: {
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
   },
   subText: {
     fontSize: typography.fontSizes.button,
-    fontFamily: typography.fontFamilies.poppins.regular,
+    fontFamily: typography.fontFamilies.poppins.medium,
     textAlign: 'center',
     opacity: 0.7,
     maxWidth: '80%',

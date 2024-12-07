@@ -51,7 +51,9 @@ const MediaScreen: React.FC = () => {
 
     return (
       <View style={styles.emptyContainer}>
-        <View style={styles.iconBackground}>
+        <View
+          style={[styles.iconBackground, { backgroundColor: colors.highlight }]}
+        >
           <MaterialCommunityIcons name="image" size={32} color={colors.text} />
         </View>
         <Text style={[styles.emptyText, { color: colors.text }]}>
@@ -95,7 +97,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   emptyText: {
     fontSize: typography.fontSizes.body,

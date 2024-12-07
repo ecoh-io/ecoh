@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,6 +11,7 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { ScrollContext } from '@/src/context/ScrollContext';
+import { useTheme } from '@/src/theme/ThemeContext';
 
 // Define your icon mappings based on route names
 const ICONS: Record<
@@ -43,6 +44,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const { isTabBarVisible } = useContext(ScrollContext);
+  const { colors } = useTheme();
 
   // Shared values for opacity and translateY
   const translateY = useSharedValue(0);
@@ -63,8 +65,14 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   }));
 
   return (
-    <Animated.View style={[styles.animatedTabBar, animatedStyle]}>
-      <BlurView tint="light" intensity={50} style={styles.blurView}>
+    <Animated.View
+      style={[
+        styles.animatedTabBar,
+        animatedStyle,
+        { backgroundColor: colors.background },
+      ]}
+    >
+      <View style={styles.blurView}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const label: string = options.title || route.name;
@@ -141,7 +149,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
             </Pressable>
           );
         })}
-      </BlurView>
+      </View>
     </Animated.View>
   );
 };

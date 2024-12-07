@@ -18,20 +18,22 @@ const TouchableRow: React.FC<ProfileInputRowProps> = ({
   onPress,
   colors,
 }) => (
-  <TouchableOpacity style={styles.inputContainer} onPress={onPress}>
-    <View style={styles.inputRow}>
-      <Feather name={iconName as any} size={44} color={colors.text} />
-      <View style={styles.inputTextContainer}>
-        <Text style={styles.inputLabel}>{label}</Text>
+  <TouchableOpacity style={styles.touchableContainer} onPress={onPress}>
+    <View style={styles.touchableRow}>
+      <Feather name={iconName as any} size={38} color={colors.text} />
+      <View style={styles.touchableRowTextContainer}>
+        <Text style={[styles.touchableRowLabel, { color: colors.text }]}>
+          {label}
+        </Text>
         <Text
-          style={[styles.inputValue, { color: colors.backdrop }]}
+          style={[styles.touchableRowValue, { color: colors.text }]}
           numberOfLines={1}
         >
           {value}
         </Text>
       </View>
     </View>
-    <Entypo name="chevron-right" size={28} color={colors.highlight} />
+    <Entypo name="chevron-right" size={32} color={colors.highlight} />
   </TouchableOpacity>
 );
 

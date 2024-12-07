@@ -1,4 +1,5 @@
 import { typography } from '@/src/theme/typography';
+import { Colors } from '@/src/types/color';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { memo } from 'react';
 import {
@@ -16,7 +17,7 @@ const HEADER_HEIGHT = 60;
 interface HeaderProps {
   username: string;
   onEditPress: () => void;
-  colors: any;
+  colors: Colors;
 }
 
 const ProfileHeader: React.FC<HeaderProps> = memo(
@@ -39,12 +40,12 @@ const ProfileHeader: React.FC<HeaderProps> = memo(
               accessibilityLabel="Edit Profile"
               accessibilityHint="Navigates to profile editing screen"
               onPress={onEditPress}
-              style={styles.headerIcon}
+              style={[styles.headerIcon, { backgroundColor: colors.highlight }]}
             >
               <MaterialCommunityIcons
                 name="pencil-outline"
                 size={24}
-                color={colors.iconColor || '#000'}
+                color={colors.text}
               />
             </TouchableOpacity>
           </View>
@@ -72,7 +73,6 @@ const styles = StyleSheet.create({
   headerIcon: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.05)', // Light background for better touch area
   },
 });
 

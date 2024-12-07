@@ -27,5 +27,6 @@ export const styles = StyleSheet.create({
   username: {
     fontSize: typography.fontSizes.smallTitle,
     fontFamily: typography.fontFamilies.poppins.medium,
+    opacity: 0.7,
   },
 });
