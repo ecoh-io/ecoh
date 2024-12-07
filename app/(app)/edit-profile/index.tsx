@@ -1,41 +1,20 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
-import Screen from '@/src/UI/Screen';
-import { Colors } from '@/src/types/color';
+import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { useAuthStore } from '@/src/store/AuthStore';
-import { router } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import TouchableRow from '@/src/components/Profile/Edit/TouchableRow/TouchableRow';
 import ProfileInfo from '@/src/components/Profile/Edit/ProfileInfo';
-import { typography } from '@/src/theme/typography';
-
-// Constants
-
-interface HeaderProps {
-  onBackPress: () => void;
-  title: string;
-  colors: Colors;
-}
-// Reusable Header Component
-const Header: React.FC<HeaderProps> = ({ onBackPress, title, colors }) => (
-  <View style={styles.headerContainer}>
-    <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
-      <Entypo name="chevron-left" size={32} color={colors.text} />
-    </TouchableOpacity>
-    <Text style={[styles.headerText, { color: colors.text }]}>{title}</Text>
-    <View style={styles.headerSpacer} />
-  </View>
-);
+import Header from '@/src/components/Profile/Edit/Header';
 
 // Main Edit Profile Screen Component
 const EditProfileScreen: React.FC = () => {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const user = useAuthStore((state) => state.user);
+  const router = useRouter();
   // Handlers for editing fields
   const handleEditName = () => {
-    // Navigate to Edit Name Screen or open a modal
-    console.log('Edit Name Pressed');
+    router.push('/edit-profile/name');
   };
 
   const handleEditUsername = () => {
@@ -49,18 +28,8 @@ const EditProfileScreen: React.FC = () => {
   };
 
   return (
-    <Screen
-      preset="auto"
-      safeAreaEdges={['top', 'bottom']}
-      backgroundColor={colors.background}
-      contentContainerStyle={styles.screenContent}
-      statusBarStyle={isDark ? 'light' : 'dark'}
-    >
-      <Header
-        onBackPress={() => router.back()}
-        title="Edit Profile"
-        colors={colors}
-      />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Header title="Edit profile" colors={colors} />
 
       <ProfileInfo user={user} colors={colors} />
 
@@ -108,33 +77,16 @@ const EditProfileScreen: React.FC = () => {
           colors={colors}
         />
       </View>
-    </Screen>
+    </View>
   );
 };
 
 // Stylesheet
 const styles = StyleSheet.create({
-  screenContent: {
+  container: {
     flex: 1,
-    paddingHorizontal: 8,
   },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-  },
-  backButton: {
-    paddingVertical: 8,
-  },
-  headerText: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: typography.fontSizes.title,
-    fontWeight: 'bold',
-  },
-  headerSpacer: {
-    width: 40, // To balance the back button
-  },
+
   inputsContainer: {
     flexDirection: 'column',
     gap: 30,

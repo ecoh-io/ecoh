@@ -1,5 +1,3 @@
-import { useTheme } from '@/src/theme/ThemeContext';
-import Screen from '@/src/UI/Screen';
 import { Stack } from 'expo-router';
 import ProtectedRoute from '../components/ProtectedRoute';
 

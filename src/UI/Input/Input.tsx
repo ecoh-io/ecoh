@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    fontFamily: typography.fontFamilies.poppins.regular,
+    fontFamily: typography.fontFamilies.poppins.medium,
     paddingVertical: 8,
     marginHorizontal: 8,
   },

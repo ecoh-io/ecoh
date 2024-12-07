@@ -1,5 +1,5 @@
+import { AuthResponse } from '../types/auth.response';
 import { ConfirmUserRegistrationData } from '../types/confirm.data';
-import { ConfrimRegistrationResponse } from '../types/confirm.response';
 import axiosInstance from './axiosInstance';
 
 /**
@@ -9,8 +9,8 @@ import axiosInstance from './axiosInstance';
  */
 export const confrimUser = async (
   formData: ConfirmUserRegistrationData,
-): Promise<ConfrimRegistrationResponse> => {
-  const response = await axiosInstance.post<ConfrimRegistrationResponse>(
+): Promise<AuthResponse> => {
+  const response = await axiosInstance.post<AuthResponse>(
     '/auth/confirm-signup',
     formData,
     {
