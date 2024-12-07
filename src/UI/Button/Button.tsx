@@ -26,7 +26,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const Button: React.FC<ButtonProps & PressableProps> = ({
   title,
   onPress,
-  disabled = false,
+  disabled,
   loading = false,
   variant = 'primary',
   size = 'medium',

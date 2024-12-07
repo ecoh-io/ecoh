@@ -6,8 +6,9 @@ export type User = {
   email: string | null;
   mobile: string | null;
   dateOfBirth: Date;
-  bio: string;
-  profileImage: string;
+  bio: string | null;
+  gender: string | null;
+  profileImage: string | null;
   connectionsCount: number;
   followersCount: number;
   followingCount: number;

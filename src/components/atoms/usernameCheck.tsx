@@ -80,13 +80,14 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 10,
   },
   icon: {
     marginRight: 10,
   },
   text: {
     fontFamily: typography.fontFamilies.poppins.regular,
-    fontSize: typography.fontSizes.body,
+    fontSize: typography.fontSizes.button,
   },
 });
 

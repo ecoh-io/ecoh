@@ -7,7 +7,6 @@ import queryClient from '@/src/utils/queryClient';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { ActivityIndicator, View } from 'react-native';
 import { WithFonts } from './components/WithFonts';
-import { RootSiblingParent } from 'react-native-root-siblings';
 
 export default function RootLayout() {
   const loading = useAuthStore((state) => state.loading);
@@ -28,13 +27,11 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <RootSiblingParent>
-        <QueryClientProvider client={queryClient}>
-          <WithFonts>
-            <Slot />
-          </WithFonts>
-        </QueryClientProvider>
-      </RootSiblingParent>
+      <QueryClientProvider client={queryClient}>
+        <WithFonts>
+          <Slot />
+        </WithFonts>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

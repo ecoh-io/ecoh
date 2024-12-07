@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
   imageContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 20,
+    marginTop: 20,
   },
   profileImage: {
     width: 100,
@@ -27,6 +27,6 @@ export const styles = StyleSheet.create({
   username: {
     fontSize: typography.fontSizes.smallTitle,
     fontFamily: typography.fontFamilies.poppins.medium,
-    opacity: 0.7,
+    opacity: 0.5,
   },
 });

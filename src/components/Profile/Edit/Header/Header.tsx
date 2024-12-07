@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({
   colors,
   save,
   isSaving = false,
-  isDisabled = false,
+  isDisabled = true,
 }) => (
   <View style={styles.headerContainer}>
     <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>

@@ -12,21 +12,22 @@ const EditProfileScreen: React.FC = () => {
   const { colors } = useTheme();
   const user = useAuthStore((state) => state.user);
   const router = useRouter();
-  // Handlers for editing fields
+
   const handleEditName = () => {
     router.push('/edit-profile/name');
   };
 
   const handleEditUsername = () => {
-    // Navigate to Edit Username Screen or open a modal
-    console.log('Edit Username Pressed');
+    router.push('/edit-profile/username');
   };
 
   const handleEditBio = () => {
-    // Navigate to Edit Bio Screen or open a modal
-    console.log('Edit Bio Pressed');
+    router.push('/edit-profile/bio');
   };
 
+  const handleEditGender = () => {
+    router.push('/edit-profile/gender');
+  };
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header title="Edit profile" colors={colors} />
@@ -66,7 +67,7 @@ const EditProfileScreen: React.FC = () => {
           iconName="users"
           label="Gender"
           value={user?.bio?.trim() ? user.bio : 'Add gender'}
-          onPress={handleEditBio}
+          onPress={handleEditGender}
           colors={colors}
         />
         <TouchableRow
