@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, memo } from 'react';
 import { View, StyleSheet, Pressable, Animated, Easing } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
@@ -42,118 +42,119 @@ interface ProfileTabBarProps {
   tabBarWidth: number;
 }
 
-const ProfileTabBar: React.FC<ProfileTabBarProps> = React.memo(
-  ({ currentIndex, onTabPress, tabBarWidth }) => {
-    const { colors } = useTheme();
-    const tabWidth = useMemo(() => tabBarWidth / TABS.length, [tabBarWidth]);
-    const indicatorWidth = useMemo(() => tabWidth * 0.5, [tabWidth]);
+const ProfileTabBar: React.FC<ProfileTabBarProps> = ({
+  currentIndex,
+  onTabPress,
+  tabBarWidth,
+}) => {
+  const { colors } = useTheme();
+  const tabWidth = useMemo(() => tabBarWidth / TABS.length, [tabBarWidth]);
+  const indicatorWidth = useMemo(() => tabWidth * 0.5, [tabWidth]);
 
-    const indicatorPosition = useRef(new Animated.Value(0)).current;
+  const indicatorPosition = useRef(new Animated.Value(0)).current;
 
-    useEffect(() => {
-      if (tabWidth > 0 && indicatorWidth > 0) {
-        const toValue =
-          currentIndex * tabWidth + (tabWidth - indicatorWidth) / 2;
-        Animated.spring(indicatorPosition, {
-          toValue,
-          tension: 300,
-          friction: 20,
-          useNativeDriver: true,
-        }).start();
-      }
-    }, [currentIndex, tabWidth, indicatorWidth]);
+  useEffect(() => {
+    if (tabWidth > 0 && indicatorWidth > 0) {
+      const toValue = currentIndex * tabWidth + (tabWidth - indicatorWidth) / 2;
+      Animated.spring(indicatorPosition, {
+        toValue,
+        tension: 300,
+        friction: 20,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [currentIndex, tabWidth, indicatorWidth]);
 
-    return (
-      <View
-        style={[styles.tabBarContainer, { backgroundColor: colors.background }]}
-      >
-        <View style={styles.tabBar}>
-          {TABS.map((tab, index) => {
-            const isActive = currentIndex === index;
+  return (
+    <View
+      style={[styles.tabBarContainer, { backgroundColor: colors.background }]}
+    >
+      <View style={styles.tabBar}>
+        {TABS.map((tab, index) => {
+          const isActive = currentIndex === index;
 
-            return (
-              <Pressable
-                key={tab.name}
-                style={[styles.tabItem, { width: tabWidth }]}
-                onPress={() => onTabPress(index)}
-                accessibilityLabel={tab.name}
-                accessibilityRole="button"
-                android_ripple={{
-                  color: 'rgba(0,0,0,0.1)',
-                  borderless: true,
-                }}
-              >
-                <View style={styles.iconContainer}>
-                  {isActive ? (
-                    <MaskedView
-                      maskElement={
-                        <MaterialCommunityIcons
-                          name={tab.icon}
-                          size={26}
-                          color="black"
-                        />
-                      }
-                    >
-                      <LinearGradient
-                        colors={['#00c6ff', '#0072ff']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={{ width: 26, height: 26 }}
-                      />
-                      <View style={StyleSheet.absoluteFill} />
-                    </MaskedView>
-                  ) : (
-                    <MaterialCommunityIcons
-                      name={tab.iconOutline}
-                      size={26}
-                      color={'#828282'}
-                    />
-                  )}
-                </View>
-              </Pressable>
-            );
-          })}
-        </View>
-        {tabBarWidth > 0 && (
-          <Animated.View
-            style={[
-              styles.tabIndicator,
-              {
-                transform: [{ translateX: indicatorPosition }],
-                width: indicatorWidth,
-              },
-            ]}
-            pointerEvents="none"
-          >
-            <MaskedView
-              maskElement={
-                <View
-                  style={{
-                    width: indicatorWidth,
-                    height: INDICATOR_HEIGHT,
-                    backgroundColor: 'black',
-                    borderRadius: INDICATOR_HEIGHT / 2,
-                  }}
-                />
-              }
+          return (
+            <Pressable
+              key={tab.name}
+              style={[styles.tabItem, { width: tabWidth }]}
+              onPress={() => onTabPress(index)}
+              accessibilityLabel={tab.name}
+              accessibilityRole="button"
+              android_ripple={{
+                color: 'rgba(0,0,0,0.1)',
+                borderless: true,
+              }}
             >
-              <LinearGradient
-                colors={['#00c6ff', '#0072ff']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+              <View style={styles.iconContainer}>
+                {isActive ? (
+                  <MaskedView
+                    maskElement={
+                      <MaterialCommunityIcons
+                        name={tab.icon}
+                        size={26}
+                        color="black"
+                      />
+                    }
+                  >
+                    <LinearGradient
+                      colors={['#00c6ff', '#0072ff']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={{ width: 26, height: 26 }}
+                    />
+                    <View style={StyleSheet.absoluteFill} />
+                  </MaskedView>
+                ) : (
+                  <MaterialCommunityIcons
+                    name={tab.iconOutline}
+                    size={26}
+                    color={'#828282'}
+                  />
+                )}
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+      {tabBarWidth > 0 && (
+        <Animated.View
+          style={[
+            styles.tabIndicator,
+            {
+              transform: [{ translateX: indicatorPosition }],
+              width: indicatorWidth,
+            },
+          ]}
+          pointerEvents="none"
+        >
+          <MaskedView
+            maskElement={
+              <View
                 style={{
                   width: indicatorWidth,
                   height: INDICATOR_HEIGHT,
+                  backgroundColor: 'black',
                   borderRadius: INDICATOR_HEIGHT / 2,
                 }}
               />
-            </MaskedView>
-          </Animated.View>
-        )}
-      </View>
-    );
-  },
-);
+            }
+          >
+            <LinearGradient
+              colors={['#00c6ff', '#0072ff']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                width: indicatorWidth,
+                height: INDICATOR_HEIGHT,
+                borderRadius: INDICATOR_HEIGHT / 2,
+              }}
+            />
+          </MaskedView>
+        </Animated.View>
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   tabBarContainer: {
@@ -200,4 +201,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileTabBar;
+export default memo(ProfileTabBar);

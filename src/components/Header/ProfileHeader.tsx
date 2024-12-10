@@ -20,40 +20,40 @@ interface HeaderProps {
   colors: Colors;
 }
 
-const ProfileHeader: React.FC<HeaderProps> = memo(
-  ({ username, onEditPress, colors }) => {
-    return (
-      <View
-        style={[
-          styles.headerContainer,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
-        <SafeAreaView>
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.text }]}>
-              {username}
-            </Text>
-            <TouchableOpacity
-              accessibilityLabel="Edit Profile"
-              accessibilityHint="Navigates to profile editing screen"
-              onPress={onEditPress}
-              style={[styles.headerIcon, { backgroundColor: colors.highlight }]}
-            >
-              <MaterialCommunityIcons
-                name="pencil-outline"
-                size={24}
-                color={colors.text}
-              />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </View>
-    );
-  },
-);
+const ProfileHeader: React.FC<HeaderProps> = ({
+  username,
+  onEditPress,
+  colors,
+}) => {
+  return (
+    <View
+      style={[
+        styles.headerContainer,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <SafeAreaView>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]}>{username}</Text>
+          <TouchableOpacity
+            accessibilityLabel="Edit Profile"
+            accessibilityHint="Navigates to profile editing screen"
+            onPress={onEditPress}
+            style={[styles.headerIcon, { backgroundColor: colors.highlight }]}
+          >
+            <MaterialCommunityIcons
+              name="pencil-outline"
+              size={24}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   headerContainer: {

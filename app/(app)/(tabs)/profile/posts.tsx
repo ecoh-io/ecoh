@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { posts } from '@/src/lib/data';
 import Post from '@/src/components/post/Post';
 import { PostType } from '@/src/types/post';

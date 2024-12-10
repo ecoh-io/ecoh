@@ -14,9 +14,6 @@ import { useRouter } from 'expo-router';
 import ProfileInfo from '@/src/components/Profile/ProfileInfo';
 import ProfileDescription from '@/src/components/Profile/ProfileDescription';
 
-const MemoizedProfileHeader = memo(ProfileHeader);
-const MemoizedProfileTabBar = memo(ProfileTabBar);
-
 const ProfileLayout: React.FC = () => {
   const { colors, isDark } = useTheme();
   const user = useAuthStore((state) => state.user);
@@ -37,7 +34,7 @@ const ProfileLayout: React.FC = () => {
   const Header = useCallback(
     () => (
       <View onLayout={onHeaderLayout}>
-        <MemoizedProfileHeader
+        <ProfileHeader
           colors={colors}
           username={user?.username || ''}
           onEditPress={() => router.push('/(app)/edit-profile')}
@@ -82,7 +79,7 @@ const ProfileLayout: React.FC = () => {
         renderHeader={Header}
         renderTabBar={() => (
           <View onLayout={handleTabBarLayout}>
-            <MemoizedProfileTabBar
+            <ProfileTabBar
               currentIndex={currentIndex}
               onTabPress={handleTabPress}
               tabBarWidth={tabBarWidth}

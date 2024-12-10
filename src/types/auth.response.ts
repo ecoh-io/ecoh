@@ -1,4 +1,4 @@
-import { UserData } from '../store/localStorage';
+import { User } from './user';
 
 export type AuthResponse = {
   tokens: {
@@ -6,5 +6,5 @@ export type AuthResponse = {
     IdToken: string;
     RefreshToken: string;
   };
-  user: UserData;
+  user: User;
 };
