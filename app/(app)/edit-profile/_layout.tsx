@@ -10,7 +10,7 @@ export default function EditLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Screen
-        preset="fixed"
+        preset="auto"
         safeAreaEdges={['top', 'bottom']}
         backgroundColor={colors.background}
         contentContainerStyle={styles.screenContent}

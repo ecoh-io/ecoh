@@ -1,8 +1,9 @@
 import { Colors } from '@/src/types/color';
 import { User } from '@/src/types/user';
 import { memo } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { styles } from './ProfileInfo.styles';
+import { Image } from 'expo-image';
 
 interface ProfileInfoProps {
   user: User;
