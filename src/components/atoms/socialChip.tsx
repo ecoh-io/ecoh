@@ -1,3 +1,4 @@
+import { typography } from '@/src/theme/typography';
 import { Colors } from '@/src/types/color';
 import { FontAwesome6, FontAwesome } from '@expo/vector-icons';
 import React from 'react';
@@ -17,12 +18,12 @@ const SocialChip: React.FC<SocialChipProps> = ({
   colors,
 }) => {
   return (
-    <View style={[styles.chipContainer, { backgroundColor: colors.highlight }]}>
+    <View style={[styles.chipContainer, { backgroundColor: colors.testGray }]}>
       <FontAwesome6 name={iconName} size={18} color={colors.text} />
-      <Text>{label}</Text>
+      <Text style={styles.label}>{label}</Text>
       {onDelete ? (
         <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-          <FontAwesome name="close" size={18} color={colors.text} />
+          <FontAwesome name="close" size={12} color={colors.text} />
         </TouchableOpacity>
       ) : null}
     </View>
@@ -34,15 +35,21 @@ export default SocialChip;
 const styles = StyleSheet.create({
   chipContainer: {
     flexDirection: 'row',
-    gap: 5,
+    gap: 10,
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 16,
   },
-
   deleteButton: {
-    borderRadius: 8,
-    padding: 2,
+    width: 21,
+    height: 21,
+    borderRadius: 32,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  label: {
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
 });

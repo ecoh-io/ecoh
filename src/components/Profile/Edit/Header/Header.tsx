@@ -3,7 +3,6 @@ import { Entypo } from '@expo/vector-icons';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './Header.styles';
 import { router } from 'expo-router';
-import Button from '@/src/UI/Button';
 
 interface HeaderProps {
   title: string;
@@ -29,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({
     </View>
     {save ? (
       isSaving ? (
-        <ActivityIndicator color={colors.text} />
+        <ActivityIndicator color={colors.primary} />
       ) : (
         <TouchableOpacity
           style={styles.saveButton}

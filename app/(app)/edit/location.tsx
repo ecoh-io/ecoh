@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     gap: 20,
+    paddingHorizontal: 12,
   },
   map: {
     width: Dimensions.get('window').width - 20, // Adjust width as needed

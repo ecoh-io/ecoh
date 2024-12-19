@@ -4,6 +4,7 @@ import { User } from '../interfaces/user';
 import { Gender } from '../enums/gender.enum';
 import { useUpdateUser } from '../hooks/useUpdateUserProfile';
 import { Location } from '../types/location';
+import { useRouter } from 'expo-router';
 
 interface EditContextType {
   user: User | null;
@@ -25,16 +26,20 @@ const EditContext = createContext<EditContextType | undefined>(undefined);
 export const EditProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const router = useRouter();
   const authUser = useAuthStore((state) => state.user);
   const [user, setUser] = useState<User | null>(authUser);
   const { mutateAsync: updateUserProfile, isPending } = useUpdateUser(
     user?.id || '',
+    {
+      onSuccess: () => {
+        router.back();
+      },
+    },
   );
   const updateUserProfileInStore = useAuthStore(
     (state) => state.updateUserProfile,
   );
-
-  console.log('Edit context user:', user);
 
   const updateName = useCallback(
     async (name: string) => {
@@ -82,7 +87,7 @@ export const EditProvider: React.FC<{ children: React.ReactNode }> = ({
       if (user) {
         const updatedUser = {
           ...user,
-          profile: { ...user.profile, socialLinks: links || null },
+          profile: { ...user.profile, links: links || null },
         };
         await updateUserProfile({ links: links || null });
         setUser(updatedUser);

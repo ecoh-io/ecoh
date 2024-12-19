@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { useAuthStore } from '@/src/store/AuthStore';
 import { Href, useRouter } from 'expo-router';
 import TouchableRow from '@/src/components/Profile/Edit/TouchableRow/TouchableRow';
 import ProfileInfo from '@/src/components/Profile/Edit/ProfileInfo';
 import Header from '@/src/components/Profile/Edit/Header';
 import { useEdit } from '@/src/context/EditContext';
+import { getGenderDisplay } from '@/src/enums/gender.enum';
 
 const useEditProfileNavigation = () => {
   const router = useRouter();
@@ -36,8 +36,6 @@ const EditProfileScreen: React.FC = () => {
     handleEditGender,
     handleEditLocation,
   } = useEditProfileNavigation();
-
-  console.log('Edit profile screen', user?.profile.city);
 
   if (!user) return null;
 
@@ -79,7 +77,11 @@ const EditProfileScreen: React.FC = () => {
         <TouchableRow
           iconName="users"
           label="Gender"
-          value={user.profile.gender ? user.profile.gender : 'Add gender'}
+          value={
+            user.profile.gender
+              ? getGenderDisplay(user.profile.gender)
+              : 'Add gender'
+          }
           onPress={handleEditGender}
           colors={colors}
         />
@@ -103,6 +105,7 @@ const EditProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 12,
   },
 
   inputsContainer: {

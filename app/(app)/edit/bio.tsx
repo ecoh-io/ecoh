@@ -1,7 +1,5 @@
 import Header from '@/src/components/Profile/Edit/Header';
 import { useEdit } from '@/src/context/EditContext';
-import { useUpdateUser } from '@/src/hooks/useUpdateUserProfile';
-import { useAuthStore } from '@/src/store/AuthStore';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import Input from '@/src/UI/Input';
@@ -26,7 +24,13 @@ const Bio: React.FC = () => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: 12,
+        backgroundColor: colors.background,
+      }}
+    >
       <Header
         title="Bio"
         colors={colors}

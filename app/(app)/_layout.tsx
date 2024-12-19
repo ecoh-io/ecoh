@@ -11,7 +11,7 @@ export default function AppLayout() {
         initialRouteName="(tabs)"
       >
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="edit-profile" />
+        <Stack.Screen name="edit" />
       </Stack>
     </ProtectedRoute>
   );

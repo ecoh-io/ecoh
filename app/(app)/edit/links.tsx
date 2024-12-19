@@ -15,8 +15,12 @@ import {
 } from '@/src/constants/SocialPlatforms';
 import { useTheme } from '@/src/theme/ThemeContext';
 import Button from '@/src/UI/Button';
-import { FontAwesome6 } from '@expo/vector-icons';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Entypo, FontAwesome6 } from '@expo/vector-icons';
+import BottomSheet, {
+  BottomSheetFlashList,
+  BottomSheetFlatList,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import Header from '@/src/components/Profile/Edit/Header';
 import { typography } from '@/src/theme/typography';
 import { useEdit } from '@/src/context/EditContext';
@@ -41,7 +45,7 @@ const Links: React.FC = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   // Snap points for Bottom Sheet
-  const snapPoints = useMemo(() => ['50%'], []);
+  const snapPoints = useMemo(() => ['60%'], []);
 
   // Available platforms excluding already linked ones
   const availablePlatforms = useMemo(
@@ -166,8 +170,11 @@ const Links: React.FC = () => {
           isDisabled={isLoading}
         />
         <Text style={styles.info}>
-          {`You can add up to ${MAX_LINKS} external links`}
+          {`People who visit your Ecoh profile will see your links.`}
+          {' \n'}
+          {`Max (${MAX_LINKS})`}
         </Text>
+
         <View style={styles.socialLinksContainer}>
           {/* Add Social Link Button */}
 
@@ -223,7 +230,7 @@ const Links: React.FC = () => {
           <Text style={[styles.sheetTitle, { color: colors.text }]}>
             Select a Platform
           </Text>
-          <FlatList
+          <BottomSheetFlatList
             data={availablePlatforms}
             keyExtractor={keyExtractor}
             renderItem={renderPlatformItem}
@@ -233,6 +240,7 @@ const Links: React.FC = () => {
             windowSize={21}
             removeClippedSubviews={true}
             keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled
           />
         </BottomSheetView>
       </BottomSheet>
@@ -275,16 +283,17 @@ const Links: React.FC = () => {
           {currentSheetView === 'usernameInput' && selectedPlatform && (
             <>
               <View style={styles.sheetHeader}>
+                <TouchableOpacity
+                  onPress={() => setCurrentSheetView('platformSelection')}
+                  style={styles.backButton}
+                >
+                  <Entypo name="chevron-left" size={32} color={colors.text} />
+                </TouchableOpacity>
                 <Text style={[styles.sheetTitle, { color: colors.text }]}>
-                  Add{' '}
-                  {
-                    SOCIAL_PLATFORMS.find((p) => p.key === selectedPlatform)
-                      ?.name
-                  }{' '}
-                  Link
+                  Add Link
                 </Text>
                 <Button
-                  title="Add"
+                  title="Save"
                   variant="primary"
                   size="small"
                   shape="rounded"
@@ -292,11 +301,17 @@ const Links: React.FC = () => {
                   onPress={handleUsernameSubmit}
                   disabled={!username.trim()}
                   accessibilityLabel="Save Social Link"
+                  style={{ width: 80 }}
                 />
               </View>
 
               {/* Selected Platform Display */}
-              <View style={styles.platformItem}>
+              <View
+                style={[
+                  styles.platformItem,
+                  { backgroundColor: colors.testGray },
+                ]}
+              >
                 <FontAwesome6
                   name={
                     SOCIAL_PLATFORMS.find((p) => p.key === selectedPlatform)
@@ -347,6 +362,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     gap: 20,
+    paddingHorizontal: 12,
   },
   socialLinksContainer: {
     flexDirection: 'row',
@@ -367,6 +383,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 8,
+    borderRadius: 16,
+    marginBottom: 16,
+    marginRight: 'auto',
+    marginLeft: 12,
   },
   platformName: {
     marginLeft: 12,
@@ -388,13 +408,12 @@ const styles = StyleSheet.create({
   },
   bottomSheetContent: {
     flex: 1,
-    paddingHorizontal: 8,
-    paddingTop: 16,
   },
   sheetTitle: {
     fontSize: 20,
     fontFamily: 'Poppins-Bold', // Adjust according to your typography
-    marginBottom: 16,
+    textAlign: 'center',
+    flex: 1,
   },
   platformList: {
     // Additional styling if needed
@@ -403,14 +422,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    alignContent: 'center',
+    paddingBottom: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 15,
+  },
+  backButton: {
+    width: 80,
   },
   input: {
     height: 48,
-    borderWidth: 1,
-    borderRadius: 8,
+    borderWidth: 2,
+    borderRadius: 16,
     paddingHorizontal: 12,
     fontSize: 16,
-    fontFamily: 'Poppins-Regular', // Adjust according to your typography
+    fontFamily: typography.fontFamilies.poppins.medium, // Adjust according to your typography
+    marginHorizontal: 12,
   },
   noLinksText: {
     fontFamily: typography.fontFamilies.poppins.medium,

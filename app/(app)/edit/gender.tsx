@@ -1,22 +1,13 @@
 import RadioButtonGroup from '@/src/components/atoms/radioButtonGroup';
 import Header from '@/src/components/Profile/Edit/Header';
 import { useEdit } from '@/src/context/EditContext';
-import { Gender } from '@/src/enums/gender.enum';
-import { useUpdateUser } from '@/src/hooks/useUpdateUserProfile';
-import { useAuthStore } from '@/src/store/AuthStore';
+import { Gender, genderOptions } from '@/src/enums/gender.enum';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import { useState } from 'react';
-import { Alert, Text } from 'react-native';
+import { Text } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { View } from 'react-native';
-
-const genderOptions = [
-  { label: 'Male', value: Gender.MALE },
-  { label: 'Female', value: Gender.FEMALE },
-  { label: 'Non-Binary', value: Gender.NON_BINARY },
-  { label: 'Prefer not to say', value: Gender.NOT_SAY },
-];
 
 const GenderScreen: React.FC = () => {
   const { user, isLoading, updateGender } = useEdit();
@@ -27,7 +18,13 @@ const GenderScreen: React.FC = () => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: 12,
+        backgroundColor: colors.background,
+      }}
+    >
       <Header
         title="Gender"
         colors={colors}

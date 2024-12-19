@@ -13,7 +13,7 @@ export default function EditLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Screen
           preset="fixed"
-          safeAreaEdges={['top', 'bottom']}
+          safeAreaEdges={['top']}
           backgroundColor={colors.background}
           contentContainerStyle={styles.screenContent}
           statusBarStyle={isDark ? 'light' : 'dark'}
@@ -39,6 +39,5 @@ export default function EditLayout() {
 const styles = StyleSheet.create({
   screenContent: {
     flex: 1,
-    paddingHorizontal: 8,
   },
 });

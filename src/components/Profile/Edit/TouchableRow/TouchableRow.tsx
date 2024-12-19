@@ -55,9 +55,11 @@ const formatValue = (
     const [longitude, latitude] = value.coordinates;
     return `Lat: ${latitude}, Lon: ${longitude}`;
   } else if (isRecord(value)) {
-    // Example: Display key-value pairs separated by commas
     return Object.entries(value)
-      .map(([key, val]) => `${key}: ${val}`)
+      .map(
+        ([platform]) =>
+          platform.charAt(0).toUpperCase() + platform.slice(1).toLowerCase(),
+      )
       .join(', ');
   }
   return '';

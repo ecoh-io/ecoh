@@ -139,7 +139,13 @@ const UserName: React.FC = () => {
   }, [isChecking]);
 
   return (
-    <View style={{ backgroundColor: colors.background, flex: 1 }}>
+    <View
+      style={{
+        backgroundColor: colors.background,
+        flex: 1,
+        paddingHorizontal: 12,
+      }}
+    >
       <Header
         title="Username"
         colors={colors}
@@ -181,7 +187,7 @@ export default UserName;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
   formContainer: {
     flex: 1,

@@ -45,7 +45,13 @@ const Name: React.FC = () => {
   }, [formik.errors.name, formik.touched.name]);
 
   return (
-    <View style={{ backgroundColor: colors.background, flex: 1 }}>
+    <View
+      style={{
+        backgroundColor: colors.background,
+        flex: 1,
+        paddingHorizontal: 12,
+      }}
+    >
       <Header
         title="Name"
         colors={colors}
@@ -87,7 +93,7 @@ export default Name;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
   formContainer: {
     flex: 1,
