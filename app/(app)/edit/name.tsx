@@ -1,4 +1,5 @@
 import Header from '@/src/components/Profile/Edit/Header';
+import { useEdit } from '@/src/context/EditContext';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
@@ -22,23 +23,19 @@ interface FormValues {
 }
 
 const Name: React.FC = () => {
+  const { user, isLoading, updateName } = useEdit();
   const { colors } = useTheme();
-  const user = useAuthStore((saved) => saved.user);
 
   const formik = useFormik<FormValues>({
-    initialValues: { name: user?.displayName || '' },
+    initialValues: { name: user?.name || '' },
     validationSchema: nameSchema,
     onSubmit: (values: FormValues, { setSubmitting }) => {
-      console.log('Name submitted', values);
       setSubmitting(false);
+      updateName(values.name);
     },
     validateOnChange: true,
     validateOnBlur: true,
   });
-
-  const save = () => {
-    console.log('Name saved');
-  };
 
   const iconColor = useMemo(() => {
     if (formik.errors.name && formik.touched.name) {
@@ -52,8 +49,8 @@ const Name: React.FC = () => {
       <Header
         title="Name"
         colors={colors}
-        save={save}
-        isSaving={formik.isSubmitting}
+        save={formik.handleSubmit}
+        isSaving={isLoading}
         isDisabled={formik.isSubmitting || !formik.isValid}
       />
       <View style={styles.formContainer}>

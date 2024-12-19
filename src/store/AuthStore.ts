@@ -8,7 +8,7 @@ import {
   setAuthToken,
   setRefreshToken,
 } from './secureStore';
-import { User } from '../types/user';
+import { User } from '../interfaces/user';
 
 interface AuthState {
   authToken: string | null;
@@ -20,6 +20,7 @@ interface AuthState {
   login: (authToken: string, refreshToken: string, user: User) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuthToken: () => Promise<void>;
+  updateUserProfile: (updatedUser: User) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -136,5 +137,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Error refreshing auth token', error);
       await get().logout();
     }
+  },
+  updateUserProfile(updatedUser: User) {
+    set({
+      user: updatedUser,
+    });
+    saveUserData(updatedUser).catch((error) => {
+      console.error('Failed to save updated user data to local storage', error);
+    });
   },
 }));

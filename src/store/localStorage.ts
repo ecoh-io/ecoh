@@ -1,15 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User } from '../types/user';
-
-export interface UserData {
-  id: string;
-  cognitoId: string;
-  username: string;
-  displayName: string;
-  email: string | null;
-  mobile: string | null;
-  dateOfBirth: Date;
-}
+import { User } from '../interfaces/user';
 
 const USER_DATA_KEY = 'user_data';
 

@@ -1,10 +1,4 @@
-import React, {
-  useMemo,
-  useCallback,
-  useState,
-  useRef,
-  useEffect,
-} from 'react';
+import React, { useMemo, useCallback, useState, useRef } from 'react';
 import {
   Keyboard,
   Text,
@@ -13,21 +7,19 @@ import {
   FlatList,
   TextInput,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
 import SocialChip from '@/src/components/atoms/socialChip';
 import {
   SOCIAL_PLATFORMS,
   SocialPlatform,
 } from '@/src/constants/SocialPlatforms';
-import { useAuthStore } from '@/src/store/AuthStore';
 import { useTheme } from '@/src/theme/ThemeContext';
 import Button from '@/src/UI/Button';
 import { FontAwesome6 } from '@expo/vector-icons';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import Header from '@/src/components/Profile/Edit/Header';
 import { typography } from '@/src/theme/typography';
-import BlurBackDrop from '@/src/components/atoms/BlurBackDrop';
+import { useEdit } from '@/src/context/EditContext';
 
 interface SocialLinksState {
   [platformKey: string]: string;
@@ -36,10 +28,12 @@ interface SocialLinksState {
 const MAX_LINKS = 5;
 
 const Links: React.FC = () => {
-  const user = useAuthStore((state) => state.user);
+  const { user, isLoading, updateLinks } = useEdit();
   const { colors } = useTheme();
 
-  const [links, setLinks] = useState<SocialLinksState>(user?.socialLinks || {});
+  const [links, setLinks] = useState<SocialLinksState>(
+    user?.profile.links || {},
+  );
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [username, setUsername] = useState<string>('');
 
@@ -155,9 +149,9 @@ const Links: React.FC = () => {
   );
 
   const save = useCallback(() => {
-    console.log('Saving social links:', links);
-    // Implement actual save logic here, e.g., API call
-  }, [links]);
+    const linksToSave = Object.keys(links).length > 0 ? links : null;
+    updateLinks(linksToSave);
+  }, [links, updateLinks]);
 
   const keyExtractor = useCallback((item: SocialPlatform) => item.key, []);
 
@@ -168,8 +162,8 @@ const Links: React.FC = () => {
           title="Links"
           colors={colors}
           save={save}
-          isSaving={false}
-          isDisabled={false}
+          isSaving={isLoading}
+          isDisabled={isLoading}
         />
         <Text style={styles.info}>
           {`You can add up to ${MAX_LINKS} external links`}

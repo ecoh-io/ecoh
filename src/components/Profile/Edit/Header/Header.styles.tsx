@@ -5,19 +5,28 @@ export const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
   },
   backButton: {
-    flex: 1,
     paddingVertical: 8,
   },
-  headerText: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: typography.fontSizes.smallTitle,
-    fontWeight: 'bold',
+  headerTextContainer: {
+    flex: 1, // This will allow the text container to take up all available space
+    alignItems: 'center', // Center the text horizontally
   },
-  headerSpacer: {
-    flex: 1,
+  headerText: {
+    fontSize: typography.fontSizes.smallTitle,
+    fontFamily: typography.fontFamilies.poppins.bold,
+    textAlign: 'center',
+  },
+  saveButton: {
+    paddingVertical: 8,
+  },
+  saveButtonText: {
+    fontFamily: typography.fontFamilies.poppins.medium,
+    fontSize: typography.fontSizes.body,
+  },
+  placeholder: {
+    width: 50, // Approximate width of the save button
   },
 });

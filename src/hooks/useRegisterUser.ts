@@ -55,53 +55,18 @@ export const useRegisterUser = (
   options?: UseRegisterUserOptions,
 ): UseMutationResult<RegisterResponse, APIError, AuthData> => {
   const mutation = useMutation<RegisterResponse, APIError, AuthData>({
-    /**
-     * The mutation function that performs the registration API call.
-     *
-     * @param formData - The registration data submitted by the user.
-     * @returns A promise resolving to the registration response.
-     */
     mutationFn: (formData: AuthData) => registerUser(formData),
 
-    /**
-     * Default onError handler to transform Axios errors to APIError.
-     * Logs the error and invokes any user-provided onError handler.
-     *
-     * @param error - The error thrown during the mutation.
-     * @param variables - The variables passed to the mutation function.
-     * @param context - The context returned from onMutate.
-     */
     onError: (error, variables, context) => {
       const apiError = transformAxiosError(error);
-
-      // Log the error for debugging purposes
       console.error('Registration failed:', apiError);
-
-      // Invoke user-provided onError handler if it exists
       if (options?.onError) {
         options.onError(apiError, variables, context);
       }
     },
 
-    /**
-     * Default onSuccess handler.
-     * Handles successful registration, such as navigating to a welcome page or logging in the user.
-     * Invokes any user-provided onSuccess handler.
-     *
-     * @param data - The data returned from the mutation function.
-     * @param variables - The variables passed to the mutation function.
-     * @param context - The context returned from onMutate.
-     */
     onSuccess: async (data, variables, context) => {
       try {
-        // Example side effect: Navigate to a welcome page after successful registration
-        // Replace this with your actual navigation logic
-        // For instance, using react-router:
-        // history.push('/welcome');
-
-        // If using Expo Router, uncomment the following line and adjust the path as needed
-        // router.replace('/welcome');
-
         console.log('Registration successful:', data);
       } catch (error) {
         // Handle any errors that occur during side effects

@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { Colors } from '@/src/types/color';
-import { User } from '@/src/types/user';
 import {
   Text,
   View,
@@ -16,6 +15,7 @@ import { memo } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { Image } from 'expo-image';
+import { User } from '@/src/interfaces/user';
 
 const DEFAULT_PROFILE_IMAGE_URL = 'https://via.placeholder.com/100';
 
@@ -29,7 +29,7 @@ interface ProfileInfoProps {
 const ProfileInfo: React.FC<ProfileInfoProps> = memo(
   ({ user, colors, onUpdateProfileImage }) => {
     const [profileImageUri, setProfileImageUri] = useState<string>(
-      user.profileImage || DEFAULT_PROFILE_IMAGE_URL,
+      user.profile.profilePictureUrl || DEFAULT_PROFILE_IMAGE_URL,
     );
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -143,7 +143,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(
         </TouchableOpacity>
         <View style={styles.profileTextContainer}>
           <Text style={[styles.name, { color: colors.text }]}>
-            {user.displayName ?? 'Unnamed User'}
+            {user.name ?? 'Unnamed User'}
           </Text>
           <Text style={[styles.username, { color: colors.text }]}>
             {user.username ?? 'username'}

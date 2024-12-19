@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -18,11 +18,13 @@ import { ILocation } from '@/src/interfaces/location';
 interface LocationSearchProps {
   onSelect: (item: ILocation) => void;
   colors: Colors;
+  selectedLocation?: ILocation | null;
 }
 
 const LocationSearchBar: React.FC<LocationSearchProps> = ({
   onSelect,
   colors,
+  selectedLocation,
 }) => {
   const {
     query,
@@ -33,6 +35,12 @@ const LocationSearchBar: React.FC<LocationSearchProps> = ({
     setLocations,
     cancelFetch,
   } = useLocationSearch();
+
+  useEffect(() => {
+    if (selectedLocation) {
+      setQuery(`${selectedLocation.city}, ${selectedLocation.region}`);
+    }
+  }, [selectedLocation, setQuery]);
 
   const handleSelect = useCallback(
     (item: ILocation) => {

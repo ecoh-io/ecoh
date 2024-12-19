@@ -1,9 +1,9 @@
 import { Colors } from '@/src/types/color';
-import { User } from '@/src/types/user';
 import { memo } from 'react';
 import { Text, View } from 'react-native';
 import { styles } from './ProfileInfo.styles';
 import { Image } from 'expo-image';
+import { User } from '@/src/interfaces/user';
 
 interface ProfileInfoProps {
   user: User;
@@ -15,7 +15,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => (
     <View style={styles.userInfo}>
       <Image
         source={{
-          uri: user?.profileImage || 'https://via.placeholder.com/100',
+          uri:
+            user?.profile.profilePictureUrl ||
+            'https://via.placeholder.com/100',
         }}
         style={styles.profileImage}
         accessibilityLabel="Profile picture"
@@ -23,7 +25,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => (
       <View style={styles.followInfo}>
         <View style={styles.followCount}>
           <Text style={[styles.followNumber, { color: colors.text }]}>
-            {user?.connectionsCount || '0'}
+            {'0'}
           </Text>
           <Text style={[styles.followLabel, { color: colors.text }]}>
             Connections
@@ -31,7 +33,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => (
         </View>
         <View style={styles.followCount}>
           <Text style={[styles.followNumber, { color: colors.text }]}>
-            {user?.followersCount || '0'}
+            {'0'}
           </Text>
           <Text style={[styles.followLabel, { color: colors.text }]}>
             Followers
@@ -39,7 +41,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => (
         </View>
         <View style={styles.followCount}>
           <Text style={[styles.followNumber, { color: colors.text }]}>
-            {user?.followingCount || '0'}
+            {'0'}
           </Text>
           <Text style={[styles.followLabel, { color: colors.text }]}>
             Following

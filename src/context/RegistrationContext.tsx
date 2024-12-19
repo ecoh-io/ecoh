@@ -193,7 +193,7 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
     if (nextRoute) {
       router.push(nextRoute);
     } else {
-      router.replace('/(authenticated)/(tabs)/dashboard');
+      router.replace('/(app)/(tabs)/dashboard');
     }
   }, [router, state.currentStep]);
 

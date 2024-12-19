@@ -4,15 +4,11 @@ import {
   UseMutationResult,
 } from '@tanstack/react-query';
 import axios from 'axios';
-import { loginUser } from '../api/login.api';
 import { useAuthStore } from '../store/AuthStore';
-import { router } from 'expo-router';
-import { AuthResponse } from '../types/auth.response';
-import { AuthData } from '../types/auth.data';
+import { UpdateUserProfileResponse } from '../types/updateUserProfile.reposnse';
+import { UpdateUserProfileData } from '../types/updateUserProfile.data';
+import { updateUserProfile } from '../api/updateUserProfile.api';
 
-/**
- * APIError interface represents the structure of error responses from the API.
- */
 interface APIError {
   status: number;
   message: string;
@@ -44,61 +40,51 @@ const transformAxiosError = (error: unknown): APIError => {
  * UseLoginUserOptions interface extends the default UseMutationOptions
  * to provide more specific typing for the login mutation.
  */
-interface UseLoginUserOptions
-  extends UseMutationOptions<AuthResponse, APIError, AuthData> {}
+interface UseUpdateUserProfileOptions
+  extends UseMutationOptions<
+    UpdateUserProfileResponse,
+    APIError,
+    UpdateUserProfileData
+  > {}
 
 /**
- * Custom hook to handle user login using React Query's useMutation.
+ * Custom hook to handle user profile updates using React Query's useMutation.
  *
  * @param options - Optional React Query mutation options to customize behavior.
  * @returns The mutation object containing methods and states for the login mutation.
  */
-export const useLoginUser = (
-  options?: UseLoginUserOptions,
-): UseMutationResult<AuthResponse, APIError, AuthData> => {
+export const useUpdateUser = (
+  id: string,
+  options?: UseUpdateUserProfileOptions,
+): UseMutationResult<
+  UpdateUserProfileResponse,
+  APIError,
+  UpdateUserProfileData
+> => {
   const authStore = useAuthStore();
 
-  const mutation = useMutation<AuthResponse, APIError, AuthData>({
-    mutationFn: (formData: AuthData) => loginUser(formData),
+  const mutation = useMutation<
+    UpdateUserProfileResponse,
+    APIError,
+    UpdateUserProfileData
+  >({
+    mutationFn: (formData: UpdateUserProfileData) =>
+      updateUserProfile(formData, id),
 
-    /**
-     * Default onError handler to transform Axios errors to APIError.
-     * Logs the error and invokes any user-provided onError handler.
-     */
     onError: (error, variables, context) => {
       const apiError = transformAxiosError(error);
-
-      // Log the error for debugging purposes
-      console.error('Login failed:', apiError);
-
-      // Invoke user-provided onError handler if it exists
       if (options?.onError) {
         options.onError(apiError, variables, context);
       }
     },
 
-    /**
-     * Default onSuccess handler.
-     * Updates authentication state and navigates to the dashboard.
-     * Invokes any user-provided onSuccess handler.
-     */
-    onSuccess: async (data: AuthResponse, variables, context) => {
+    onSuccess: async (data: UpdateUserProfileResponse, variables, context) => {
       try {
-        // Update authentication state with tokens and user data
-        authStore.login(
-          data.tokens.AccessToken,
-          data.tokens.RefreshToken,
-          data.user,
-        );
-
-        // Navigate to the dashboard
-        router.replace('/(app)/(tabs)/dashboard');
+        authStore.updateUserProfile(data);
       } catch (error) {
-        // Handle any errors that occur during state update or navigation
-        console.error('Error during login success handling:', error);
+        console.error('Error during updating user information:', error);
       }
 
-      // Invoke user-provided onSuccess handler if it exists
       if (options?.onSuccess) {
         options.onSuccess(data, variables, context);
       }

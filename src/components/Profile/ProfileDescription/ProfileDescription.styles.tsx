@@ -10,8 +10,7 @@ export const styles = StyleSheet.create({
     fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   profileBio: {
-    fontSize: typography.fontSizes.body,
-    fontFamily: typography.fontFamilies.poppins.regular,
-    marginVertical: 8,
+    fontSize: typography.fontSizes.button,
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
 });

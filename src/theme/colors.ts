@@ -1,6 +1,6 @@
 export const lightColors = {
   // Primary Colors
-  primary: '#6200EE', // Main brand color
+  primary: '#0072ff', // Main brand color
   onPrimary: '#FFFFFF', // Text/icon color on primary background
 
   // Secondary Colors

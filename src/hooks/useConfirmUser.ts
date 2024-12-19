@@ -66,47 +66,21 @@ export const useConfirmUser = (
     APIError,
     ConfirmUserRegistrationData
   >({
-    /**
-     * The mutation function that performs the confirmation API call.
-     *
-     * @param formData - The confirmation data submitted by the user.
-     * @returns A promise resolving to the confirmation response.
-     */
     mutationFn: (formData: ConfirmUserRegistrationData) =>
       confrimUser(formData),
 
-    /**
-     * Default onError handler to transform Axios errors to APIError.
-     * Logs the error and invokes any user-provided onError handler.
-     *
-     * @param error - The error thrown during the mutation.
-     * @param variables - The variables passed to the mutation function.
-     * @param context - The context returned from onMutate.
-     */
     onError: (error, variables, context) => {
       const apiError = transformAxiosError(error);
 
-      // Log the error for debugging purposes
       console.error('Confirmation failed:', apiError);
 
-      // Invoke user-provided onError handler if it exists
       if (options?.onError) {
         options.onError(apiError, variables, context);
       }
     },
 
-    /**
-     * Default onSuccess handler.
-     * Updates authentication state with tokens and user data.
-     * Invokes any user-provided onSuccess handler.
-     *
-     * @param data - The data returned from the mutation function.
-     * @param variables - The variables passed to the mutation function.
-     * @param context - The context returned from onMutate.
-     */
     onSuccess: async (data: AuthResponse, variables, context) => {
       try {
-        // Update authentication state with tokens and user data
         await login(
           data.tokens.AccessToken,
           data.tokens.RefreshToken,
@@ -115,11 +89,9 @@ export const useConfirmUser = (
 
         console.log('User confirmed and logged in successfully:', data.user);
       } catch (error) {
-        // Handle any errors that occur during state update
         console.error('Login error:', error);
       }
 
-      // Invoke user-provided onSuccess handler if it exists
       if (options?.onSuccess) {
         options.onSuccess(data, variables, context);
       }

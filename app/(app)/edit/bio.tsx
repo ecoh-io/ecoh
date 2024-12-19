@@ -1,4 +1,6 @@
 import Header from '@/src/components/Profile/Edit/Header';
+import { useEdit } from '@/src/context/EditContext';
+import { useUpdateUser } from '@/src/hooks/useUpdateUserProfile';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
@@ -9,10 +11,10 @@ import { View } from 'react-native';
 
 const MAX_BIO_LENGTH = 150;
 const Bio: React.FC = () => {
-  const user = useAuthStore((saved) => saved.user);
+  const { user, isLoading, updateBio } = useEdit();
   const { colors } = useTheme();
 
-  const [bio, setBio] = useState<string>(user?.bio || '');
+  const [bio, setBio] = useState<string>(user?.profile.bio || '');
 
   const handleChangeText = useCallback(
     (text: string) => {
@@ -23,17 +25,14 @@ const Bio: React.FC = () => {
     [setBio],
   );
 
-  const save = () => {
-    console.log('Bio updated:', bio);
-  };
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Header
         title="Bio"
         colors={colors}
-        save={save}
-        isSaving={false}
-        isDisabled={false}
+        save={() => updateBio(bio)}
+        isSaving={isLoading}
+        isDisabled={isLoading}
       />
       <View style={styles.bioContainer}>
         <Input
@@ -42,7 +41,6 @@ const Bio: React.FC = () => {
           containerStyle={styles.bioInputContainer}
           value={bio}
           onChangeText={handleChangeText}
-          keyboardType="numbers-and-punctuation"
         />
         <Text style={styles.bioCounter}>
           {bio.length}/{MAX_BIO_LENGTH}

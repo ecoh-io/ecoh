@@ -1,8 +1,8 @@
 import { Colors } from '@/src/types/color';
-import { User } from '@/src/types/user';
 import { memo } from 'react';
 import { Text, View } from 'react-native';
 import { styles } from './ProfileDescription.styles';
+import { User } from '@/src/interfaces/user';
 
 interface ProfileDescriptionProps {
   user: User;
@@ -13,11 +13,11 @@ const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
   ({ user, colors }) => (
     <View style={styles.profileDescription}>
       <Text style={[styles.profileName, { color: colors.text }]}>
-        {user?.displayName || ''}
+        {user?.name || ''}
       </Text>
-      {user.bio ? (
+      {user.profile.bio ? (
         <Text style={[styles.profileBio, { color: colors.text }]}>
-          {user.bio}
+          {user.profile.bio}
         </Text>
       ) : null}
     </View>

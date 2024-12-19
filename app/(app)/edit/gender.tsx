@@ -1,45 +1,45 @@
 import RadioButtonGroup from '@/src/components/atoms/radioButtonGroup';
 import Header from '@/src/components/Profile/Edit/Header';
+import { useEdit } from '@/src/context/EditContext';
+import { Gender } from '@/src/enums/gender.enum';
+import { useUpdateUser } from '@/src/hooks/useUpdateUserProfile';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import { useState } from 'react';
-import { Text } from 'react-native';
+import { Alert, Text } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { View } from 'react-native';
 
 const genderOptions = [
-  { label: 'Male', value: 'male' },
-  { label: 'Female', value: 'female' },
-  { label: 'Non-Binary', value: 'non-binary' },
-  { label: 'Prefer not to say', value: 'prefer-not-to-say' },
+  { label: 'Male', value: Gender.MALE },
+  { label: 'Female', value: Gender.FEMALE },
+  { label: 'Non-Binary', value: Gender.NON_BINARY },
+  { label: 'Prefer not to say', value: Gender.NOT_SAY },
 ];
 
-const Gender: React.FC = () => {
-  const user = useAuthStore((saved) => saved.user);
+const GenderScreen: React.FC = () => {
+  const { user, isLoading, updateGender } = useEdit();
   const { colors } = useTheme();
 
-  const [selectedGender, setSelectedGender] = useState<string>(
-    user?.gender || 'prefer-not-to-say',
+  const [gender, setGender] = useState<Gender>(
+    user?.profile.gender || Gender.NOT_SAY,
   );
 
-  const save = () => {
-    console.log('Gender updated: ', selectedGender);
-  };
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Header
         title="Gender"
         colors={colors}
-        save={save}
-        isSaving={false}
-        isDisabled={false}
+        save={() => updateGender(gender)}
+        isSaving={isLoading}
+        isDisabled={isLoading}
       />
       <View style={styles.container}>
         <RadioButtonGroup
           options={genderOptions}
-          selectedValue={selectedGender}
-          onValueChange={setSelectedGender}
+          selectedValue={gender}
+          onValueChange={(value) => setGender(value as Gender)}
           direction="vertical"
         />
         <Text style={styles.info}>
@@ -50,7 +50,7 @@ const Gender: React.FC = () => {
   );
 };
 
-export default Gender;
+export default GenderScreen;
 
 const styles = StyleSheet.create({
   container: {

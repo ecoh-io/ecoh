@@ -1,6 +1,6 @@
 import { Colors } from '@/src/types/color';
 import { Entypo } from '@expo/vector-icons';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './Header.styles';
 import { router } from 'expo-router';
 import Button from '@/src/UI/Button';
@@ -24,22 +24,30 @@ const Header: React.FC<HeaderProps> = ({
     <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
       <Entypo name="chevron-left" size={32} color={colors.text} />
     </TouchableOpacity>
-    <Text style={[styles.headerText, { color: colors.text }]}>{title}</Text>
+    <View style={styles.headerTextContainer}>
+      <Text style={[styles.headerText, { color: colors.text }]}>{title}</Text>
+    </View>
     {save ? (
-      <View style={styles.headerSpacer}>
-        <Button
+      isSaving ? (
+        <ActivityIndicator color={colors.text} />
+      ) : (
+        <TouchableOpacity
+          style={styles.saveButton}
           onPress={save}
-          title="save"
-          variant="primary"
-          size="small"
-          loading={isSaving}
           disabled={isDisabled}
-          gradientColors={['#00c6ff', '#0072ff']}
-          style={{ paddingLeft: 75 }}
-        />
-      </View>
+        >
+          <Text
+            style={[
+              styles.saveButtonText,
+              { color: colors.primary, opacity: isDisabled ? 0.5 : 1 },
+            ]}
+          >
+            Save
+          </Text>
+        </TouchableOpacity>
+      )
     ) : (
-      <View style={styles.headerSpacer} />
+      <View style={styles.placeholder} />
     )}
   </View>
 );

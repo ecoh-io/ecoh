@@ -6,6 +6,7 @@ import { Href, useRouter } from 'expo-router';
 import TouchableRow from '@/src/components/Profile/Edit/TouchableRow/TouchableRow';
 import ProfileInfo from '@/src/components/Profile/Edit/ProfileInfo';
 import Header from '@/src/components/Profile/Edit/Header';
+import { useEdit } from '@/src/context/EditContext';
 
 const useEditProfileNavigation = () => {
   const router = useRouter();
@@ -15,20 +16,18 @@ const useEditProfileNavigation = () => {
   };
 
   return {
-    handleEditName: () => navigateTo('/(app)/edit-profile/name'),
-    handleEditUsername: () => navigateTo('/(app)/edit-profile/username'),
-    handleEditBio: () => navigateTo('/(app)/edit-profile/bio'),
-    handleEditLinks: () => navigateTo('/(app)/edit-profile/links'),
-    handleEditGender: () => navigateTo('/(app)/edit-profile/gender'),
-    handleEditLocation: () => navigateTo('/(app)/edit-profile/location'),
+    handleEditName: () => navigateTo('/(app)/edit/name'),
+    handleEditUsername: () => navigateTo('/(app)/edit/username'),
+    handleEditBio: () => navigateTo('/(app)/edit/bio'),
+    handleEditLinks: () => navigateTo('/(app)/edit/links'),
+    handleEditGender: () => navigateTo('/(app)/edit/gender'),
+    handleEditLocation: () => navigateTo('/(app)/edit/location'),
   };
 };
-
-const DEFAULT_PROFILE_IMAGE_URL = 'https://via.placeholder.com/100';
 // Main Edit Profile Screen Component
 const EditProfileScreen: React.FC = () => {
+  const { user } = useEdit();
   const { colors } = useTheme();
-  const user = useAuthStore((state) => state.user);
   const {
     handleEditName,
     handleEditUsername,
@@ -37,6 +36,8 @@ const EditProfileScreen: React.FC = () => {
     handleEditGender,
     handleEditLocation,
   } = useEditProfileNavigation();
+
+  console.log('Edit profile screen', user?.profile.city);
 
   if (!user) return null;
 
@@ -50,7 +51,7 @@ const EditProfileScreen: React.FC = () => {
         <TouchableRow
           iconName="user"
           label="Name"
-          value={user.displayName}
+          value={user.name}
           onPress={handleEditName}
           colors={colors}
         />
@@ -64,28 +65,32 @@ const EditProfileScreen: React.FC = () => {
         <TouchableRow
           iconName="file-text"
           label="Bio"
-          value={user.bio?.trim() ? user.bio : 'Add bio'}
+          value={user.profile.bio?.trim() ? user.profile.bio : 'Add bio'}
           onPress={handleEditBio}
           colors={colors}
         />
         <TouchableRow
           iconName="link"
           label="Links"
-          value={user.bio?.trim() ? user.bio : 'Add links'}
+          value={user.profile.links ? user.profile.links : 'Add links'}
           onPress={handleEditLinks}
           colors={colors}
         />
         <TouchableRow
           iconName="users"
           label="Gender"
-          value={user.gender ? user.gender : 'Add gender'}
+          value={user.profile.gender ? user.profile.gender : 'Add gender'}
           onPress={handleEditGender}
           colors={colors}
         />
         <TouchableRow
           iconName="map-pin"
           label="Location"
-          value={user.location ? user.location : 'Add location'}
+          value={
+            user.profile.location && user.profile.city && user.profile.region
+              ? `${user.profile.city}, ${user.profile.region}`
+              : 'Add location'
+          }
           onPress={handleEditLocation}
           colors={colors}
         />

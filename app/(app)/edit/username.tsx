@@ -1,5 +1,6 @@
 import { UsernameCheck } from '@/src/components/atoms';
 import Header from '@/src/components/Profile/Edit/Header';
+import { useEdit } from '@/src/context/EditContext';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
@@ -30,8 +31,8 @@ const usernameSchema = yup.object().shape({
 });
 
 const UserName: React.FC = () => {
+  const { user, isLoading, updateUsername } = useEdit();
   const { colors } = useTheme();
-  const user = useAuthStore((saved) => saved.user);
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
 
@@ -48,6 +49,7 @@ const UserName: React.FC = () => {
         if (!available) {
           setErrors({ username: 'Username is already taken' });
         } else {
+          updateUsername(values.username);
         }
       } catch (error) {
         console.error('Error checking username availability:', error);
@@ -136,17 +138,13 @@ const UserName: React.FC = () => {
     return null;
   }, [isChecking]);
 
-  const save = () => {
-    console.log('Name saved');
-  };
-
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <Header
         title="Username"
         colors={colors}
-        save={save}
-        isSaving={formik.isSubmitting}
+        save={formik.handleSubmit}
+        isSaving={isLoading}
         isDisabled={formik.isSubmitting || !formik.isValid}
       />
       <View style={styles.formContainer}>

@@ -6,7 +6,7 @@ import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 interface SocialChipProps {
   label: string;
   iconName: keyof typeof FontAwesome6.glyphMap;
-  onDelete: () => void;
+  onDelete?: () => void;
   colors: Colors;
 }
 
@@ -20,9 +20,11 @@ const SocialChip: React.FC<SocialChipProps> = ({
     <View style={[styles.chipContainer, { backgroundColor: colors.highlight }]}>
       <FontAwesome6 name={iconName} size={18} color={colors.text} />
       <Text>{label}</Text>
-      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-        <FontAwesome name="close" size={18} color={colors.text} />
-      </TouchableOpacity>
+      {onDelete ? (
+        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+          <FontAwesome name="close" size={18} color={colors.text} />
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };

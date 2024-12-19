@@ -37,7 +37,7 @@ const ProfileLayout: React.FC = () => {
         <ProfileHeader
           colors={colors}
           username={user?.username || ''}
-          onEditPress={() => router.push('/(app)/edit-profile')}
+          onEditPress={() => router.push('/(app)/edit')}
         />
         {user && <ProfileInfo user={user} colors={colors} />}
         {user && <ProfileDescription user={user} colors={colors} />}
