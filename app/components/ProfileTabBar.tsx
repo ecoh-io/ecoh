@@ -1,203 +1,183 @@
-import React, { useRef, useEffect, useMemo, memo } from 'react';
-import { View, StyleSheet, Pressable, Animated, Easing } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import MaskedView from '@react-native-masked-view/masked-view';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useRef, useEffect, useState, memo } from 'react';
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  Animated,
+  Text,
+  LayoutChangeEvent,
+} from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
+import { typography } from '@/src/theme/typography';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-type Tab = {
-  name: string;
-  icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-  iconOutline: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-};
+type Tab = { name: string; icon: keyof typeof MaterialCommunityIcons.glyphMap };
 
 const TABS: Tab[] = [
-  {
-    name: 'Posts',
-    icon: 'post',
-    iconOutline: 'post-outline',
-  },
-  {
-    name: 'Media',
-    icon: 'image-multiple',
-    iconOutline: 'image-multiple-outline',
-  },
-  {
-    name: 'Tags',
-    icon: 'tag',
-    iconOutline: 'tag-outline',
-  },
-  {
-    name: 'Saved',
-    icon: 'bookmark',
-    iconOutline: 'bookmark-outline',
-  },
+  { name: 'Posts', icon: 'post-outline' },
+  { name: 'Media', icon: 'image-outline' },
+  { name: 'Tags', icon: 'tag-outline' },
+  { name: 'Saved', icon: 'bookmark-outline' },
 ];
-
-const INDICATOR_HEIGHT = 3;
 
 interface ProfileTabBarProps {
   currentIndex: number;
   onTabPress: (index: number) => void;
-  tabBarWidth: number;
 }
 
 const ProfileTabBar: React.FC<ProfileTabBarProps> = ({
   currentIndex,
   onTabPress,
-  tabBarWidth,
 }) => {
   const { colors } = useTheme();
-  const tabWidth = useMemo(() => tabBarWidth / TABS.length, [tabBarWidth]);
-  const indicatorWidth = useMemo(() => tabWidth * 0.5, [tabWidth]);
 
-  const indicatorPosition = useRef(new Animated.Value(0)).current;
+  // Array to store layout measurements for each tab (by index)
+  const [layouts, setLayouts] = useState<
+    Array<{ x: number; width: number } | null>
+  >(new Array(TABS.length).fill(null));
 
+  // Animated values for the pill's horizontal position and width
+  const pillAnimX = useRef(new Animated.Value(0)).current;
+  const pillAnimWidth = useRef(new Animated.Value(0)).current;
+
+  const iconScale = useRef(new Animated.Value(0)).current;
+
+  // When currentIndex or measured layouts change, animate the pill to match the active tab
   useEffect(() => {
-    if (tabWidth > 0 && indicatorWidth > 0) {
-      const toValue = currentIndex * tabWidth + (tabWidth - indicatorWidth) / 2;
-      Animated.spring(indicatorPosition, {
-        toValue,
-        tension: 300,
-        friction: 20,
-        useNativeDriver: true,
-      }).start();
+    const layout = layouts[currentIndex];
+    if (layout) {
+      Animated.parallel([
+        Animated.spring(pillAnimX, {
+          toValue: layout.x,
+          tension: 300,
+          friction: 20,
+          useNativeDriver: false, // 'left' and 'width' cannot use native driver
+        }),
+        Animated.spring(pillAnimWidth, {
+          toValue: layout.width,
+          tension: 300,
+          friction: 20,
+          useNativeDriver: false,
+        }),
+      ]).start();
     }
-  }, [currentIndex, tabWidth, indicatorWidth]);
+    Animated.spring(iconScale, {
+      toValue: 1,
+      tension: 150,
+      friction: 10,
+      useNativeDriver: true,
+    }).start();
+  }, [currentIndex, layouts, pillAnimX, pillAnimWidth, iconScale]);
+
+  // Capture layout measurements for each tab
+  const onTabLayout = (index: number) => (event: LayoutChangeEvent) => {
+    const { x, width } = event.nativeEvent.layout;
+    setLayouts((prev) => {
+      const newLayouts = [...prev];
+      newLayouts[index] = { x, width };
+      return newLayouts;
+    });
+  };
 
   return (
     <View
       style={[styles.tabBarContainer, { backgroundColor: colors.background }]}
     >
+      {/* Animated pill background positioned absolutely behind the tab text */}
+      <Animated.View
+        style={[
+          styles.animatedPill,
+          {
+            left: pillAnimX,
+            width: pillAnimWidth,
+          },
+        ]}
+      />
       <View style={styles.tabBar}>
         {TABS.map((tab, index) => {
-          const isActive = currentIndex === index;
-
+          const isActive = index === currentIndex;
           return (
             <Pressable
               key={tab.name}
-              style={[styles.tabItem, { width: tabWidth }]}
               onPress={() => onTabPress(index)}
-              accessibilityLabel={tab.name}
+              onLayout={onTabLayout(index)}
+              style={styles.tabItem}
+              android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true }}
               accessibilityRole="button"
-              android_ripple={{
-                color: 'rgba(0,0,0,0.1)',
-                borderless: true,
-              }}
+              accessibilityLabel={tab.name}
             >
-              <View style={styles.iconContainer}>
-                {isActive ? (
-                  <MaskedView
-                    maskElement={
-                      <MaterialCommunityIcons
-                        name={tab.icon}
-                        size={26}
-                        color="black"
-                      />
-                    }
-                  >
-                    <LinearGradient
-                      colors={['#00c6ff', '#0072ff']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={{ width: 26, height: 26 }}
-                    />
-                    <View style={StyleSheet.absoluteFill} />
-                  </MaskedView>
-                ) : (
+              {isActive && (
+                <Animated.View style={{ transform: [{ scale: iconScale }] }}>
                   <MaterialCommunityIcons
-                    name={tab.iconOutline}
-                    size={26}
-                    color={'#828282'}
+                    name={tab.icon}
+                    size={24}
+                    color={isActive ? '#0072ff' : '#000000'}
+                    style={styles.icon}
                   />
-                )}
-              </View>
+                </Animated.View>
+              )}
+              <Text
+                style={[
+                  styles.tabText,
+                  isActive ? styles.activeTabText : styles.inactiveTabText,
+                ]}
+              >
+                {tab.name}
+              </Text>
             </Pressable>
           );
         })}
       </View>
-      {tabBarWidth > 0 && (
-        <Animated.View
-          style={[
-            styles.tabIndicator,
-            {
-              transform: [{ translateX: indicatorPosition }],
-              width: indicatorWidth,
-            },
-          ]}
-          pointerEvents="none"
-        >
-          <MaskedView
-            maskElement={
-              <View
-                style={{
-                  width: indicatorWidth,
-                  height: INDICATOR_HEIGHT,
-                  backgroundColor: 'black',
-                  borderRadius: INDICATOR_HEIGHT / 2,
-                }}
-              />
-            }
-          >
-            <LinearGradient
-              colors={['#00c6ff', '#0072ff']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{
-                width: indicatorWidth,
-                height: INDICATOR_HEIGHT,
-                borderRadius: INDICATOR_HEIGHT / 2,
-              }}
-            />
-          </MaskedView>
-        </Animated.View>
-      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   tabBarContainer: {
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    width: '100%', // Ensure it spans the full width
+    width: '100%',
+    position: 'relative',
+    marginVertical: 15,
+    marginHorizontal: 10,
   },
   tabBar: {
     flexDirection: 'row',
-    width: '100%',
-    height: '100%',
+    justifyContent: 'flex-start', // left aligned
     alignItems: 'center',
   },
+  // Each tab item has a fixed height with centered content so the text appears centered.
   tabItem: {
-    alignItems: 'center',
+    height: 40,
+    flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center', // centers the text horizontally
+    paddingHorizontal: 12,
+    marginRight: 8,
+    borderRadius: 20,
+    zIndex: 1, // ensures text is rendered on top of the animated pill
   },
-  iconContainer: {
-    padding: 8,
-    borderRadius: 50,
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  activeIcon: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-  },
-  tabIndicator: {
+  // The animated pill background positioned behind the active tab
+  animatedPill: {
     position: 'absolute',
+    top: 0,
     bottom: 0,
-    left: 0,
-    height: INDICATOR_HEIGHT,
-    borderRadius: INDICATOR_HEIGHT / 2,
-    zIndex: 100,
+    height: 40,
+    backgroundColor: '#e6f0ff', // adjust as needed
+    borderRadius: 20,
+    zIndex: 0,
   },
-  indicatorGradient: {
-    width: '100%',
-    height: '100%',
-    borderRadius: INDICATOR_HEIGHT / 2,
+  tabText: {
+    fontSize: 16,
+    textAlign: 'center', // ensure text is centered within the Pressable
+    fontFamily: typography.fontFamilies.poppins.medium,
+  },
+  activeTabText: {
+    color: '#0072ff', // blue for active tab
+  },
+  inactiveTabText: {
+    color: '#000000', // black for inactive tabs
+  },
+  icon: {
+    marginRight: 4, // Space between icon and text
   },
 });
 

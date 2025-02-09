@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     fontSize: typography.fontSizes.caption,
   },
   followNumber: {
-    fontSize: typography.fontSizes.body,
+    fontSize: typography.fontSizes.headline,
     fontFamily: typography.fontFamilies.poppins.semiBold,
     marginTop: 5,
   },

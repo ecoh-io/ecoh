@@ -11,6 +11,7 @@ interface EditContextType {
   isLoading: boolean;
   updateName: (name: string) => void;
   updateUsername: (username: string) => void;
+  updateProfilePictureUrl: (profilePictureUrl: string | null) => void;
   updateBio: (bio: string) => void;
   updateLinks: (links: Record<string, string> | null) => void;
   updateGender: (gender: Gender) => void;
@@ -58,6 +59,20 @@ export const EditProvider: React.FC<{ children: React.ReactNode }> = ({
       if (user) {
         const updatedUser = { ...user, username };
         await updateUserProfile({ username });
+        setUser(updatedUser);
+        updateUserProfileInStore(updatedUser);
+      }
+    },
+    [user, updateUserProfile, updateUserProfileInStore],
+  );
+
+  const updateProfilePictureUrl = useCallback(
+    async (profilePictureUrl: string | null) => {
+      if (user) {
+        const updatedUser = {
+          ...user,
+          profile: { ...user.profile, profilePictureUrl },
+        };
         setUser(updatedUser);
         updateUserProfileInStore(updatedUser);
       }
@@ -141,6 +156,7 @@ export const EditProvider: React.FC<{ children: React.ReactNode }> = ({
     updateLinks,
     updateGender,
     updateLocation,
+    updateProfilePictureUrl,
   };
 
   return <EditContext.Provider value={value}>{children}</EditContext.Provider>;

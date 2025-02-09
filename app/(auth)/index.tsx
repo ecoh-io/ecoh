@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@/src/theme/ThemeContext';
 import Button from '@/src/UI/Button/Button';
+import { Image } from 'expo-image';
 
 const Index: React.FC = () => {
   const { colors, toggleTheme } = useTheme();
@@ -17,6 +18,12 @@ const Index: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Image
+          source={require('@/assets/images/Applogo.png')}
+          style={{ width: 155, height: 140 }}
+        />
+      </View>
       <Button
         title="Sign in"
         onPress={loginPressed}

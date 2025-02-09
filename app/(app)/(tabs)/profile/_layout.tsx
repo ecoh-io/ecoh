@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useRef, useState } from 'react';
-import { View, StyleSheet, LayoutChangeEvent, Dimensions } from 'react-native';
+import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 import ProfileHeader from '@/src/components/Header/ProfileHeader';
 import ProfileTabBar from '@/app/components/ProfileTabBar';
 import { useTheme } from '@/src/theme/ThemeContext';
@@ -19,9 +19,6 @@ const ProfileLayout: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const [headerLayoutHeight, setHeaderLayoutHeight] = useState(250);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [tabBarWidth, setTabBarWidth] = useState(
-    Dimensions.get('window').width,
-  );
   const tabNames = ['Posts', 'Media', 'Tags', 'Saved'];
   const tabsRef = useRef<any>(null);
   const router = useRouter();
@@ -45,11 +42,6 @@ const ProfileLayout: React.FC = () => {
     ),
     [colors, user, onHeaderLayout, router],
   );
-
-  const handleTabBarLayout = useCallback((event: LayoutChangeEvent) => {
-    const { width } = event.nativeEvent.layout;
-    setTabBarWidth(width);
-  }, []);
 
   const handleTabPress = useCallback(
     (index: number) => {
@@ -78,13 +70,10 @@ const ProfileLayout: React.FC = () => {
         headerHeight={headerLayoutHeight}
         renderHeader={Header}
         renderTabBar={() => (
-          <View onLayout={handleTabBarLayout}>
-            <ProfileTabBar
-              currentIndex={currentIndex}
-              onTabPress={handleTabPress}
-              tabBarWidth={tabBarWidth}
-            />
-          </View>
+          <ProfileTabBar
+            currentIndex={currentIndex}
+            onTabPress={handleTabPress}
+          />
         )}
         onIndexChange={handleIndexChange}
         headerContainerStyle={[

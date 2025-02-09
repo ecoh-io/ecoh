@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
   Alert,
   Animated,
   Easing,
@@ -55,7 +54,9 @@ const Login: React.FC = () => {
           password: values.password,
         };
         await mutateAsync(loginData);
-      } catch (err) {}
+      } catch (err) {
+        console.error('Error logging in:', err);
+      }
     },
     validateOnChange: true,
     validateOnBlur: true,

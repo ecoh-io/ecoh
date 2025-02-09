@@ -10,6 +10,7 @@ interface ProfileInputRowProps {
   value: string | Record<string, string> | Location;
   onPress: () => void;
   colors: Colors;
+  isLastItem?: boolean;
 }
 /**
  * Type guard to check if the value is a Location object.
@@ -72,8 +73,12 @@ const TouchableRow: React.FC<ProfileInputRowProps> = ({
   value,
   onPress,
   colors,
+  isLastItem = false,
 }) => (
-  <TouchableOpacity style={styles.touchableContainer} onPress={onPress}>
+  <TouchableOpacity
+    style={[styles.touchableContainer, isLastItem && { borderBottomWidth: 0 }]}
+    onPress={onPress}
+  >
     <View style={styles.touchableRow}>
       <Feather name={iconName as any} size={38} color={colors.text} />
       <View style={styles.touchableRowTextContainer}>

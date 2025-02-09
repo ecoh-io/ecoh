@@ -4,6 +4,8 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   profileDescription: {
     paddingHorizontal: 10,
+    flexDirection: 'column',
+    gap: 14,
   },
   profileName: {
     fontSize: typography.fontSizes.body,
@@ -12,5 +14,9 @@ export const styles = StyleSheet.create({
   profileBio: {
     fontSize: typography.fontSizes.button,
     fontFamily: typography.fontFamilies.poppins.medium,
+  },
+  socialLinks: {
+    flexDirection: 'row',
+    gap: 10,
   },
 });

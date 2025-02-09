@@ -46,6 +46,8 @@ const axiosInstance: AxiosInstance = axios.create({
   timeout: 10000, // 10 seconds timeout
 });
 
+console.log('base URL:', process.env.EXPO_PUBLIC_API_BASE_URL);
+
 // Flag to indicate if token is being refreshed
 let isRefreshing = false;
 

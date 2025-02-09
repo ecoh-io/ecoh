@@ -45,7 +45,7 @@ const EditProfileScreen: React.FC = () => {
 
       <ProfileInfo user={user} colors={colors} />
 
-      <View style={styles.inputsContainer}>
+      <View style={[styles.inputsContainer]}>
         <TouchableRow
           iconName="user"
           label="Name"
@@ -95,6 +95,7 @@ const EditProfileScreen: React.FC = () => {
           }
           onPress={handleEditLocation}
           colors={colors}
+          isLastItem={true}
         />
       </View>
     </View>
@@ -110,8 +111,11 @@ const styles = StyleSheet.create({
 
   inputsContainer: {
     flexDirection: 'column',
-    gap: 30,
-    paddingVertical: 20,
+    marginVertical: 30,
+    marginHorizontal: 8,
+    borderRadius: 16,
+    borderColor: '#D3D3D3',
+    borderWidth: StyleSheet.hairlineWidth,
   },
 });
 

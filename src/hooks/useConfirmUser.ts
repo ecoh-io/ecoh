@@ -81,11 +81,7 @@ export const useConfirmUser = (
 
     onSuccess: async (data: AuthResponse, variables, context) => {
       try {
-        await login(
-          data.tokens.AccessToken,
-          data.tokens.RefreshToken,
-          data.user,
-        );
+        await login(data.AccessToken, data.RefreshToken, data.user);
 
         console.log('User confirmed and logged in successfully:', data.user);
       } catch (error) {

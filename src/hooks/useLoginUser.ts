@@ -85,11 +85,7 @@ export const useLoginUser = (
     onSuccess: async (data: AuthResponse, variables, context) => {
       try {
         // Update authentication state with tokens and user data
-        authStore.login(
-          data.tokens.AccessToken,
-          data.tokens.RefreshToken,
-          data.user,
-        );
+        authStore.login(data.AccessToken, data.RefreshToken, data.user);
 
         // Navigate to the dashboard
         router.replace('/(app)/(tabs)/dashboard');

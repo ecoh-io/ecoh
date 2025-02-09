@@ -1,4 +1,4 @@
-import { Slot, Stack } from 'expo-router';
+import { Slot } from 'expo-router';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { ThemeProvider } from '@/src/theme/ThemeContext';
