@@ -42,6 +42,16 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  addButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   modalBackground: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
@@ -50,15 +60,24 @@ export const styles = StyleSheet.create({
     zIndex: 1000,
   },
   modalContainer: {
-    width: '85%',
+    width: '100%',
+    height: '95%',
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 15,
+    fontSize: typography.fontSizes.headline,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
+    color: 'white',
+    marginBottom: 35,
+  },
+  modalImageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
   modalImage: {
     width: 200,
@@ -66,18 +85,14 @@ export const styles = StyleSheet.create({
     borderRadius: 100, // Makes the image circular
     marginBottom: 20,
     backgroundColor: '#e0e0e0',
+    borderWidth: 2,
+    borderColor: 'rgba(265,265,265,0.6)',
   },
   modalButtonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 10,
     width: '100%',
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    borderRadius: 5,
-    alignItems: 'center',
   },
   cancelButton: {
     backgroundColor: 'transparent',

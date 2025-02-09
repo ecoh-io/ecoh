@@ -9,15 +9,14 @@ import {
 } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-type Tab = { name: string; icon: keyof typeof MaterialCommunityIcons.glyphMap };
+type Tab = { name: string };
 
 const TABS: Tab[] = [
-  { name: 'Posts', icon: 'post-outline' },
-  { name: 'Media', icon: 'image-outline' },
-  { name: 'Tags', icon: 'tag-outline' },
-  { name: 'Saved', icon: 'bookmark-outline' },
+  { name: 'Posts' },
+  { name: 'Media' },
+  { name: 'Tagged' },
+  { name: 'Saved' },
 ];
 
 interface ProfileTabBarProps {
@@ -40,8 +39,6 @@ const ProfileTabBar: React.FC<ProfileTabBarProps> = ({
   const pillAnimX = useRef(new Animated.Value(0)).current;
   const pillAnimWidth = useRef(new Animated.Value(0)).current;
 
-  const iconScale = useRef(new Animated.Value(0)).current;
-
   // When currentIndex or measured layouts change, animate the pill to match the active tab
   useEffect(() => {
     const layout = layouts[currentIndex];
@@ -61,13 +58,7 @@ const ProfileTabBar: React.FC<ProfileTabBarProps> = ({
         }),
       ]).start();
     }
-    Animated.spring(iconScale, {
-      toValue: 1,
-      tension: 150,
-      friction: 10,
-      useNativeDriver: true,
-    }).start();
-  }, [currentIndex, layouts, pillAnimX, pillAnimWidth, iconScale]);
+  }, [currentIndex, layouts, pillAnimX, pillAnimWidth]);
 
   // Capture layout measurements for each tab
   const onTabLayout = (index: number) => (event: LayoutChangeEvent) => {
@@ -106,16 +97,6 @@ const ProfileTabBar: React.FC<ProfileTabBarProps> = ({
               accessibilityRole="button"
               accessibilityLabel={tab.name}
             >
-              {isActive && (
-                <Animated.View style={{ transform: [{ scale: iconScale }] }}>
-                  <MaterialCommunityIcons
-                    name={tab.icon}
-                    size={24}
-                    color={isActive ? '#0072ff' : '#000000'}
-                    style={styles.icon}
-                  />
-                </Animated.View>
-              )}
               <Text
                 style={[
                   styles.tabText,
@@ -147,7 +128,6 @@ const styles = StyleSheet.create({
   // Each tab item has a fixed height with centered content so the text appears centered.
   tabItem: {
     height: 40,
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center', // centers the text horizontally
     paddingHorizontal: 12,
@@ -175,9 +155,6 @@ const styles = StyleSheet.create({
   },
   inactiveTabText: {
     color: '#000000', // black for inactive tabs
-  },
-  icon: {
-    marginRight: 4, // Space between icon and text
   },
 });
 

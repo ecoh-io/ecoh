@@ -19,6 +19,10 @@ import axiosInstance from '@/src/api/axiosInstance';
 import { useEdit } from '@/src/context/EditContext';
 import { useMutation } from '@tanstack/react-query';
 import CircularProgressIndicator from '@/src/components/CircularProgressIndicator/CircularProgressIndicator';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import Button from '@/src/UI/Button';
 
 const DEFAULT_PROFILE_IMAGE_URL = 'https://via.placeholder.com/100';
 
@@ -232,6 +236,12 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
               />
             </View>
           )}
+          <LinearGradient
+            colors={[colors.gradient[0], colors.gradient[1]]}
+            style={styles.addButton}
+          >
+            <MaterialIcons name="edit" size={20} color="white" />
+          </LinearGradient>
         </View>
       </TouchableOpacity>
       <View style={styles.profileTextContainer}>
@@ -250,51 +260,39 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
         onRequestClose={handleCancelImage}
         onDismiss={handleCancelImage}
       >
-        <View style={styles.modalBackground}>
-          <View
-            style={[
-              styles.modalContainer,
-              { backgroundColor: colors.background },
-            ]}
-          >
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              Preview Profile Image
-            </Text>
+        <BlurView intensity={25} style={styles.modalBackground}>
+          <View style={[styles.modalContainer]}>
             {selectedImage && (
-              <Image
-                source={{ uri: selectedImage.uri }}
-                style={styles.modalImage}
-                contentFit="cover"
-              />
+              <View style={styles.modalImageContainer}>
+                <Text style={styles.modalTitle}>
+                  Confirm Your Profile Photo
+                </Text>
+                <Image
+                  source={{ uri: selectedImage.uri }}
+                  style={styles.modalImage}
+                  contentFit="cover"
+                />
+              </View>
             )}
             <View style={styles.modalButtonsContainer}>
-              <Pressable
-                style={[styles.modalButton, styles.cancelButton]}
+              <Button
+                title="Cancel"
                 onPress={handleCancelImage}
-                accessibilityLabel="Cancel image selection"
-                accessibilityRole="button"
-              >
-                <Text
-                  style={[styles.modalButtonText, { color: colors.primary }]}
-                >
-                  Cancel
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[styles.modalButton, styles.confirmButton]}
+                variant="secondary"
+                size="large"
+                style={{ flex: 1 }}
+              />
+              <Button
+                title="Confirm"
                 onPress={handleConfirmImage}
-                accessibilityLabel="Confirm image selection"
-                accessibilityRole="button"
-              >
-                <Text
-                  style={[styles.modalButtonText, { color: colors.primary }]}
-                >
-                  Confirm
-                </Text>
-              </Pressable>
+                variant="primary"
+                style={{ flex: 1 }}
+                size="large"
+                gradientColors={[colors.gradient[0], colors.gradient[1]]}
+              />
             </View>
           </View>
-        </View>
+        </BlurView>
       </Modal>
     </View>
   );
