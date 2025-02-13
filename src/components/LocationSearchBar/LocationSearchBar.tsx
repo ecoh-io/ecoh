@@ -19,12 +19,14 @@ interface LocationSearchProps {
   onSelect: (item: ILocation) => void;
   colors: Colors;
   selectedLocation?: ILocation | null;
+  onSearchStart: () => void;
 }
 
 const LocationSearchBar: React.FC<LocationSearchProps> = ({
   onSelect,
   colors,
   selectedLocation,
+  onSearchStart,
 }) => {
   const {
     query,
@@ -87,6 +89,8 @@ const LocationSearchBar: React.FC<LocationSearchProps> = ({
       <Input
         value={query}
         onChangeText={handleChange}
+        onFocus={onSearchStart}
+        onBlur={onSearchStart}
         placeholder="Enter city or region"
         LeftAccessory={() => (
           <FontAwesome
@@ -119,12 +123,7 @@ const LocationSearchBar: React.FC<LocationSearchProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  input: {
-    marginBottom: 8,
-  },
+  container: {},
   icon: {
     alignSelf: 'center',
     marginLeft: 6,
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   list: {
-    flex: 1,
+    zIndex: 1000,
   },
   searchResult: {
     fontSize: typography.fontSizes.body,

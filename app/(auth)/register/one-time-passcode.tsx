@@ -33,7 +33,7 @@ export default function OneTimePasscode() {
           identifier: state.formData.identifier!,
           code: values.OTP,
           password: state.formData.password,
-          displayName: state.formData.name,
+          name: state.formData.name,
           username: state.formData.username,
           dateOfBirth: state.formData.dateOfBirth!,
         };

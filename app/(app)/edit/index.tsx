@@ -45,7 +45,7 @@ const EditProfileScreen: React.FC = () => {
 
       <ProfileInfo user={user} colors={colors} />
 
-      <View style={[styles.inputsContainer]}>
+      <View style={[styles.inputsContainer, { borderColor: colors.highlight }]}>
         <TouchableRow
           iconName="user"
           label="Name"
@@ -114,8 +114,7 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     marginHorizontal: 8,
     borderRadius: 16,
-    borderColor: '#D3D3D3',
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
   },
 });
 

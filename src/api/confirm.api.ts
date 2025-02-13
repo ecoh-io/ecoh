@@ -11,7 +11,7 @@ export const confrimUser = async (
   formData: ConfirmUserRegistrationData,
 ): Promise<AuthResponse> => {
   const response = await axiosInstance.post<AuthResponse>(
-    '/auth/confirm-signup',
+    '/auth/confirm',
     formData,
     {
       headers: {

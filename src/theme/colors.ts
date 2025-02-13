@@ -4,7 +4,7 @@ export const lightColors = {
   onPrimary: '#FFFFFF', // Text/icon color on primary background
 
   // Secondary Colors
-  secondary: '#DADADA', // Secondary brand color
+  secondary: '#ccc', // Secondary brand color
   onSecondary: '#000000', // Text/icon color on secondary background
 
   // Background Colors

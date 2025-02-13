@@ -23,6 +23,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import Button from '@/src/UI/Button';
+import { uploadProfileImage } from '@/src/hooks/useMediaUploader';
 
 const DEFAULT_PROFILE_IMAGE_URL = 'https://via.placeholder.com/100';
 
@@ -42,10 +43,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
     useState<ImagePicker.ImagePickerAsset | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
-  useEffect(() => {}, [uploadProgress]);
-
   const requestPermission = async () => {
-    // Only request permissions on iOS; Android handles permissions automatically
+    // Request permissions on non-web platforms
     if (Platform.OS !== 'web') {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -58,87 +57,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
       }
     }
     return true;
-  };
-
-  const uploadProfileImage = async (
-    imageAsset: ImagePicker.ImagePickerAsset,
-    userId: string,
-    onUploadProgress: (progress: number) => void,
-  ) => {
-    try {
-      // Step 1: Request a pre-signed URL from the Media Service
-      const presignResponse = await axiosInstance.post(`/media/presigned-url`, {
-        type: MediaType.PROFILE_PICTURE,
-        mimetype: imageAsset.mimeType,
-        userId: userId,
-      });
-
-      const { url, key, mediaId } = presignResponse.data;
-
-      // Step 2: Upload the image to S3 using the pre-signed URL
-      const response = await fetch(imageAsset.uri);
-      const blob = await response.blob();
-
-      return new Promise<string>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', url, true);
-        xhr.setRequestHeader('Content-Type', imageAsset.type!);
-
-        let startTime: number;
-        let lastProgressUpdate = 0;
-
-        xhr.upload.onloadstart = () => {
-          startTime = Date.now();
-        };
-
-        xhr.upload.onprogress = (event) => {
-          const now = Date.now();
-          if (now - lastProgressUpdate > 1000) {
-            // Update progress max once per second
-            lastProgressUpdate = now;
-
-            let percentCompleted;
-            if (event.lengthComputable) {
-              percentCompleted = Math.round((event.loaded * 100) / event.total);
-            } else {
-              // Fallback: Estimate progress based on time elapsed
-              const elapsedSeconds = (now - startTime) / 1000;
-              percentCompleted = Math.min(99, Math.round(elapsedSeconds * 10)); // Assume 10% per second, max 99%
-            }
-
-            onUploadProgress(percentCompleted);
-          }
-        };
-
-        xhr.onload = async () => {
-          if (xhr.status === 200) {
-            onUploadProgress(100); // Ensure 100% is reported on completion
-            // Step 3: Notify the Media Service that the upload is complete
-            try {
-              await axiosInstance.post(`/media/complete-upload`, {
-                mediaId,
-                key,
-                userId: userId,
-              });
-
-              resolve(imageAsset.uri);
-            } catch (error) {
-              reject(error);
-            }
-          } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
-          }
-        };
-
-        xhr.onerror = () => {
-          reject(new Error('XHR request failed'));
-        };
-
-        xhr.send(blob);
-      });
-    } catch (error) {
-      throw error;
-    }
   };
 
   // Set up the mutation with React Query
@@ -167,7 +85,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
       Alert.alert('Upload Failed', 'There was an error uploading your image.');
     },
     onSettled: () => {
-      // Reset progress after a short delay
       setTimeout(() => setUploadProgress(0), 1000);
     },
   });
@@ -202,9 +119,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
 
   const handleConfirmImage = useCallback(() => {
     if (selectedImage) {
-      setIsModalVisible(false); // Dismiss the modal immediately
-      mutateUpload(selectedImage); // Trigger the upload mutation
-      setSelectedImage(null); // Reset selected image
+      setIsModalVisible(false); // Dismiss modal immediately
+      mutateUpload(selectedImage); // Trigger upload mutation
+      setSelectedImage(null);
     }
   }, [selectedImage, mutateUpload]);
 
@@ -261,7 +178,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
         onDismiss={handleCancelImage}
       >
         <BlurView intensity={25} style={styles.modalBackground}>
-          <View style={[styles.modalContainer]}>
+          <View style={styles.modalContainer}>
             {selectedImage && (
               <View style={styles.modalImageContainer}>
                 <Text style={styles.modalTitle}>

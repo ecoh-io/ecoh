@@ -138,7 +138,12 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
                       end={{ x: 1, y: 1 }}
                       style={styles.profileGradientBorder}
                     >
-                      <View style={styles.profileImageContainer}>
+                      <View
+                        style={[
+                          styles.profileImageContainer,
+                          { backgroundColor: colors.background },
+                        ]}
+                      >
                         <Image
                           source={{ uri: profilePhoto }}
                           style={styles.profileImage}
@@ -244,7 +249,6 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 14,
-    backgroundColor: '#fff', // Use your background color or colors.background
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',

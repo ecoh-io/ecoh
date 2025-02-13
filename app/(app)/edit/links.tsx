@@ -1,35 +1,27 @@
-import React, { useMemo, useCallback, useState, useRef } from 'react';
-import {
-  Keyboard,
-  Text,
-  TouchableOpacity,
-  View,
-  FlatList,
-  TextInput,
-  StyleSheet,
-} from 'react-native';
+import React, { useMemo, useCallback, useState } from 'react';
+import { Text, View, TextInput, StyleSheet, ScrollView } from 'react-native';
 import SocialChip from '@/src/components/atoms/socialChip';
-import {
-  SOCIAL_PLATFORMS,
-  SocialPlatform,
-} from '@/src/constants/SocialPlatforms';
+import { SOCIAL_PLATFORMS } from '@/src/constants/SocialPlatforms';
 import { useTheme } from '@/src/theme/ThemeContext';
 import Button from '@/src/UI/Button';
-import { Entypo, FontAwesome6 } from '@expo/vector-icons';
-import BottomSheet, {
-  BottomSheetFlashList,
-  BottomSheetFlatList,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import Header from '@/src/components/Profile/Edit/Header';
 import { typography } from '@/src/theme/typography';
 import { useEdit } from '@/src/context/EditContext';
+import { FormikProvider, useFormik } from 'formik';
+import * as Yup from 'yup';
+import FormikEcohDropdown from '@/src/UI/Dropdown/FormikDropdown';
+import {
+  AnimatedWrapper,
+  AnimationType,
+} from '@/src/components/Animations/Animations';
+import Input from '@/src/UI/Input';
 
 interface SocialLinksState {
   [platformKey: string]: string;
 }
 
-const MAX_LINKS = 5;
+const MAX_LINKS = 7;
 
 const Links: React.FC = () => {
   const { user, isLoading, updateLinks } = useEdit();
@@ -38,16 +30,10 @@ const Links: React.FC = () => {
   const [links, setLinks] = useState<SocialLinksState>(
     user?.profile.links || {},
   );
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
-  const [username, setUsername] = useState<string>('');
+  const [isFormVisible, setFormVisible] = useState(false);
+  const [isFormClosed, setIsFormClosed] = useState(true);
 
-  // Bottom Sheet Ref
-  const bottomSheetRef = useRef<BottomSheet>(null);
-
-  // Snap points for Bottom Sheet
-  const snapPoints = useMemo(() => ['60%'], []);
-
-  // Available platforms excluding already linked ones
+  // Compute available platforms (exclude already linked)
   const availablePlatforms = useMemo(
     () =>
       SOCIAL_PLATFORMS.filter(
@@ -56,112 +42,78 @@ const Links: React.FC = () => {
     [links],
   );
 
-  // State to manage current view inside BottomSheet
-  const [currentSheetView, setCurrentSheetView] = useState<
-    'platformSelection' | 'usernameInput'
-  >('platformSelection');
-
-  // Handler to open the Bottom Sheet
-  const handleAddLink = useCallback(() => {
-    setCurrentSheetView('platformSelection');
-    bottomSheetRef.current?.expand();
-  }, []);
-
-  // Handler when a platform is selected
-  const handlePlatformSelect = useCallback((platformKey: string) => {
-    setSelectedPlatform(platformKey);
-    setCurrentSheetView('usernameInput');
-  }, []);
-
-  // Function to add or update a social link
-  const addOrUpdateLink = useCallback(
-    (platformKey: string, username: string) => {
-      const platform = SOCIAL_PLATFORMS.find((p) => p.key === platformKey);
-      if (!platform) {
-        return;
-      }
-
-      const link = platform.baseUrl
-        ? platform.baseUrl.replace('{username}', encodeURIComponent(username))
-        : username;
-
-      setLinks((prevLinks) => {
-        const updatedLinks = {
-          ...prevLinks,
-          [platform.key]: link,
-        };
-
-        return updatedLinks;
-      });
+  const formik = useFormik({
+    initialValues: {
+      platform: '',
+      username: '',
     },
-    [user],
-  );
-
-  // Handler to submit the username and add/update the link
-  const handleUsernameSubmit = useCallback(() => {
-    if (!selectedPlatform) {
-      return;
-    }
-
-    if (!username.trim()) {
-      return;
-    }
-
-    addOrUpdateLink(selectedPlatform, username.trim());
-    setUsername('');
-    setSelectedPlatform(null);
-    bottomSheetRef.current?.close();
-    Keyboard.dismiss();
-  }, [selectedPlatform, username, addOrUpdateLink]);
-
-  // Handler to remove a social link
-  const handleRemoveLink = useCallback(
-    (platformKey: string) => {
-      const platform = SOCIAL_PLATFORMS.find((p) => p.key === platformKey);
-      if (!platform) {
-        return;
-      }
-
-      setLinks((prevLinks) => {
-        const updatedLinks = { ...prevLinks };
-        delete updatedLinks[platformKey];
-        // Update the user in the global store
-
-        return updatedLinks;
-      });
+    validationSchema: Yup.object({
+      platform: Yup.string().required('Platform is required'),
+      username: Yup.string().required('Username is required'),
+    }),
+    onSubmit: (values) => {
+      setLinks((prevLinks) => ({
+        ...prevLinks,
+        [values.platform]: values.username,
+      }));
+      setFormVisible(false);
+      formik.resetForm();
     },
-    [user],
-  );
+  });
 
-  // Render each platform item in the selection view
-  const renderPlatformItem = useCallback(
-    ({ item }: { item: SocialPlatform }) => (
-      <TouchableOpacity
-        style={styles.platformItem}
-        onPress={() => handlePlatformSelect(item.key)}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel={`Select ${item.name}`}
-      >
-        <FontAwesome6 name={item.icon} size={24} color={colors.text} />
-        <Text style={[styles.platformName, { color: colors.text }]}>
-          {item.name}
-        </Text>
-      </TouchableOpacity>
-    ),
-    [handlePlatformSelect, colors.text],
-  );
+  const handleAddLink = () => {
+    setFormVisible(!isFormVisible);
+    setIsFormClosed(!isFormClosed);
+  };
+
+  const handleDeleteLink = (platformKey: string) => {
+    setLinks((prevLinks) => {
+      const updatedLinks = { ...prevLinks };
+      delete updatedLinks[platformKey];
+      return updatedLinks;
+    });
+  };
 
   const save = useCallback(() => {
     const linksToSave = Object.keys(links).length > 0 ? links : null;
     updateLinks(linksToSave);
   }, [links, updateLinks]);
 
-  const keyExtractor = useCallback((item: SocialPlatform) => item.key, []);
+  const animationSettings: {
+    enterAnimation: AnimationType;
+    exitAnimation: AnimationType;
+  } = React.useMemo(
+    () => ({
+      enterAnimation: 'fade-in',
+      exitAnimation: 'fade-out',
+      duration: 600,
+    }),
+    [],
+  );
+
+  const animationButtonIconSettings: {
+    enterAnimation: AnimationType;
+    exitAnimation: AnimationType;
+  } = React.useMemo(
+    () => ({
+      enterAnimation: 'plus-to-cross',
+      exitAnimation: 'cross-to-plus',
+      duration: 600,
+      initial: { opacity: 1 },
+    }),
+    [],
+  );
+
+  const iconColor = useMemo(() => {
+    if (formik.errors.username && formik.touched.username) {
+      return colors.error;
+    }
+    return colors.secondary;
+  }, [formik.errors.username, formik.touched.username]);
 
   return (
-    <>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <View style={styles.container}>
         <Header
           title="Links"
           colors={colors}
@@ -169,286 +121,177 @@ const Links: React.FC = () => {
           isSaving={isLoading}
           isDisabled={isLoading}
         />
-        <Text style={styles.info}>
-          {`People who visit your Ecoh profile will see your links.`}
-          {' \n'}
-          {`Max (${MAX_LINKS})`}
-        </Text>
-
         <View style={styles.socialLinksContainer}>
-          {/* Add Social Link Button */}
-
+          {/* Button to add a new social link */}
           <Button
             variant="primary"
             size="small"
-            shape="pill"
+            shape="rounded"
             disabled={Object.keys(links).length >= MAX_LINKS}
             gradientColors={['#00c6ff', '#0072ff']}
             icon={
-              <FontAwesome6 name="plus" size={18} color={colors.onGradient} />
-            }
-            onPress={handleAddLink}
-            contentStyle={{ paddingVertical: 14 }}
-          />
-
-          {Object.keys(links).length > 0 ? (
-            <View style={styles.chipsContainer}>
-              {Object.entries(links).map(([platformKey, link]) => {
-                const platform = SOCIAL_PLATFORMS.find(
-                  (p) => p.key === platformKey,
-                );
-                if (!platform) return null;
-                return (
-                  <SocialChip
-                    key={platformKey}
-                    label={platform.name}
-                    iconName={platform.icon}
-                    onDelete={() => handleRemoveLink(platformKey)}
-                    colors={colors}
-                  />
-                );
-              })}
-            </View>
-          ) : (
-            <Text style={[styles.noLinksText, { color: colors.text }]}>
-              Add external links
-            </Text>
-          )}
-        </View>
-      </View>
-
-      {/* Platform Selection Bottom Sheet */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        animateOnMount={false}
-        style={styles.bottomSheet}
-      >
-        <BottomSheetView style={styles.bottomSheetContent}>
-          <Text style={[styles.sheetTitle, { color: colors.text }]}>
-            Select a Platform
-          </Text>
-          <BottomSheetFlatList
-            data={availablePlatforms}
-            keyExtractor={keyExtractor}
-            renderItem={renderPlatformItem}
-            contentContainerStyle={styles.platformList}
-            initialNumToRender={5}
-            maxToRenderPerBatch={10}
-            windowSize={21}
-            removeClippedSubviews={true}
-            keyboardShouldPersistTaps="handled"
-            nestedScrollEnabled
-          />
-        </BottomSheetView>
-      </BottomSheet>
-
-      {/* Username Input Bottom Sheet */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1} // Ensure the sheet is closed initially
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        animateOnMount={false}
-        style={styles.bottomSheet} // Apply shadow styles here
-      >
-        <BottomSheetView style={styles.bottomSheetContent}>
-          {currentSheetView === 'platformSelection' && (
-            <>
-              <Text style={[styles.sheetTitle, { color: colors.text }]}>
-                Select a Platform
-              </Text>
-              {availablePlatforms.length > 0 ? (
-                <FlatList
-                  data={availablePlatforms}
-                  keyExtractor={keyExtractor}
-                  renderItem={renderPlatformItem}
-                  contentContainerStyle={styles.platformList}
-                  initialNumToRender={5}
-                  maxToRenderPerBatch={10}
-                  windowSize={21}
-                  removeClippedSubviews={true}
-                  keyboardShouldPersistTaps="handled"
-                />
-              ) : (
-                <Text style={[styles.noLinksText, { color: colors.text }]}>
-                  No available platforms to add.
-                </Text>
-              )}
-            </>
-          )}
-
-          {currentSheetView === 'usernameInput' && selectedPlatform && (
-            <>
-              <View style={styles.sheetHeader}>
-                <TouchableOpacity
-                  onPress={() => setCurrentSheetView('platformSelection')}
-                  style={styles.backButton}
-                >
-                  <Entypo name="chevron-left" size={32} color={colors.text} />
-                </TouchableOpacity>
-                <Text style={[styles.sheetTitle, { color: colors.text }]}>
-                  Add Link
-                </Text>
-                <Button
-                  title="Save"
-                  variant="primary"
-                  size="small"
-                  shape="rounded"
-                  gradientColors={['#00c6ff', '#0072ff']}
-                  onPress={handleUsernameSubmit}
-                  disabled={!username.trim()}
-                  accessibilityLabel="Save Social Link"
-                  style={{ width: 80 }}
-                />
-              </View>
-
-              {/* Selected Platform Display */}
-              <View
-                style={[
-                  styles.platformItem,
-                  { backgroundColor: colors.testGray },
-                ]}
+              <AnimatedWrapper
+                {...animationButtonIconSettings}
+                visible={isFormClosed}
               >
                 <FontAwesome6
-                  name={
-                    SOCIAL_PLATFORMS.find((p) => p.key === selectedPlatform)
-                      ?.icon
-                  }
-                  size={24}
-                  color={colors.text}
+                  name={'plus'}
+                  size={18}
+                  color={colors.onGradient}
                 />
-                <Text style={[styles.platformName, { color: colors.text }]}>
-                  {
-                    SOCIAL_PLATFORMS.find((p) => p.key === selectedPlatform)
-                      ?.name
-                  }
-                </Text>
-              </View>
+              </AnimatedWrapper>
+            }
+            onPress={handleAddLink}
+            contentStyle={{ paddingVertical: 12 }}
+          />
 
-              {/* Username Input */}
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    borderColor: colors.highlight,
-                    color: colors.text,
-                  },
-                ]}
+          <Text style={styles.info}>
+            {`Your Ecoh profile visitors can view your social links. You can add up to ${MAX_LINKS} links.`}
+          </Text>
+        </View>
+
+        {Object.keys(links).length > 0 && (
+          <View style={styles.chipsContainer}>
+            {Object.entries(links).map(([platformKey, link]) => {
+              const platform = SOCIAL_PLATFORMS.find(
+                (p) => p.key === platformKey,
+              );
+              if (!platform) return null;
+              return (
+                <AnimatedWrapper {...animationSettings} key={platformKey}>
+                  <SocialChip key={platformKey} platform={platform} />
+                </AnimatedWrapper>
+              );
+            })}
+          </View>
+        )}
+
+        <AnimatedWrapper
+          {...animationSettings}
+          visible={isFormVisible}
+          style={styles.formContainer}
+        >
+          <FormikProvider value={formik}>
+            <FormikEcohDropdown
+              options={availablePlatforms.map((platform) => ({
+                id: platform.key,
+                label: platform.name,
+                value: platform.key,
+              }))}
+              name="platform"
+              placeholder="Platform"
+            />
+            <AnimatedWrapper
+              {...animationSettings}
+              visible={!!formik.values.platform}
+            >
+              <Input
                 placeholder="Username"
-                placeholderTextColor={colors.placeholder}
-                value={username}
-                onChangeText={setUsername}
-                returnKeyType="done"
-                onSubmitEditing={handleUsernameSubmit}
-                autoFocus
-                accessible
-                accessibilityLabel="Username Input"
+                value={formik.values.username}
+                onChangeText={formik.handleChange('username')}
+                onBlur={formik.handleBlur('username')}
+                error={
+                  formik.touched.username ? formik.errors.username : undefined
+                }
+                LeftAccessory={() => (
+                  <Ionicons
+                    name="person"
+                    size={26}
+                    color={iconColor}
+                    style={styles.icon}
+                  />
+                )}
               />
-            </>
-          )}
-        </BottomSheetView>
-      </BottomSheet>
-    </>
+            </AnimatedWrapper>
+          </FormikProvider>
+        </AnimatedWrapper>
+      </View>
+      <AnimatedWrapper
+        {...animationSettings}
+        visible={isFormVisible}
+        style={styles.buttonWrapper}
+      >
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <Button
+            title="Cancel"
+            onPress={() => formik.handleSubmit()}
+            variant="secondary"
+            size="large"
+            style={{ flex: 1 }}
+          />
+          <Button
+            variant="primary"
+            title="Add"
+            size="large"
+            style={{ flex: 1 }}
+            onPress={() => formik.handleSubmit()}
+            gradientColors={['#00c6ff', '#0072ff']}
+            icon={
+              <FontAwesome6 name={'plus'} size={18} color={colors.onGradient} />
+            }
+          />
+        </View>
+      </AnimatedWrapper>
+    </View>
   );
 };
 
 export default Links;
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    flexDirection: 'column',
-    gap: 20,
     paddingHorizontal: 12,
+  },
+  icon: {
+    alignSelf: 'center',
+    marginStart: 6,
+  },
+  container: {
+    flexDirection: 'column',
+    gap: 10,
   },
   socialLinksContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    flexWrap: 'wrap',
     gap: 10,
-  },
-  chipsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    alignSelf: 'center',
-    gap: 10,
-    flex: 1,
-  },
-  platformItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 16,
-    marginBottom: 16,
-    marginRight: 'auto',
-    marginLeft: 12,
-  },
-  platformName: {
-    marginLeft: 12,
-    fontSize: 16,
-    fontFamily: 'Poppins-Medium', // Adjust according to your typography
-  },
-  bottomSheet: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2, // Shadow upwards
-    },
-    shadowOpacity: 0.05, // Lower opacity for subtle shadow
-    shadowRadius: 3,
-    // Android Shadow
-    elevation: 3, // Lower elevation for subtle shadow
-    borderRadius: 16,
-    overflow: 'hidden', // Important for rounded corners
-  },
-  bottomSheetContent: {
-    flex: 1,
-  },
-  sheetTitle: {
-    fontSize: 20,
-    fontFamily: 'Poppins-Bold', // Adjust according to your typography
-    textAlign: 'center',
-    flex: 1,
-  },
-  platformList: {
-    // Additional styling if needed
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    alignContent: 'center',
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginBottom: 15,
-  },
-  backButton: {
-    width: 80,
-  },
-  input: {
-    height: 48,
-    borderWidth: 2,
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    fontFamily: typography.fontFamilies.poppins.medium, // Adjust according to your typography
-    marginHorizontal: 12,
-  },
-  noLinksText: {
-    fontFamily: typography.fontFamilies.poppins.medium,
-    fontSize: typography.fontSizes.body,
-    alignSelf: 'center',
   },
   info: {
     fontFamily: typography.fontFamilies.poppins.medium,
     fontSize: 13,
     paddingHorizontal: 4,
+    flexShrink: 1, // Allow text to shrink to fit within the container
+    width: '100%',
+    alignSelf: 'center',
+  },
+  formContainer: {
+    flexDirection: 'column',
+    gap: 20,
+    width: '100%',
+  },
+  chipsContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    flexGrow: 0,
+    paddingVertical: 10,
+    flexWrap: 'wrap',
+    alignItems: 'center',
+  },
+  buttonWrapper: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 12,
+    backgroundColor: 'transparent', // You might want to set this to match your background
+  },
+  formTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    gap: 5,
+  },
+  formTitle: {
+    fontFamily: typography.fontFamilies.poppins.medium,
+    fontSize: typography.fontSizes.title,
   },
 });

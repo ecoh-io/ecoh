@@ -11,8 +11,9 @@ import { styles } from './ProfileDescription.styles';
 import { User } from '@/src/interfaces/user';
 import SocialChip from '../../atoms/socialChip';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 import { typography } from '@/src/theme/typography';
+import { SOCIAL_PLATFORMS } from '@/src/constants/SocialPlatforms';
 
 interface ProfileDescriptionProps {
   user: User;
@@ -22,6 +23,7 @@ interface ProfileDescriptionProps {
 const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
   ({ user, colors }) => {
     const router = useRouter();
+
     const extractUsernameFromUrl = (url: string) => {
       try {
         const urlObj = new URL(url);
@@ -54,54 +56,48 @@ const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
           </Text>
         ) : null}
         {user.profile.links ? (
-          <ScrollView
-            style={styles.socialLinks}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-          >
+          <View style={styles.socialLinks}>
             {Object.entries(user.profile.links).map(
-              ([platform, url], index) => (
-                <TouchableOpacity
-                  onPress={() => handleChipPress(url)}
-                  style={{ marginRight: 10 }}
-                >
-                  <SocialChip
-                    key={index}
-                    iconName={platform}
-                    label={extractUsernameFromUrl(url)}
-                    colors={colors}
-                  />
-                </TouchableOpacity>
-              ),
+              ([platform, url], index) => {
+                const pl = SOCIAL_PLATFORMS.find((p) => p.key === platform);
+
+                if (!pl) return null;
+                return (
+                  <TouchableOpacity onPress={() => handleChipPress(url)}>
+                    <SocialChip key={index} platform={pl} />
+                  </TouchableOpacity>
+                );
+              },
             )}
-          </ScrollView>
+          </View>
         ) : null}
         <ScrollView
-          style={styles.socialLinks}
+          style={styles.albumsContainer}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
         >
           <TouchableOpacity
             onPress={handleAddAlbumPress}
             style={{
-              borderWidth: 2,
-              borderStyle: 'dotted',
-              borderColor: colors.secondary,
-              borderRadius: 8,
-              paddingHorizontal: 8,
-              paddingVertical: 32,
-              alignItems: 'center',
-              justifyContent: 'center',
               flexDirection: 'column',
               gap: 10,
               marginRight: 10,
             }}
           >
-            <MaterialIcons
-              name="add-photo-alternate"
-              size={24}
-              color={colors.secondary}
-            />
+            <View
+              style={{
+                borderWidth: 1,
+                borderStyle: 'dashed',
+                borderColor: colors.secondary,
+                borderRadius: 8,
+                paddingHorizontal: 8,
+                paddingVertical: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Entypo name="plus" size={32} color={colors.secondary} />
+            </View>
             <Text
               style={{
                 color: colors.secondary,

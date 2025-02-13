@@ -6,14 +6,18 @@ import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import { Location } from '@/src/types/location';
 import { useCallback, useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
-
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import MapView, { Region } from 'react-native-maps';
 const LocationScreen: React.FC = () => {
   const { user, isLoading, updateLocation } = useEdit();
   const { colors } = useTheme();
-  const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
-    null,
-  );
+  const [selectedLocation, setSelectedLocation] = useState<ILocation>({
+    city: '',
+    longitude: 0,
+    latitude: 0,
+    region: '',
+  });
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   useEffect(() => {
     if (user?.profile?.location && user.profile.city && user.profile.region) {
@@ -40,6 +44,17 @@ const LocationScreen: React.FC = () => {
     setSelectedLocation(location);
   };
 
+  const handleSearchStart = () => {
+    setIsSearching(!isSearching);
+  };
+
+  const initialRegion: Region = {
+    latitude: selectedLocation.latitude,
+    longitude: selectedLocation.longitude,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header
@@ -49,11 +64,35 @@ const LocationScreen: React.FC = () => {
         isSaving={isLoading}
         isDisabled={!selectedLocation && !user?.profile?.location}
       />
-      <LocationSearchBar
-        onSelect={handleLocationSelect}
-        selectedLocation={selectedLocation}
-        colors={colors}
-      />
+      <View style={styles.searchBarContainer}>
+        <LocationSearchBar
+          onSelect={handleLocationSelect}
+          selectedLocation={selectedLocation}
+          colors={colors}
+          onSearchStart={handleSearchStart}
+        />
+      </View>
+      {!isSearching && selectedLocation && (
+        <View>
+          <MapView
+            style={styles.map}
+            initialRegion={initialRegion}
+            region={{
+              latitude: selectedLocation.latitude,
+              longitude: selectedLocation.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+            liteMode={true} // Lite mode is used to reduce memory usage
+          />
+          <View style={styles.locationDetails}>
+            <Text style={styles.city}>{selectedLocation.city}</Text>
+            <Text style={[styles.region, { color: colors.secondary }]}>
+              {selectedLocation.region}
+            </Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -64,14 +103,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    gap: 20,
     paddingHorizontal: 12,
   },
   map: {
-    width: Dimensions.get('window').width - 20, // Adjust width as needed
-    height: 300, // Adjust height as needed
+    width: Dimensions.get('window').width - 25, // Adjust width as needed
+    height: 200, // Adjust height as needed
     borderRadius: 10,
     alignSelf: 'center',
+    marginTop: 10,
+  },
+  locationDetails: {
+    flexDirection: 'column',
+    gap: 5,
+    paddingVertical: 12,
+  },
+  searchBarContainer: {
+    marginTop: 10,
   },
   city: {
     fontSize: typography.fontSizes.title,

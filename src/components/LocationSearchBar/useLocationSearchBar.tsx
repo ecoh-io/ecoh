@@ -65,6 +65,11 @@ const useLocationSearch = (minLength: number = 3, delay: number = 500) => {
 
           const formattedLocations: Location[] = detailsResponses
             .map((detail) => {
+              if (!detail.data || !detail.data.result) {
+                return null;
+              }
+
+              console.log(detail.data.result);
               const addressComponents = detail.data.result.address_components;
               const geometry = detail.data.result.geometry;
 

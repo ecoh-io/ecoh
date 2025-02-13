@@ -14,8 +14,17 @@ export const styles = StyleSheet.create({
   profileBio: {
     fontSize: typography.fontSizes.button,
     fontFamily: typography.fontFamilies.poppins.medium,
+    lineHeight: 25,
   },
   socialLinks: {
+    flexDirection: 'row',
+    gap: 10,
+    flexGrow: 0,
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    paddingVertical: 5,
+  },
+  albumsContainer: {
     flexDirection: 'row',
     gap: 10,
   },

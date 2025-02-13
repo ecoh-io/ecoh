@@ -76,7 +76,11 @@ const TouchableRow: React.FC<ProfileInputRowProps> = ({
   isLastItem = false,
 }) => (
   <TouchableOpacity
-    style={[styles.touchableContainer, isLastItem && { borderBottomWidth: 0 }]}
+    style={[
+      styles.touchableContainer,
+      isLastItem && { borderBottomWidth: 0 },
+      { borderColor: colors.highlight },
+    ]}
     onPress={onPress}
   >
     <View style={styles.touchableRow}>

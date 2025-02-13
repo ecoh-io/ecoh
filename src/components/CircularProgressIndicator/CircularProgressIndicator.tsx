@@ -1,5 +1,6 @@
+// CircularProgressIndicator.tsx
 import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import Animated, {
   useAnimatedProps,
@@ -7,6 +8,8 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
+import { typography } from '@/src/theme/typography';
+import { BlurView } from 'expo-blur';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -32,7 +35,7 @@ const CircularProgressIndicator: React.FC<CircularProgressIndicatorProps> = ({
       duration: 500,
       easing: Easing.bezier(0.25, 0.1, 0.25, 1),
     });
-  }, [progress]);
+  }, [progress, animatedProgress]);
 
   const animatedProps = useAnimatedProps(() => {
     const strokeDashoffset =
@@ -69,6 +72,11 @@ const CircularProgressIndicator: React.FC<CircularProgressIndicatorProps> = ({
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </Svg>
+      <BlurView intensity={10} style={styles.blurContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.percentageText}>{Math.round(progress)}%</Text>
+        </View>
+      </BlurView>
     </View>
   );
 };
@@ -77,6 +85,27 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  textContainer: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  blurContainer: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '95%',
+    height: '95%',
+    borderRadius: 1000, // A large value to ensure it's circular
+    overflow: 'hidden',
+  },
+  percentageText: {
+    fontSize: 18,
+    fontWeight: '600',
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
 });
 

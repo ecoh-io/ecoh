@@ -1,14 +1,21 @@
-import React, { useRef, useEffect, useState, memo } from 'react';
+// ProfileTabBar.tsx
+import React, { useState, useEffect, memo } from 'react';
 import {
   View,
   StyleSheet,
   Pressable,
-  Animated,
   Text,
   LayoutChangeEvent,
 } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
+import {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
+import { AnimatedWrapper } from '@/src/components/Animations/Animations';
 
 type Tab = { name: string };
 
@@ -30,37 +37,39 @@ const ProfileTabBar: React.FC<ProfileTabBarProps> = ({
 }) => {
   const { colors } = useTheme();
 
-  // Array to store layout measurements for each tab (by index)
+  // State to store layout measurements for each tab (by index)
   const [layouts, setLayouts] = useState<
     Array<{ x: number; width: number } | null>
   >(new Array(TABS.length).fill(null));
 
-  // Animated values for the pill's horizontal position and width
-  const pillAnimX = useRef(new Animated.Value(0)).current;
-  const pillAnimWidth = useRef(new Animated.Value(0)).current;
+  // Use Reanimated shared values for the pill's horizontal position and width.
+  const pillAnimX = useSharedValue(0);
+  const pillAnimWidth = useSharedValue(0);
 
-  // When currentIndex or measured layouts change, animate the pill to match the active tab
+  // When currentIndex or measured layouts change, animate the pill to match the active tab.
   useEffect(() => {
     const layout = layouts[currentIndex];
     if (layout) {
-      Animated.parallel([
-        Animated.spring(pillAnimX, {
-          toValue: layout.x,
-          tension: 300,
-          friction: 20,
-          useNativeDriver: false, // 'left' and 'width' cannot use native driver
-        }),
-        Animated.spring(pillAnimWidth, {
-          toValue: layout.width,
-          tension: 300,
-          friction: 20,
-          useNativeDriver: false,
-        }),
-      ]).start();
+      pillAnimX.value = withTiming(layout.x, {
+        duration: 300,
+        easing: Easing.out(Easing.exp),
+      });
+      pillAnimWidth.value = withTiming(layout.width, {
+        duration: 300,
+        easing: Easing.out(Easing.exp),
+      });
     }
   }, [currentIndex, layouts, pillAnimX, pillAnimWidth]);
 
-  // Capture layout measurements for each tab
+  // Compute the animated style for the pill based on our shared values.
+  const pillAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      left: pillAnimX.value,
+      width: pillAnimWidth.value,
+    };
+  });
+
+  // Capture layout measurements for each tab.
   const onTabLayout = (index: number) => (event: LayoutChangeEvent) => {
     const { x, width } = event.nativeEvent.layout;
     setLayouts((prev) => {
@@ -74,16 +83,19 @@ const ProfileTabBar: React.FC<ProfileTabBarProps> = ({
     <View
       style={[styles.tabBarContainer, { backgroundColor: colors.background }]}
     >
-      {/* Animated pill background positioned absolutely behind the tab text */}
-      <Animated.View
-        style={[
-          styles.animatedPill,
-          {
-            left: pillAnimX,
-            width: pillAnimWidth,
-          },
-        ]}
-      />
+      {/* Animated pill background positioned absolutely behind the tab text.
+          We wrap the pill background with AnimatedWrapper. Since the pill is always visible,
+          we pass visible={true} and use a zero-duration "fade-in" so that our externally computed
+          animated style (pillAnimatedStyle) is applied without additional mount animations. */}
+      <AnimatedWrapper
+        visible={true}
+        animation="fade-in"
+        duration={0}
+        style={[styles.animatedPill, pillAnimatedStyle]}
+      >
+        <></>
+      </AnimatedWrapper>
+
       <View style={styles.tabBar}>
         {TABS.map((tab, index) => {
           const isActive = index === currentIndex;
@@ -125,17 +137,17 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start', // left aligned
     alignItems: 'center',
   },
-  // Each tab item has a fixed height with centered content so the text appears centered.
+  // Each tab item is centered and has some horizontal padding.
   tabItem: {
     height: 40,
     justifyContent: 'center',
-    alignItems: 'center', // centers the text horizontally
+    alignItems: 'center',
     paddingHorizontal: 12,
     marginRight: 8,
     borderRadius: 20,
     zIndex: 1, // ensures text is rendered on top of the animated pill
   },
-  // The animated pill background positioned behind the active tab
+  // The animated pill background is positioned absolutely behind the tabs.
   animatedPill: {
     position: 'absolute',
     top: 0,
@@ -147,7 +159,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 16,
-    textAlign: 'center', // ensure text is centered within the Pressable
+    textAlign: 'center',
     fontFamily: typography.fontFamilies.poppins.medium,
   },
   activeTabText: {

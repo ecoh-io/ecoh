@@ -8,8 +8,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 15,
     paddingHorizontal: 12,
-    borderBottomColor: '#D3D3D3',
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: 1,
   },
   touchableRow: {
     flexDirection: 'row',

@@ -45,10 +45,9 @@ const Bio: React.FC = () => {
           containerStyle={styles.bioInputContainer}
           value={bio}
           onChangeText={handleChangeText}
+          maxLength={280}
+          showCharacterCount
         />
-        <Text style={styles.bioCounter}>
-          {bio.length}/{MAX_BIO_LENGTH}
-        </Text>
       </View>
     </View>
   );
