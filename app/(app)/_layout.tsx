@@ -12,6 +12,7 @@ export default function AppLayout() {
       >
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="edit" />
+        <Stack.Screen name="album" />
       </Stack>
     </ProtectedRoute>
   );

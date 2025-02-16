@@ -26,6 +26,10 @@ export const styles = StyleSheet.create({
   },
   albumsContainer: {
     flexDirection: 'row',
-    gap: 10,
+    paddingVertical: 10,
+  },
+  albumName: {
+    fontSize: typography.fontSizes.caption,
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
 });

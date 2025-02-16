@@ -211,6 +211,7 @@ const EcohDropdown: React.FC<EcohDropdownProps> = ({
             keyboardShouldPersistTaps="handled"
             style={styles.flatList}
             showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
           />
         </AnimatedWrapper>
       </View>
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
     top: '100%', // positions dropdown immediately below the trigger
     left: 0,
     right: 0,
-    zIndex: 1,
+    zIndex: 9999,
   },
   dropdown: {
     borderRadius: 12,

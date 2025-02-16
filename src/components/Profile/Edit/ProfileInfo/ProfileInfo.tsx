@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Colors } from '@/src/types/color';
 import {
   Text,
@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
-  Pressable,
   Modal,
 } from 'react-native';
 import { styles } from './ProfileInfo.styles';
@@ -14,8 +13,6 @@ import { memo } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { User } from '@/src/interfaces/user';
-import { MediaType } from '@/src/enums/media-type.enum';
-import axiosInstance from '@/src/api/axiosInstance';
 import { useEdit } from '@/src/context/EditContext';
 import { useMutation } from '@tanstack/react-query';
 import CircularProgressIndicator from '@/src/components/CircularProgressIndicator/CircularProgressIndicator';
@@ -23,7 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import Button from '@/src/UI/Button';
-import { uploadProfileImage } from '@/src/hooks/useMediaUploader';
+import { useMediaUploader } from '@/src/hooks/useMediaUploader';
 
 const DEFAULT_PROFILE_IMAGE_URL = 'https://via.placeholder.com/100';
 
@@ -41,53 +38,21 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] =
     useState<ImagePicker.ImagePickerAsset | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
+
+  // Use our custom hook to handle the upload flow.
+  const { uploadProgress, error, handleUpload } = useMediaUploader(user.id);
 
   const requestPermission = async () => {
-    // Request permissions on non-web platforms
-    if (Platform.OS !== 'web') {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permission Denied',
-          'Sorry, we need camera roll permissions to make this work!',
-        );
-        return false;
-      }
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission Denied',
+        'Sorry, we need camera roll permissions to make this work!',
+      );
+      return false;
     }
     return true;
   };
-
-  // Set up the mutation with React Query
-  const { mutate: mutateUpload, isPending: isUploading } = useMutation<
-    string,
-    Error,
-    ImagePicker.ImagePickerAsset
-  >({
-    mutationFn: (imageAsset) =>
-      uploadProfileImage(imageAsset, user.id, setUploadProgress),
-    onMutate: () => {
-      setUploadProgress(0);
-    },
-    onSuccess: (profilePictureUrl) => {
-      setUploadProgress(100);
-      setProfileImageUri(profilePictureUrl);
-      updateProfilePictureUrl(profilePictureUrl);
-      setTimeout(() => {
-        Alert.alert('Success', 'Profile image uploaded successfully!');
-        setUploadProgress(0);
-      }, 1000);
-    },
-    onError: (error) => {
-      setUploadProgress(0);
-      console.error('Upload error:', error);
-      Alert.alert('Upload Failed', 'There was an error uploading your image.');
-    },
-    onSettled: () => {
-      setTimeout(() => setUploadProgress(0), 1000);
-    },
-  });
 
   const handleSelectImage = useCallback(async () => {
     const hasPermission = await requestPermission();
@@ -103,6 +68,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
 
       if (!result.canceled && result.assets[0]) {
         setSelectedImage(result.assets[0]);
+        // Open the modal after a slight delay on iOS.
         setTimeout(
           () => setIsModalVisible(true),
           Platform.OS === 'ios' ? 500 : 0,
@@ -117,13 +83,25 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
     }
   }, []);
 
-  const handleConfirmImage = useCallback(() => {
+  const handleConfirmImage = useCallback(async () => {
     if (selectedImage) {
       setIsModalVisible(false); // Dismiss modal immediately
-      mutateUpload(selectedImage); // Trigger upload mutation
-      setSelectedImage(null);
+      try {
+        const { uri } = await handleUpload(selectedImage);
+        setProfileImageUri(uri);
+        updateProfilePictureUrl(uri);
+        Alert.alert('Success', 'Profile image uploaded successfully!');
+      } catch (err) {
+        console.error('Upload error:', err);
+        Alert.alert(
+          'Upload Failed',
+          'There was an error uploading your image.',
+        );
+      } finally {
+        setSelectedImage(null);
+      }
     }
-  }, [selectedImage, mutateUpload]);
+  }, [selectedImage, handleUpload, updateProfilePictureUrl]);
 
   const handleCancelImage = useCallback(() => {
     setSelectedImage(null);
@@ -143,7 +121,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = memo(({ user, colors }) => {
             accessibilityLabel="Profile picture"
             contentFit="cover"
           />
-          {(isUploading || uploadProgress > 0) && (
+          {uploadProgress > 0 && (
             <View style={styles.uploadOverlay}>
               <CircularProgressIndicator
                 size={styles.profileImage.width}

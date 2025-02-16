@@ -19,7 +19,6 @@ interface AuthState {
   initializeAuth: () => Promise<void>;
   login: (authToken: string, refreshToken: string, user: User) => Promise<void>;
   logout: () => Promise<void>;
-  refreshAuthToken: () => Promise<void>;
   updateUserProfile: (updatedUser: User) => void;
 }
 
@@ -97,45 +96,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
     } catch (error) {
       console.error('Logout failed', error);
-    }
-  },
-
-  /**
-   * Refresh authentication token using the refresh token
-   */
-  async refreshAuthToken() {
-    const { refreshToken } = get();
-    if (!refreshToken) {
-      console.warn('No refresh token available');
-      await get().logout();
-      return;
-    }
-
-    try {
-      const response = await axios.post('https://your-api.com/auth/refresh', {
-        refreshToken,
-      });
-
-      if (response.status === 200) {
-        const { authToken: newAuthToken, refreshToken: newRefreshToken } =
-          response.data;
-
-        await Promise.all([
-          setAuthToken(newAuthToken),
-          setRefreshToken(newRefreshToken),
-        ]);
-
-        set({
-          authToken: newAuthToken,
-          refreshToken: newRefreshToken,
-        });
-      } else {
-        console.error('Failed to refresh auth token');
-        await get().logout();
-      }
-    } catch (error) {
-      console.error('Error refreshing auth token', error);
-      await get().logout();
     }
   },
   updateUserProfile(updatedUser: User) {

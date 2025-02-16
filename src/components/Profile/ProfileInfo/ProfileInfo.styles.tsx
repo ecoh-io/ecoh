@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   profileInfo: {
     paddingHorizontal: 10,
-    paddingBottom: 10,
+    paddingBottom: 14,
   },
   userInfo: {
     flexDirection: 'row',

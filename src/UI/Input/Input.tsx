@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: typography.fontFamilies.poppins.medium,
     paddingVertical: 4,
-    marginLeft: 4,
+    marginLeft: 8,
     textAlignVertical: 'center',
   },
   leftAccessory: {

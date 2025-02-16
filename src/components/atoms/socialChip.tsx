@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
   chipContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     borderRadius: 16,
   },
   contentContainer: {

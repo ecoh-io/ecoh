@@ -1,11 +1,9 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import AnimatedHeart from '../Animated/AnimatedHeart';
 import { VideoPost } from '@/src/types/post';
-import { FontAwesome } from '@expo/vector-icons';
-import { runOnJS } from 'react-native-reanimated';
 
 interface VideoPostProps {
   post: VideoPost;

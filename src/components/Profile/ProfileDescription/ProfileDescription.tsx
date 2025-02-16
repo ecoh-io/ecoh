@@ -1,6 +1,7 @@
 import { Colors } from '@/src/types/color';
 import { memo } from 'react';
 import {
+  Dimensions,
   Linking,
   ScrollView,
   Text,
@@ -14,15 +15,24 @@ import { useRouter } from 'expo-router';
 import { Entypo } from '@expo/vector-icons';
 import { typography } from '@/src/theme/typography';
 import { SOCIAL_PLATFORMS } from '@/src/constants/SocialPlatforms';
+import { useAlbums } from '@/src/api/album/useAlbumQuries';
+import { Image } from 'expo-image';
+import { Album } from '@/src/types/Album';
 
 interface ProfileDescriptionProps {
   user: User;
   colors: Colors;
 }
 
+const DEFAULT_PROFILE_IMAGE_URL = 'https://via.placeholder.com/100';
+
 const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
   ({ user, colors }) => {
     const router = useRouter();
+    const { data: albums, isLoading } = useAlbums();
+    const { width: screenWidth } = Dimensions.get('window');
+    const albumWidth = screenWidth * 0.16;
+    const albumHeight = albumWidth * 1.2;
 
     const extractUsernameFromUrl = (url: string) => {
       try {
@@ -42,7 +52,7 @@ const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
     };
 
     const handleAddAlbumPress = () => {
-      router.push('/create-album'); // Navigate to the create album screen
+      router.push('/album/create-album'); // Navigate to the create album screen
     };
 
     return (
@@ -81,7 +91,7 @@ const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
             style={{
               flexDirection: 'column',
               gap: 10,
-              marginRight: 10,
+              marginRight: 14,
             }}
           >
             <View
@@ -89,9 +99,9 @@ const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
                 borderWidth: 1,
                 borderStyle: 'dashed',
                 borderColor: colors.secondary,
-                borderRadius: 8,
-                paddingHorizontal: 8,
-                paddingVertical: 32,
+                borderRadius: albumWidth / 2, // Make it circular
+                width: albumWidth,
+                height: albumWidth,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
@@ -102,11 +112,48 @@ const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
               style={{
                 color: colors.secondary,
                 fontFamily: typography.fontFamilies.poppins.medium,
+                fontSize: typography.fontSizes.caption,
               }}
             >
               Create Album
             </Text>
           </TouchableOpacity>
+          {!isLoading &&
+            albums &&
+            albums?.length > 0 &&
+            albums?.map((album: Album) => (
+              <TouchableOpacity
+                key={album.id}
+                style={{
+                  flexDirection: 'column',
+                  gap: 10,
+                  marginRight: 14,
+                  width: albumWidth,
+                  alignItems: 'center',
+                }}
+                onPress={() => router.push(`/album/${album.id}`)}
+              >
+                <Image
+                  source={{ uri: album.coverPhoto.url }}
+                  style={{
+                    width: albumWidth,
+                    height: albumWidth, // Ensure it's a square
+                    borderRadius: albumWidth / 2, // Make it circular
+                    borderWidth: 1, // Optional: Add a border for a cleaner look
+                    borderColor: colors.secondary, // Use a subtle border color
+                  }}
+                  contentFit="cover"
+                  accessibilityLabel={`Cover photo of ${album.name}`}
+                />
+                <Text
+                  style={[styles.albumName, { color: colors.text }]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {album.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
         </ScrollView>
       </View>
     );
