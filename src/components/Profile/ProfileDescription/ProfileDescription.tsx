@@ -16,8 +16,8 @@ import { Entypo } from '@expo/vector-icons';
 import { typography } from '@/src/theme/typography';
 import { SOCIAL_PLATFORMS } from '@/src/constants/SocialPlatforms';
 import { useAlbums } from '@/src/api/album/useAlbumQuries';
-import { Image } from 'expo-image';
 import { Album } from '@/src/types/Album';
+import AlbumCircle from '../../atoms/album';
 
 interface ProfileDescriptionProps {
   user: User;
@@ -133,17 +133,11 @@ const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
                 }}
                 onPress={() => router.push(`/album/${album.id}`)}
               >
-                <Image
-                  source={{ uri: album.coverPhoto.url }}
-                  style={{
-                    width: albumWidth,
-                    height: albumWidth, // Ensure it's a square
-                    borderRadius: albumWidth / 2, // Make it circular
-                    borderWidth: 1, // Optional: Add a border for a cleaner look
-                    borderColor: colors.secondary, // Use a subtle border color
-                  }}
-                  contentFit="cover"
-                  accessibilityLabel={`Cover photo of ${album.name}`}
+                <AlbumCircle
+                  uri={album.coverPhoto.url}
+                  visibility={album.visibility}
+                  size={albumWidth}
+                  haloSize={3}
                 />
                 <Text
                   style={[styles.albumName, { color: colors.text }]}
