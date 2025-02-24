@@ -1,10 +1,10 @@
 import { createContext, useCallback, useContext, useState } from 'react';
 import { useAuthStore } from '../store/AuthStore';
-import { User } from '../interfaces/user';
 import { Gender } from '../enums/gender.enum';
 import { useUpdateUser } from '../hooks/useUpdateUserProfile';
 import { Location } from '../types/location';
 import { useRouter } from 'expo-router';
+import { User } from '../types/user';
 
 interface EditContextType {
   user: User | null;

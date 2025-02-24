@@ -1,12 +1,7 @@
-import Button from '@/src/UI/Button';
-import Input from '@/src/UI/Input';
-import MobileNumberInput from '@/src/UI/MobileNumberInput';
 import { ICountryCode } from '@/src/UI/MobileNumberInput/MobileNumberInput';
 import { Footer, Header } from '@/src/components/atoms';
 import { useRegistration } from '@/src/context/RegistrationContext';
-import { useRegisterUser } from '@/src/hooks/useRegisterUser';
 import { useTheme } from '@/src/theme/ThemeContext';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFormik } from 'formik';
 import { CountryCode } from 'libphonenumber-js/types';
 import { AsYouType, parsePhoneNumberWithError } from 'libphonenumber-js';
@@ -16,6 +11,7 @@ import { CountryPicker } from 'react-native-country-codes-picker';
 import * as yup from 'yup';
 import { typography } from '@/src/theme/typography';
 import IdentifierInput from '@/src/UI/IdentifierInput';
+import { useRegisterUser } from '@/src/api/authentication/useAuthenticationMutations';
 
 // Validation schema using Yup
 const emailSchema = yup.object().shape({

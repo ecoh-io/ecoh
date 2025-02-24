@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState } from 'react';
-import { Text, View, TextInput, StyleSheet, ScrollView } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import SocialChip from '@/src/components/atoms/socialChip';
 import { SOCIAL_PLATFORMS } from '@/src/constants/SocialPlatforms';
 import { useTheme } from '@/src/theme/ThemeContext';
@@ -28,7 +28,7 @@ const Links: React.FC = () => {
   const { colors } = useTheme();
 
   const [links, setLinks] = useState<SocialLinksState>(
-    user?.profile.links || {},
+    user?.profile.socialLinks || {},
   );
   const [isFormVisible, setFormVisible] = useState(false);
   const [isFormClosed, setIsFormClosed] = useState(true);

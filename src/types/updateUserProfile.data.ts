@@ -1,4 +1,5 @@
 import { Gender } from '../enums/gender.enum';
+import { Location } from './location';
 
 export type UpdateUserProfileData = {
   name?: string;
@@ -7,10 +8,7 @@ export type UpdateUserProfileData = {
   bio?: string;
   gender?: Gender;
   links?: Record<string, string> | null;
-  location?: {
-    type: 'Point';
-    coordinates: [number, number];
-  } | null;
+  location?: Location | null;
   city?: string | null;
   region?: string | null;
 };

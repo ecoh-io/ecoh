@@ -1,20 +1,13 @@
-interface SocialLinksState {
-  [platformKey: string]: string;
-}
+import { Profile } from './profile';
 
 export type User = {
   id: string;
-  cognitoId: string;
   username: string;
-  displayName: string;
+  name: string;
   email: string | null;
   mobile: string | null;
   dateOfBirth: Date;
-  bio: string | null;
-  gender: string | null;
-  socialLinks: SocialLinksState | null;
-  location: string | null;
-  profileImage: string | null;
+  profile: Profile;
   connectionsCount: number;
   followersCount: number;
   followingCount: number;

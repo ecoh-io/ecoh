@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import axios from 'axios';
 import { loadUserData, saveUserData } from './localStorage';
 import {
   clearAllTokens,
@@ -8,7 +7,7 @@ import {
   setAuthToken,
   setRefreshToken,
 } from './secureStore';
-import { User } from '../interfaces/user';
+import { User } from '../types/user';
 
 interface AuthState {
   authToken: string | null;

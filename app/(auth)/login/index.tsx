@@ -13,9 +13,9 @@ import * as Yup from 'yup';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Input from '@/src/UI/Input';
 import Button from '@/src/UI/Button';
-import { useLoginUser } from '@/src/hooks/useLoginUser';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
+import { useLoginUser } from '@/src/api/authentication/useAuthenticationMutations';
 
 interface FormValues {
   identifier: string;

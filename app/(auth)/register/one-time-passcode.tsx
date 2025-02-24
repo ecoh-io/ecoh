@@ -7,7 +7,7 @@ import OTPInput from '@/src/UI/OTPInput';
 import Button from '@/src/UI/Button';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { Footer, Header } from '@/src/components/atoms';
-import { useConfirmUser } from '@/src/hooks/useConfirmUser';
+import { useConfirmUser } from '@/src/api/authentication/useAuthenticationMutations';
 
 interface FormValues {
   OTP: string;
