@@ -1,15 +1,21 @@
 {
   "expo": {
-    "name": "Ecoh",
+    "name": "ecoh",
     "slug": "Ecoh",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "Anthony.McMillan.ecoh",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,6 +30,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-video",
       [
         "expo-splash-screen",
         {
@@ -36,6 +43,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "38fc3634-a451-43e0-94e1-a5918e340d58"
+      }
     }
   }
 }

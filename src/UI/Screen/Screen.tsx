@@ -1,36 +1,40 @@
-import {
-  ExtendedEdge,
-  useSafeAreaInsetsStyle,
-} from '@/src/utils/useSafeAreaInsetsStyle';
-import { useScrollToTop } from '@react-navigation/native';
-import { StatusBar, StatusBarProps } from 'expo-status-bar';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, memo } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
-  KeyboardAvoidingViewProps,
   LayoutChangeEvent,
   Platform,
   ScrollView,
   ScrollViewProps,
-  StyleProp,
+  StyleSheet,
   TouchableWithoutFeedback,
   View,
   ViewStyle,
 } from 'react-native';
+import { StatusBar, StatusBarProps } from 'expo-status-bar';
+import {
+  useSafeAreaInsetsStyle,
+  ExtendedEdge,
+} from '@/src/utils/useSafeAreaInsetsStyle';
+import { useScrollToTop } from '@react-navigation/native';
 import { BaseScreenProps } from './types';
 
+// -------------------------
+// Types & Interfaces
+// -------------------------
 interface FixedScreenProps extends BaseScreenProps {
   preset?: 'fixed';
 }
+
 interface ScrollScreenProps extends BaseScreenProps {
   preset?: 'scroll';
   keyboardShouldPersistTaps?: 'handled' | 'always' | 'never';
-  ScrollViewProps?: ScrollViewProps;
+  scrollViewProps?: ScrollViewProps;
 }
 
 interface AutoScreenProps extends Omit<ScrollScreenProps, 'preset'> {
   preset?: 'auto';
+  /** Toggle scrolling when content is shorter than the threshold (percentage or fixed point) */
   scrollEnabledToggleThreshold?: { percent?: number; point?: number };
 }
 
@@ -39,47 +43,47 @@ export type ScreenProps =
   | FixedScreenProps
   | AutoScreenProps;
 
-const isIos = Platform.OS === 'ios';
-
-function isNonScrolling(preset?: ScreenProps['preset']) {
-  return !preset || preset === 'fixed';
-}
-
-function useAutoPreset(props: AutoScreenProps) {
-  const { preset, scrollEnabledToggleThreshold } = props;
-  const { percent = 0.92, point = 0 } = scrollEnabledToggleThreshold || {};
-
-  const scrollViewHeight = useRef<null | number>(null);
-  const scrollViewContentHeight = useRef<null | number>(null);
+// -------------------------
+// Utility Hook: Auto Scroll Preset
+// -------------------------
+function useAutoScrollPreset(
+  preset: AutoScreenProps['preset'],
+  toggleThreshold?: AutoScreenProps['scrollEnabledToggleThreshold'],
+) {
+  const { percent = 0.92, point = 0 } = toggleThreshold || {};
+  const scrollViewHeight = useRef<number | null>(null);
+  const scrollViewContentHeight = useRef<number | null>(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
-  function updateScrollState() {
+  const updateScrollState = useCallback(() => {
     if (
       scrollViewHeight.current === null ||
       scrollViewContentHeight.current === null
-    )
+    ) {
       return;
-
+    }
+    // Determine if content fits the screen without scrolling.
     const contentFitsScreen = point
       ? scrollViewContentHeight.current < scrollViewHeight.current - point
       : scrollViewContentHeight.current < scrollViewHeight.current * percent;
+    setScrollEnabled(!(preset === 'auto' && contentFitsScreen));
+  }, [percent, point, preset]);
 
-    if (scrollEnabled && contentFitsScreen) setScrollEnabled(false);
-    if (!scrollEnabled && !contentFitsScreen) setScrollEnabled(true);
-  }
+  const onContentSizeChange = useCallback(
+    (w: number, h: number) => {
+      scrollViewContentHeight.current = h;
+      updateScrollState();
+    },
+    [updateScrollState],
+  );
 
-  function onContentSizeChange(w: number, h: number) {
-    scrollViewContentHeight.current = h;
-    updateScrollState();
-  }
-
-  function onLayout(e: LayoutChangeEvent) {
-    const { height } = e.nativeEvent.layout;
-    scrollViewHeight.current = height;
-    updateScrollState();
-  }
-
-  if (preset === 'auto') updateScrollState();
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      scrollViewHeight.current = e.nativeEvent.layout.height;
+      updateScrollState();
+    },
+    [updateScrollState],
+  );
 
   return {
     scrollEnabled: preset === 'auto' ? scrollEnabled : true,
@@ -88,114 +92,138 @@ function useAutoPreset(props: AutoScreenProps) {
   };
 }
 
-function ScreenWithoutScrolling(props: ScreenProps) {
-  const { style, contentContainerStyle, children } = props;
+// -------------------------
+// Fixed Screen (Non-Scrolling)
+// -------------------------
+const FixedScreen = memo(function FixedScreen({
+  style,
+  contentContainerStyle,
+  children,
+}: FixedScreenProps) {
+  const dismissKeyboard = useCallback(() => Keyboard.dismiss(), []);
   return (
     <TouchableWithoutFeedback
-      style={[$outerStyle, style]}
-      onPress={Keyboard.dismiss}
+      style={[styles.outer, style]}
+      onPress={dismissKeyboard}
     >
-      <View style={[$innerStyle, contentContainerStyle]}>{children}</View>
+      <View style={[styles.inner, contentContainerStyle]}>{children}</View>
     </TouchableWithoutFeedback>
   );
-}
+});
 
-function ScreenWithScrolling(props: ScreenProps) {
+// -------------------------
+// Scrollable Screen
+// -------------------------
+const ScrollableScreen = memo(function ScrollableScreen(
+  props: ScrollScreenProps | AutoScreenProps,
+) {
   const {
     children,
     keyboardShouldPersistTaps = 'handled',
     contentContainerStyle,
-    ScrollViewProps,
+    scrollViewProps,
     style,
-  } = props as ScrollScreenProps;
+    preset,
+  } = props;
 
-  const ref = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+  useScrollToTop(scrollViewRef);
 
-  const { scrollEnabled, onContentSizeChange, onLayout } = useAutoPreset(
-    props as AutoScreenProps,
+  const { scrollEnabled, onContentSizeChange, onLayout } = useAutoScrollPreset(
+    preset as AutoScreenProps['preset'],
+    (props as AutoScreenProps).scrollEnabledToggleThreshold,
   );
-
-  useScrollToTop(ref);
 
   return (
     <ScrollView
-      {...{ keyboardShouldPersistTaps, scrollEnabled, ref }}
-      {...ScrollViewProps}
+      ref={scrollViewRef}
+      keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+      scrollEnabled={scrollEnabled}
+      onContentSizeChange={(w, h) => {
+        onContentSizeChange(w, h);
+        scrollViewProps?.onContentSizeChange?.(w, h);
+      }}
       onLayout={(e) => {
         onLayout(e);
-        ScrollViewProps?.onLayout?.(e);
+        scrollViewProps?.onLayout?.(e);
       }}
-      onContentSizeChange={(w: number, h: number) => {
-        onContentSizeChange(w, h);
-        ScrollViewProps?.onContentSizeChange?.(w, h);
-      }}
-      style={[$outerStyle, ScrollViewProps?.style, style]}
+      style={[styles.outer, scrollViewProps?.style, style]}
       contentContainerStyle={[
-        $innerStyle,
-        ScrollViewProps?.contentContainerStyle,
+        styles.inner,
+        scrollViewProps?.contentContainerStyle,
         contentContainerStyle,
       ]}
+      {...scrollViewProps}
     >
       {children}
     </ScrollView>
   );
-}
+});
 
+// -------------------------
+// Main Screen Component
+// -------------------------
 export default function Screen(props: ScreenProps) {
   const {
     backgroundColor,
-    KeyboardAvoidingViewProps,
     keyboardOffset = 0,
     safeAreaEdges,
     StatusBarProps,
     statusBarStyle,
+    KeyboardAvoidingViewProps,
   } = props;
 
-  const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges);
+  const safeAreaStyle = useSafeAreaInsetsStyle(safeAreaEdges);
 
   useEffect(() => {
-    return () => {
-      // Clean up on unmount
-      Keyboard.dismiss();
-    };
+    return () => Keyboard.dismiss();
   }, []);
 
   return (
-    <View style={[$containerStyle, { backgroundColor }, $containerInsets]}>
+    <View style={[styles.container, { backgroundColor }, safeAreaStyle]}>
       <StatusBar style={statusBarStyle} {...StatusBarProps} />
       <KeyboardAvoidingView
-        behavior={isIos ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={keyboardOffset}
+        style={[styles.keyboardAvoidingView, KeyboardAvoidingViewProps?.style]}
         {...KeyboardAvoidingViewProps}
-        style={[$keyboardAvoidingViewStyle, KeyboardAvoidingViewProps?.style]}
       >
         {isNonScrolling(props.preset) ? (
-          <ScreenWithoutScrolling {...props} />
+          <FixedScreen {...(props as FixedScreenProps)} />
         ) : (
-          <ScreenWithScrolling {...props} />
+          <ScrollableScreen {...(props as ScrollScreenProps)} />
         )}
       </KeyboardAvoidingView>
     </View>
   );
 }
 
-const $containerStyle: ViewStyle = {
-  flex: 1,
-  height: '100%',
-  width: '100%',
-};
+// -------------------------
+// Helper: Determine if Screen is Non-Scrolling
+// -------------------------
+function isNonScrolling(preset?: ScreenProps['preset']) {
+  return !preset || preset === 'fixed';
+}
 
-const $keyboardAvoidingViewStyle: ViewStyle = {
-  flex: 1,
-};
-
-const $outerStyle: ViewStyle = {
-  flex: 1,
-  height: '100%',
-  width: '100%',
-};
-
-const $innerStyle: ViewStyle = {
-  justifyContent: 'flex-start',
-  alignItems: 'stretch',
-};
+// -------------------------
+// Styles
+// -------------------------
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    height: '100%',
+    width: '100%',
+  } as ViewStyle,
+  keyboardAvoidingView: {
+    flex: 1,
+  } as ViewStyle,
+  outer: {
+    flex: 1,
+    height: '100%',
+    width: '100%',
+  } as ViewStyle,
+  inner: {
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+  } as ViewStyle,
+});

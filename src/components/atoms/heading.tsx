@@ -19,8 +19,11 @@ export default function Header({ title, subtitle }: HeaderProps) {
 
 const styles = StyleSheet.create({
   title: {
-    fontFamily: typography.Poppins.medium,
-    fontSize: 18,
+    fontFamily: typography.fontFamilies.poppins.bold,
+    fontSize: typography.fontSizes.title,
   },
-  subtitle: { fontFamily: typography.Poppins.medium, fontSize: 16 },
+  subtitle: {
+    fontFamily: typography.fontFamilies.poppins.semiBold,
+    fontSize: typography.fontSizes.body,
+  },
 });

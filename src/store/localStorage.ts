@@ -1,19 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export interface UserData {
-  id: string;
-  cognitoId: string;
-  username: string;
-  displayName: string;
-  email: string | null;
-  mobile: string | null;
-  dateOfBirth: Date;
-}
+import { User } from '../interfaces/user';
 
 const USER_DATA_KEY = 'user_data';
 
 // Save user data to AsyncStorage
-export const saveUserData = async (userData: UserData): Promise<void> => {
+export const saveUserData = async (userData: User): Promise<void> => {
   try {
     const serializedData = JSON.stringify(userData);
     await AsyncStorage.setItem(USER_DATA_KEY, serializedData);
@@ -23,7 +14,7 @@ export const saveUserData = async (userData: UserData): Promise<void> => {
 };
 
 // Load user data from AsyncStorage
-export const loadUserData = async (): Promise<UserData | null> => {
+export const loadUserData = async (): Promise<User | null> => {
   try {
     const serializedData = await AsyncStorage.getItem(USER_DATA_KEY);
     return serializedData ? JSON.parse(serializedData) : null;

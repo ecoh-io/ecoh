@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, ViewStyle, TextStyle, View } from 'react-native';
+import { Text, ViewStyle, TextStyle, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient from Expo
 import { typography } from '@/src/theme/typography';
 
@@ -11,38 +11,36 @@ const Badge: React.FC<BadgeProps> = ({ type }) => {
   const badgeText = type === 'connection' ? 'Connection' : 'Following';
 
   // Define solid background color for "following"
-  const followingColor = '#1D9BF0';
+  const followingColor = 'rgba(29, 155, 240,0.3)';
 
   // Styles for the badge text
   const textStyle: TextStyle = {
     color: '#fff',
-    fontSize: 10,
-    fontFamily: typography.Poppins.medium,
+    fontSize: typography.fontSizes.button,
+    fontFamily: typography.fontFamilies.poppins.medium,
   };
 
   // Styles for the badge container
   const badgeContainer: ViewStyle = {
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 32,
+    borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
   };
 
   if (type === 'connection') {
     return (
-      <View style={styles.neuomorphicContainer}>
-        <LinearGradient
-          colors={['#00c6ff', '#0072ff']}
-          style={badgeContainer}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          accessible
-          accessibilityLabel={badgeText}
-        >
-          <Text style={textStyle}>{badgeText}</Text>
-        </LinearGradient>
-      </View>
+      <LinearGradient
+        colors={['#00c6ff', '#0072ff']}
+        style={badgeContainer}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        accessible
+        accessibilityLabel={badgeText}
+      >
+        <Text style={textStyle}>{badgeText}</Text>
+      </LinearGradient>
     );
   } else {
     return (
@@ -53,7 +51,8 @@ const Badge: React.FC<BadgeProps> = ({ type }) => {
             backgroundColor: followingColor,
             paddingHorizontal: 6,
             paddingVertical: 2,
-            borderRadius: 32,
+            borderRadius: 4,
+            color: '#1D9BF0',
           },
         ]}
         accessible
@@ -64,18 +63,5 @@ const Badge: React.FC<BadgeProps> = ({ type }) => {
     );
   }
 };
-
-const styles = StyleSheet.create({
-  neuomorphicContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-
-    shadowColor: '#888',
-    shadowOffset: { width: 0, height: 4 }, // Downward shadow for depth
-    shadowOpacity: 0.25,
-    shadowRadius: 4, // Soft spread for shadow
-    elevation: 8, // Android shadow effect
-  },
-});
 
 export default Badge;

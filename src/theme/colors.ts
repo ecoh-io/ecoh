@@ -1,10 +1,10 @@
 export const lightColors = {
   // Primary Colors
-  primary: '#6200EE', // Main brand color
+  primary: '#0072ff', // Main brand color
   onPrimary: '#FFFFFF', // Text/icon color on primary background
 
   // Secondary Colors
-  secondary: '#DADADA', // Secondary brand color
+  secondary: '#ccc', // Secondary brand color
   onSecondary: '#000000', // Text/icon color on secondary background
 
   // Background Colors
@@ -16,6 +16,7 @@ export const lightColors = {
   text: '#000000', // Primary text color
   onBackground: '#000000', // Text on background
   onSurface: '#000000', // Text on surface
+  onGradient: '#FFFFFF',
 
   // Disabled States
   disabled: 'rgba(0, 0, 0, 0.38)', // Disabled text and icon color
@@ -43,8 +44,12 @@ export const lightColors = {
   outlined: '#ECF2F5', // Outlined component border color
 
   // Additional Semantic Colors
-  highlight: '#C8C8C8', // Highlight color for selections
+  highlight: 'rgba(0,0,0,0.1)', // Highlight color for selections
   shadow: 'rgba(0, 0, 0, 0.2)', // Shadow color
+
+  gradient: ['#00c6ff', '#0072ff'],
+
+  testGray: '#ECF2F5',
 };
 
 export const darkColors = {
@@ -92,6 +97,8 @@ export const darkColors = {
   outlined: '#333333', // Outlined component border color for dark theme
 
   // Additional Semantic Colors
-  highlight: '#C8C8C8', // Highlight color for selections
+  highlight: 'rgba(255,255,255,0.3)', // Highlight color for selections
   shadow: 'rgba(255, 255, 255, 0.2)', // Shadow color
+
+  gradient: ['#00c6ff', '#0072ff'],
 };

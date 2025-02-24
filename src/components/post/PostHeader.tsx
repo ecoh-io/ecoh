@@ -100,12 +100,12 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 16,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.bold,
     maxWidth: '80%',
   },
   userHandle: {
     fontSize: 14,
-    fontFamily: typography.Poppins.regular,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
     marginTop: 2,
     color: '#6b6b6b',
     maxWidth: '50%',
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   timestamp: {
     fontSize: 14,
-    fontFamily: typography.Poppins.light,
+    fontFamily: typography.fontFamilies.poppins.regular,
     marginRight: 8,
   },
   rightSection: {

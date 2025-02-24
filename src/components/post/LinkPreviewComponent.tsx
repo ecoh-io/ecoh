@@ -174,13 +174,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   title: {
-    fontSize: 16,
-    fontFamily: typography.Poppins.medium,
+    fontSize: typography.fontSizes.body,
+    fontFamily: typography.fontFamilies.poppins.bold,
     marginBottom: 6,
   },
   description: {
-    fontSize: 14,
-    fontFamily: typography.Poppins.regular,
+    fontSize: typography.fontSizes.button,
+    fontFamily: typography.fontFamilies.poppins.regular,
     marginBottom: 8,
   },
   footer: {
@@ -189,8 +189,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   domain: {
-    fontSize: 12,
-    fontFamily: typography.Poppins.medium,
+    fontSize: typography.fontSizes.caption,
+    fontFamily: typography.fontFamilies.poppins.bold,
   },
   shareButton: {
     padding: 4,

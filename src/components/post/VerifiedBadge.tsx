@@ -29,11 +29,6 @@ const styles = StyleSheet.create({
     padding: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#888',
-    shadowOffset: { width: 0, height: 6 }, // Downward shadow for depth
-    shadowOpacity: 0.3,
-    shadowRadius: 4, // Soft spread for shadow
-    elevation: 8, // Android shadow effect
   },
   gradientIconBackground: {
     width: 24,

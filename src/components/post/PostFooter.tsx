@@ -5,6 +5,7 @@ import AnimatedLikeButton from './Animated/AnimatedLikeButton';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import AnimatedSaveButton from './Animated/AnimatedSaveButton';
+import { formatNumber } from '@/src/lib/helpers';
 
 interface PostFooterProps {
   likes: number;
@@ -45,8 +46,8 @@ const ActionWithCount: React.FC<ActionWithCountProps> = memo(
 );
 
 const PostFooter: React.FC<PostFooterProps> = ({
-  likes,
-  commentsCount,
+  likes = 0,
+  commentsCount = 0,
   sharesCount = 0, // Default to 0 if not provided
   isLiked,
   isSaved,
@@ -57,33 +58,18 @@ const PostFooter: React.FC<PostFooterProps> = ({
 }) => {
   const { colors } = useTheme();
 
-  // Memoize the formatCount function to avoid recreating it on every render
-  const formatCount = useMemo(
-    () => (count: number) => {
-      if (count >= 1_000_000_000) {
-        return `${(count / 1_000_000_000).toFixed(1)}B`;
-      } else if (count >= 1_000_000) {
-        return `${(count / 1_000_000).toFixed(1)}M`;
-      } else if (count >= 1_000) {
-        return `${(count / 1_000).toFixed(1)}k`;
-      }
-      return count.toString();
-    },
-    [],
-  );
-
   // Memoize formatted counts
   const formattedLikes = useMemo(
-    () => formatCount(likes),
-    [likes, formatCount],
+    () => formatNumber(likes),
+    [likes, formatNumber],
   );
   const formattedComments = useMemo(
-    () => formatCount(commentsCount),
-    [commentsCount, formatCount],
+    () => formatNumber(commentsCount),
+    [commentsCount, formatNumber],
   );
   const formattedShares = useMemo(
-    () => formatCount(sharesCount),
-    [sharesCount, formatCount],
+    () => formatNumber(sharesCount),
+    [sharesCount, formatNumber],
   );
 
   return (
@@ -103,7 +89,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
           onPress={onCommentPress}
           icon={<Feather name="message-circle" size={24} color="#000" />}
           count={commentsCount}
-          accessibilityLabel={`Comment. ${commentsCount} ${
+          accessibilityLabel={`Comment. ${formattedComments} ${
             commentsCount === 1 ? 'comment' : 'comments'
           }`}
         />
@@ -113,7 +99,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
           onPress={onShare}
           icon={<Feather name="send" size={24} color="#000" />}
           count={sharesCount}
-          accessibilityLabel={`Share. ${sharesCount} ${
+          accessibilityLabel={`Share. ${formattedShares} ${
             sharesCount === 1 ? 'share' : 'shares'
           }`}
         />
@@ -147,8 +133,8 @@ const styles = StyleSheet.create({
   },
   countText: {
     marginLeft: 6,
-    fontSize: 14,
-    fontFamily: typography.Poppins.medium,
+    fontSize: typography.fontSizes.button,
+    fontFamily: typography.fontFamilies.poppins.bold,
     color: '#000', // Default color, overridden by dynamic color if needed
   },
 });

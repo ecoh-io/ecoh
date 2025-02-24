@@ -1,4 +1,5 @@
-import { RegisterResponse, RegistrationData } from '../types';
+import { RegisterResponse } from '../types';
+import { AuthData } from '../types/auth.data';
 import axiosInstance from './axiosInstance';
 
 /**
@@ -7,7 +8,7 @@ import axiosInstance from './axiosInstance';
  * @returns The API response.
  */
 export const registerUser = async (
-  formData: RegistrationData,
+  formData: AuthData,
 ): Promise<RegisterResponse> => {
   const response = await axiosInstance.post<RegisterResponse>(
     '/auth/register',

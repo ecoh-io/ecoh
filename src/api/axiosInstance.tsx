@@ -12,6 +12,8 @@ import {
   getRefreshToken,
   setAuthToken,
 } from '../store/secureStore';
+import { useAuthStore } from '../store/AuthStore';
+import { loadUserData } from '../store/localStorage';
 
 // Define the shape of your error response
 interface ErrorResponse {
@@ -21,12 +23,13 @@ interface ErrorResponse {
 
 // Define the shape of the refresh token response
 interface RefreshTokenResponse {
-  token: string;
+  AccessToken: string;
 }
 
 // Define the shape of the refresh token request
 interface RefreshTokenRequest {
-  token: string;
+  refreshToken: string;
+  identifier: string;
 }
 
 // Extend AxiosRequestConfig to include a custom retry property
@@ -141,13 +144,27 @@ axiosInstance.interceptors.response.use(
           throw new Error('No refresh token available');
         }
 
+        const userData = await loadUserData();
+
+        if (!userData) {
+          throw new Error('No user data available');
+        }
+
         // Make a request to refresh the token using the default axios instance to avoid interceptors
         const response = await axios.post<RefreshTokenResponse>(
           `${process.env.EXPO_PUBLIC_API_BASE_URL}/auth/refresh-token`,
-          { token: refreshToken } as RefreshTokenRequest,
+          {
+            refreshToken,
+            identifier: userData.id,
+          } as RefreshTokenRequest,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
         );
 
-        const newToken = response.data.token;
+        const newToken = response.data.AccessToken;
 
         // Update the auth token in storage
         await setAuthToken(newToken);

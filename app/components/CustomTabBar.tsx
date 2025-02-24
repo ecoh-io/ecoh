@@ -1,11 +1,23 @@
-import React, { useRef, useEffect, useContext } from 'react';
-import { Pressable, StyleSheet, Animated, Dimensions } from 'react-native';
+import React, { useEffect, useContext } from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  View,
+  Image,
+  LayoutChangeEvent,
+} from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { ScrollContext } from '@/src/context/ScrollContext';
+import { useTheme } from '@/src/theme/ThemeContext';
+import { useAuthStore } from '@/src/store/AuthStore';
 
 // Define your icon mappings based on route names
 const ICONS: Record<
@@ -28,7 +40,6 @@ const ICONS: Record<
     unfocused: 'magnify-minus-outline',
   },
   profile: { focused: 'account-circle', unfocused: 'account-circle-outline' },
-
   // Add more mappings as needed
 };
 
@@ -38,41 +49,43 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const { isTabBarVisible } = useContext(ScrollContext);
+  const { colors } = useTheme();
+  const user = useAuthStore((state) => state.user);
+  // Use the user's profile photo URL; fallback to a default placeholder if needed.
+  const profilePhoto =
+    user?.profile.profilePictureUrl ||
+    'https://example.com/default-profile.png';
 
-  // Animated values for opacity and translateY
-  const translateY = useRef(new Animated.Value(0)).current;
-  const opacity = useRef(new Animated.Value(1)).current;
+  // Shared values for opacity and translateY for showing/hiding the tab bar.
+  const translateY = useSharedValue(0);
+  const opacity = useSharedValue(1);
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(translateY, {
-        toValue: isTabBarVisible ? 0 : 80, // Adjust slide distance as needed
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: isTabBarVisible ? 1 : 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [isTabBarVisible, translateY, opacity]);
+    translateY.value = withTiming(isTabBarVisible ? 0 : 80, {
+      duration: 200,
+    });
+    opacity.value = withTiming(isTabBarVisible ? 1 : 0, {
+      duration: 200,
+    });
+  }, [isTabBarVisible]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
 
   return (
     <Animated.View
       style={[
         styles.animatedTabBar,
-        {
-          transform: [{ translateY }],
-          opacity,
-        },
+        animatedStyle,
+        { backgroundColor: colors.background },
       ]}
     >
-      <BlurView tint="light" intensity={50} style={styles.blurView}>
+      <View style={styles.blurView}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const label: string = options.title || route.name;
-
           const isFocused = state.index === index;
 
           const onPress = () => {
@@ -81,29 +94,28 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
               target: route.key,
               canPreventDefault: true,
             });
-
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name);
             }
           };
 
-          // Retrieve icon names based on route and focus state
+          // Retrieve icon names based on route and focus state.
           const iconNames = ICONS[route.name] || {
             focused: 'ellipse',
             unfocused: 'ellipse-outline',
           };
 
-          // Animation for scaling the icon when focused
-          const scaleValue = useRef(new Animated.Value(1)).current;
-
+          // Animation for scaling the icon or profile photo when focused.
+          const scaleValue = useSharedValue(1);
           useEffect(() => {
-            Animated.spring(scaleValue, {
-              toValue: isFocused ? 1.2 : 1,
-              useNativeDriver: true,
-              friction: 4,
-              tension: 160,
-            }).start();
-          }, [isFocused, scaleValue]);
+            scaleValue.value = withTiming(isFocused ? 1.2 : 1, {
+              duration: 300,
+            });
+          }, [isFocused]);
+
+          const iconAnimatedStyle = useAnimatedStyle(() => ({
+            transform: [{ scale: scaleValue.value }],
+          }));
 
           return (
             <Pressable
@@ -115,8 +127,39 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
               style={styles.tabItem}
               android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true }}
             >
-              <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-                {isFocused ? (
+              <Animated.View style={iconAnimatedStyle}>
+                {route.name.toLowerCase() === 'profile' ? (
+                  // Render the user's profile photo.
+                  isFocused ? (
+                    // When active, wrap the profile image with a gradient border.
+                    <LinearGradient
+                      colors={['#00c6ff', '#0072ff']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.profileGradientBorder}
+                    >
+                      <View
+                        style={[
+                          styles.profileImageContainer,
+                          { backgroundColor: colors.background },
+                        ]}
+                      >
+                        <Image
+                          source={{ uri: profilePhoto }}
+                          style={styles.profileImage}
+                        />
+                      </View>
+                    </LinearGradient>
+                  ) : (
+                    <View style={styles.inactiveProfileBorder}>
+                      <Image
+                        source={{ uri: profilePhoto }}
+                        style={styles.profileImage}
+                      />
+                    </View>
+                  )
+                ) : // Render a regular icon for non-profile tabs.
+                isFocused ? (
                   <MaskedView
                     maskElement={
                       <MaterialCommunityIcons
@@ -144,14 +187,12 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
             </Pressable>
           );
         })}
-      </BlurView>
+      </View>
     </Animated.View>
   );
 };
 
 export default CustomTabBar;
-
-const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   animatedTabBar: {
@@ -165,20 +206,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden',
     paddingBottom: 15,
-
-    // Removed borderRadius for sharp corners
-    // borderRadius: 40,
-
     // Shadow adjustments for subtlety
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 }, // Reduced offset
-    shadowOpacity: 0.05, // Very subtle opacity
-    shadowRadius: 3, // Slight spread
-
-    // Subtle Shadow for Android
-    elevation: 2, // Lower elevation for softer shadow
-
-    backgroundColor: 'rgba(255, 255, 255, 1)', // Fully opaque background
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+    backgroundColor: 'rgba(255, 255, 255, 1)',
   },
   blurView: {
     flex: 1,
@@ -193,5 +227,35 @@ const styles = StyleSheet.create({
   gradientIconBackground: {
     width: 24,
     height: 24,
+  },
+  // Styles for the profile tab
+  profileGradientBorder: {
+    width: 34,
+    height: 34,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inactiveProfileBorder: {
+    width: 34,
+    height: 34,
+    borderRadius: 16,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: '#828282',
+  },
+  profileImageContainer: {
+    width: 30,
+    height: 30,
+    borderRadius: 14,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 28,
+    height: 28,
+    borderRadius: 28 / 2,
   },
 });

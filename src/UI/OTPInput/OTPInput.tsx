@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 4,
     fontSize: 14,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.bold,
   },
 });
 

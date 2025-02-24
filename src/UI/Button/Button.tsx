@@ -26,7 +26,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const Button: React.FC<ButtonProps & PressableProps> = ({
   title,
   onPress,
-  disabled = false,
+  disabled,
   loading = false,
   variant = 'primary',
   size = 'medium',
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontFamily: typography.Poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
   icon: {
     marginHorizontal: 4,

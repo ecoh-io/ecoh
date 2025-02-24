@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     flex: 1, // Makes the progress bar take up the remaining space
   },
   text: {
-    fontFamily: typography.Poppins.medium,
-    fontSize: 16,
+    fontFamily: typography.fontFamilies.poppins.medium,
+    fontSize: typography.fontSizes.body,
   },
 });

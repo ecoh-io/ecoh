@@ -5,10 +5,12 @@ import Animated, {
   useAnimatedStyle,
   withSequence,
   withTiming,
+  runOnJS,
 } from 'react-native-reanimated';
 import { FontAwesome } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 interface AnimatedLikeButtonProps {
   isLiked: boolean;
@@ -34,46 +36,34 @@ const AnimatedLikeButton: React.FC<AnimatedLikeButtonProps> = ({
     }
   }, [isLiked]);
 
+  const tapGesture = Gesture.Tap().onEnd(() => {
+    // Use runOnJS to call the onLike callback on the JS thread
+    runOnJS(onLike)();
+  });
+
   return (
-    <TouchableWithoutFeedback
-      onPress={onLike}
-      accessibilityLabel="Like Button"
-      accessibilityRole="button"
-    >
-      <View style={styles.neuomorphicContainer}>
-        <Animated.View style={[animatedStyle]}>
-          {isLiked ? (
-            <MaskedView
-              maskElement={<FontAwesome name="heart" size={28} color="#000" />}
-            >
-              <LinearGradient
-                colors={['#ff7e5f', '#ff3f81', '#ff0000']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gradientBackground}
-              />
-            </MaskedView>
-          ) : (
-            <FontAwesome name="heart-o" size={28} color="#555" />
-          )}
-        </Animated.View>
-      </View>
-    </TouchableWithoutFeedback>
+    <GestureDetector gesture={tapGesture}>
+      <Animated.View style={[animatedStyle]}>
+        {isLiked ? (
+          <MaskedView
+            maskElement={<FontAwesome name="heart" size={28} color="#000" />}
+          >
+            <LinearGradient
+              colors={['#ff7e5f', '#ff3f81', '#ff0000']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradientBackground}
+            />
+          </MaskedView>
+        ) : (
+          <FontAwesome name="heart-o" size={28} color="#555" />
+        )}
+      </Animated.View>
+    </GestureDetector>
   );
 };
 
 const styles = StyleSheet.create({
-  neuomorphicContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 28,
-    height: 28,
-    shadowColor: '#888',
-    shadowOffset: { width: 0, height: 6 }, // Downward shadow for depth
-    shadowOpacity: 0.3,
-    shadowRadius: 4, // Soft spread for shadow
-    elevation: 8, // Android shadow effect
-  },
   gradientBackground: {
     flex: 1,
     width: 28,

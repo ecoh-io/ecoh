@@ -4,10 +4,10 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRegistration } from '@/src/context/RegistrationContext';
 import OTPInput from '@/src/UI/OTPInput';
-import { useConfrimUser } from '@/src/hooks/useConfirmUser';
 import Button from '@/src/UI/Button';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { Footer, Header } from '@/src/components/atoms';
+import { useConfirmUser } from '@/src/hooks/useConfirmUser';
 
 interface FormValues {
   OTP: string;
@@ -33,7 +33,7 @@ export default function OneTimePasscode() {
           identifier: state.formData.identifier!,
           code: values.OTP,
           password: state.formData.password,
-          displayName: state.formData.name,
+          name: state.formData.name,
           username: state.formData.username,
           dateOfBirth: state.formData.dateOfBirth!,
         };
@@ -53,8 +53,8 @@ export default function OneTimePasscode() {
     validateOnBlur: true,
   });
 
-  const { mutateAsync } = useConfrimUser({
-    onError: (error) => {
+  const { mutateAsync } = useConfirmUser({
+    onError: (error: any) => {
       if (error?.status === 400) {
         formik.setErrors({ OTP: 'Invalid confirmation code.' });
       } else {
