@@ -3,11 +3,9 @@ import { Colors } from '@/src/types/color';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { memo } from 'react';
 import {
-  Animated,
   StyleSheet,
   Text,
   TouchableOpacity,
-  Platform,
   SafeAreaView,
   View,
 } from 'react-native';

@@ -1,5 +1,12 @@
-import React, { useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Dimensions,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { typography } from '@/src/theme/typography';
 import { useTheme } from '@/src/theme/ThemeContext';
@@ -26,9 +33,7 @@ const CreateAlbumSchema = Yup.object().shape({
     .required('Visibility is required'),
 });
 
-const CreateAlbum = () => {
-  const [selectedImage, setSelectedImage] =
-    useState<ImagePicker.ImagePickerAsset | null>(null);
+const CreateAlbum: React.FC = () => {
   const router = useRouter();
   const { colors } = useTheme();
   const user = useAuthStore((state) => state.user);
@@ -37,6 +42,12 @@ const CreateAlbum = () => {
     MediaType.ALBUM_COVER_IMAGE,
   );
   const { mutate: createAlbum } = useCreateAlbum();
+
+  const { width: screenWidth } = Dimensions.get('window');
+
+  const [selectedImage, setSelectedImage] =
+    useState<ImagePicker.ImagePickerAsset | null>(null);
+  const width = screenWidth * 0.5;
 
   const handleSelectImage = useCallback(async () => {
     const imageAsset = await pickSingleImage();
@@ -81,6 +92,13 @@ const CreateAlbum = () => {
     value: value,
   }));
 
+  const iconColor = useMemo(() => {
+    if (formik.errors.name && formik.touched.name) {
+      return colors.error;
+    }
+    return colors.secondary;
+  }, [formik.errors.name, formik.touched.name]);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.headerContainer}>
@@ -95,51 +113,35 @@ const CreateAlbum = () => {
         </Text>
       </View>
 
-      <View style={{ flexDirection: 'column', gap: 5, flex: 1 }}>
+      <View style={{ flexDirection: 'column', gap: 30, flex: 1 }}>
         <FormikProvider value={formik}>
           <TouchableOpacity
             style={{
               flexDirection: 'column',
-              gap: 10,
-              flex: 1,
+              gap: 14,
+              alignItems: 'center',
             }}
             onPress={handleSelectImage}
           >
             {selectedImage ? (
-              <View style={{ flex: 1 }}>
-                <Image
-                  source={{ uri: selectedImage.uri }}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: 16,
-                    resizeMode: 'cover',
-                  }}
-                />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.8)']}
-                  style={styles.imageOverlay}
-                >
-                  <Text
-                    style={[
-                      styles.imageOverlayText,
-                      !formik.values.name && styles.placeholderText,
-                    ]}
-                    numberOfLines={2}
-                    ellipsizeMode="tail"
-                  >
-                    {formik.values.name || 'Album Title'}
-                  </Text>
-                </LinearGradient>
-              </View>
+              <Image
+                source={{ uri: selectedImage.uri }}
+                style={{
+                  width: width,
+                  height: width,
+                  borderRadius: width / 2,
+                  resizeMode: 'cover',
+                }}
+              />
             ) : (
               <View
                 style={{
                   borderWidth: 1,
-                  flex: 1,
+                  width: width,
+                  height: width,
+                  borderRadius: width / 2,
                   borderStyle: 'dashed',
                   borderColor: colors.secondary,
-                  borderRadius: 16,
                   paddingHorizontal: 8,
                   paddingVertical: 32,
                   alignItems: 'center',
@@ -147,7 +149,7 @@ const CreateAlbum = () => {
                   zIndex: 1,
                 }}
               >
-                <Entypo name="plus" size={64} color={colors.secondary} />
+                <Entypo name="plus" size={48} color={colors.secondary} />
                 <Text
                   style={[styles.coverPhotoText, { color: colors.secondary }]}
                 >
@@ -156,13 +158,20 @@ const CreateAlbum = () => {
               </View>
             )}
           </TouchableOpacity>
+          <Text
+            style={[
+              styles.imageOverlayText,
+              !formik.values.name && styles.placeholderText,
+            ]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {formik.values.name || 'Album Title'}
+          </Text>
           <View
             style={{
-              marginTop: 20,
               flexDirection: 'column',
               gap: 14,
-              justifyContent: 'flex-end',
-              zIndex: 800,
             }}
           >
             <FormikEcohDropdown
@@ -174,6 +183,9 @@ const CreateAlbum = () => {
               name="visibility"
               placeholder="visibility"
               style={{ width: '60%' }}
+              leftIcon={
+                <Entypo name="eye" size={24} color={colors.secondary} />
+              }
             />
             <Input
               value={formik.values.name}
@@ -187,7 +199,7 @@ const CreateAlbum = () => {
                   : undefined
               }
               LeftAccessory={() => (
-                <Entypo name="images" size={24} color={colors.secondary} />
+                <Entypo name="images" size={24} color={iconColor} />
               )}
             />
             <Button
@@ -215,7 +227,7 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   coverPhotoText: {
-    fontSize: 21,
+    fontSize: 18,
     fontFamily: typography.fontFamilies.poppins.medium,
   },
   textArea: {
@@ -240,29 +252,13 @@ const styles = StyleSheet.create({
   backButton: {
     paddingRight: 10,
   },
-  imageOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '20%', // Adjust this value to control how much of the image is covered by the gradient
-    justifyContent: 'flex-end',
-    padding: 10,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
-  },
   imageOverlayText: {
-    color: 'white',
     fontSize: 21,
     fontFamily: typography.fontFamilies.poppins.medium,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-    marginVertical: 8,
+    alignSelf: 'center',
   },
   placeholderText: {
     fontFamily: typography.fontFamilies.poppins.medium,
-    opacity: 0.7,
   },
 });
 

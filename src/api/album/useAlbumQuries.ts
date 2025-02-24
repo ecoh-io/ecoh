@@ -10,7 +10,7 @@ export const useAlbums = () => {
   });
 };
 
-export const useAlbum = (albumId: number) => {
+export const useAlbum = (albumId: string) => {
   return useQuery<Album, Error>({
     queryKey: ['album', albumId],
     queryFn: () => fetchAlbumById(albumId),

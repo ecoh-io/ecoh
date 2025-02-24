@@ -15,6 +15,7 @@ interface FormikEcohDropdownProps {
     isSelected: boolean,
   ) => React.ReactNode;
   style?: any;
+  leftIcon?: React.ReactNode;
 }
 
 const FormikEcohDropdown: React.FC<FormikEcohDropdownProps> = ({
@@ -24,6 +25,7 @@ const FormikEcohDropdown: React.FC<FormikEcohDropdownProps> = ({
   multiSelect,
   renderOption,
   style,
+  leftIcon,
 }) => {
   // useField provides field, meta, and helpers for Formik integration.
   const [field, meta, helpers] = useField(name);
@@ -37,6 +39,7 @@ const FormikEcohDropdown: React.FC<FormikEcohDropdownProps> = ({
         placeholder={placeholder}
         multiSelect={multiSelect}
         renderOption={renderOption}
+        leftIcon={leftIcon}
       />
       {meta.touched && meta.error ? (
         <Text style={styles.errorText}>{meta.error}</Text>

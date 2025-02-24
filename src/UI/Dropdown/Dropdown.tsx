@@ -42,6 +42,8 @@ export interface EcohDropdownProps {
     isSelected: boolean,
   ) => React.ReactNode;
   placeholder?: string;
+  /** Optional left icon to be displayed on the dropdown trigger */
+  leftIcon?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -52,6 +54,7 @@ const EcohDropdown: React.FC<EcohDropdownProps> = ({
   multiSelect = false,
   renderOption,
   placeholder = 'Select an option',
+  leftIcon,
   style,
 }) => {
   // Local state for open/close and highlighted index (for keyboard navigation)
@@ -144,9 +147,15 @@ const EcohDropdown: React.FC<EcohDropdownProps> = ({
       ? Array.isArray(selected) && selected.includes(item.id)
       : selected === item.id;
 
+    const isLastItem = index === options.length - 1;
+
     return (
       <TouchableOpacity
-        style={[styles.optionItem, isSelected && styles.selectedOption]}
+        style={[
+          styles.optionItem,
+          isSelected && styles.selectedOption,
+          isLastItem && styles.lastOptionItem,
+        ]}
         onPress={() => handleSelect(item)}
         accessible={true}
         accessibilityRole="button"
@@ -187,6 +196,7 @@ const EcohDropdown: React.FC<EcohDropdownProps> = ({
           { backgroundColor: theme.dropdownBackground, zIndex: 2 },
         ]}
       >
+        {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
         <Text style={[styles.triggerText, { color: theme.text }]}>
           {triggerText()}
         </Text>
@@ -245,6 +255,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  leftIcon: {
+    marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   triggerText: {
     fontSize: 16,
     flex: 1,
@@ -282,6 +297,9 @@ const styles = StyleSheet.create({
   },
   selectedOption: {
     backgroundColor: '#fff',
+  },
+  lastOptionItem: {
+    borderBottomWidth: 0, // No border for the last item
   },
 });
 

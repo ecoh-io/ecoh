@@ -32,7 +32,7 @@ interface AlbumCircleProps {
 const solidColorByVisibility: Record<Visibility, string> = {
   [Visibility.PRIVATE]: '', // No border for private
   [Visibility.CONNECTIONS_ONLY]: '', // Not used because we apply gradient
-  [Visibility.NETWORK_ONLY]: '#85B1FF', // Updated solid color for network only
+  [Visibility.NETWORK_ONLY]: '#599AFF', // Updated solid color for network only
   [Visibility.EVERYONE]: '#D4DEE4', // Darker blue/gray
 };
 
@@ -178,6 +178,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
-    gap: 5,
+    gap: 1,
   },
 });

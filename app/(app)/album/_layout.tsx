@@ -12,8 +12,8 @@ export default function AlbumLayout() {
     <EditProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Screen
-          preset="auto"
-          safeAreaEdges={['top', 'bottom']}
+          preset="fixed"
+          safeAreaEdges={['top']}
           backgroundColor={colors.background}
           contentContainerStyle={styles.screenContent}
           statusBarStyle={isDark ? 'light' : 'dark'}

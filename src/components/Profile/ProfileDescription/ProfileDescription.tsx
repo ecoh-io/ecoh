@@ -32,7 +32,6 @@ const ProfileDescription: React.FC<ProfileDescriptionProps> = memo(
     const { data: albums, isLoading } = useAlbums();
     const { width: screenWidth } = Dimensions.get('window');
     const albumWidth = screenWidth * 0.16;
-    const albumHeight = albumWidth * 1.2;
 
     const extractUsernameFromUrl = (url: string) => {
       try {
