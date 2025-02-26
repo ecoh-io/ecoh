@@ -6,6 +6,7 @@ import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import AnimatedSaveButton from './Animated/AnimatedSaveButton';
 import { formatNumber } from '@/src/lib/helpers';
+import { Colors } from '@/src/types/color';
 
 interface PostFooterProps {
   likes: number;
@@ -25,19 +26,20 @@ interface ActionWithCountProps {
   icon: React.ReactNode;
   count: number;
   accessibilityLabel: string;
+  colors: Colors;
 }
 
 const ActionWithCount: React.FC<ActionWithCountProps> = memo(
-  ({ onPress, icon, count, accessibilityLabel }) => (
+  ({ onPress, icon, count, accessibilityLabel, colors }) => (
     <TouchableOpacity
       onPress={onPress}
-      style={styles.actionWithCount}
+      style={[styles.actionWithCount, { borderColor: colors.secondary }]}
       activeOpacity={0.7}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
     >
       {icon}
-      <Text style={styles.countText}>{count}</Text>
+      <Text style={[styles.countText, { color: colors.text }]}>{count}</Text>
     </TouchableOpacity>
   ),
   (prevProps, nextProps) =>
@@ -58,6 +60,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const subtleLikedColor = 'rgba(255, 0, 0, 0.15)';
+
+  const subtleSavedColor = 'rgba(0, 122, 255, 0.15)'; // Subtle blue color
+
   // Memoize formatted counts
   const formattedLikes = useMemo(
     () => formatNumber(likes),
@@ -76,36 +82,55 @@ const PostFooter: React.FC<PostFooterProps> = ({
     <View style={styles.container}>
       {/* Actions Row */}
       <View style={styles.actionsRow}>
-        {/* Like Button with Count */}
-        <View style={styles.actionWithCount}>
-          <AnimatedLikeButton isLiked={isLiked} onLike={onLike} />
-          <Text style={[styles.countText, { color: colors.text }]}>
-            {formattedLikes}
-          </Text>
+        <View style={styles.actionButtonRow}>
+          {/* Like Button with Count */}
+          <View
+            style={[
+              styles.actionWithCount,
+              {
+                borderColor: isLiked ? subtleLikedColor : colors.secondary,
+                backgroundColor: isLiked ? subtleLikedColor : 'transparent',
+              },
+            ]}
+          >
+            <AnimatedLikeButton isLiked={isLiked} onLike={onLike} />
+            <Text style={[styles.countText, { color: colors.text }]}>
+              {formattedLikes}
+            </Text>
+          </View>
+
+          {/* Comment Button with Count */}
+          <ActionWithCount
+            onPress={onCommentPress}
+            icon={<Feather name="message-circle" size={18} color="#000" />}
+            count={commentsCount}
+            accessibilityLabel={`Comment. ${formattedComments} ${
+              commentsCount === 1 ? 'comment' : 'comments'
+            }`}
+            colors={colors}
+          />
+
+          {/* Share Button with Count */}
+          <ActionWithCount
+            onPress={onShare}
+            icon={<Feather name="send" size={18} color="#000" />}
+            count={sharesCount}
+            accessibilityLabel={`Share. ${formattedShares} ${
+              sharesCount === 1 ? 'share' : 'shares'
+            }`}
+            colors={colors}
+          />
         </View>
-
-        {/* Comment Button with Count */}
-        <ActionWithCount
-          onPress={onCommentPress}
-          icon={<Feather name="message-circle" size={24} color="#000" />}
-          count={commentsCount}
-          accessibilityLabel={`Comment. ${formattedComments} ${
-            commentsCount === 1 ? 'comment' : 'comments'
-          }`}
-        />
-
-        {/* Share Button with Count */}
-        <ActionWithCount
-          onPress={onShare}
-          icon={<Feather name="send" size={24} color="#000" />}
-          count={sharesCount}
-          accessibilityLabel={`Share. ${formattedShares} ${
-            sharesCount === 1 ? 'share' : 'shares'
-          }`}
-        />
-
         {/* Save Button */}
-        <View style={styles.saveButton}>
+        <View
+          style={[
+            styles.saveButton,
+            {
+              borderColor: isSaved ? subtleSavedColor : colors.secondary,
+              backgroundColor: isSaved ? subtleSavedColor : 'transparent',
+            },
+          ]}
+        >
           <AnimatedSaveButton isSaved={isSaved} onSave={onSave} />
         </View>
       </View>
@@ -116,26 +141,37 @@ const PostFooter: React.FC<PostFooterProps> = ({
 // Stylesheet
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 12,
-    paddingBottom: 18,
+    paddingVertical: 14,
   },
   actionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  actionButtonRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
   actionWithCount: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 24,
+    justifyContent: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 32,
+    borderWidth: 1,
   },
   saveButton: {
-    marginLeft: 'auto',
+    justifyContent: 'center',
+    padding: 6,
+    borderRadius: 32,
+    borderWidth: 1,
   },
   countText: {
     marginLeft: 6,
     fontSize: typography.fontSizes.button,
-    fontFamily: typography.fontFamilies.poppins.bold,
-    color: '#000', // Default color, overridden by dynamic color if needed
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
 });
 

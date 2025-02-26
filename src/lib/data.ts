@@ -78,32 +78,46 @@ const comments: Record<string, Comment> = {
 // Define post data
 export const posts: PostData[] = [
   {
-    id: '1',
-    type: PostType.IMAGE,
+    id: 1,
+    type: PostType.TEXT,
     user: users.u1,
     timestamp: getTimeAgo(5), // 5 hours ago
-    likes: 4900000,
+    likes: 4,
     shares: 300,
     comments: [comments.c2],
     isLiked: true,
     isSaved: true,
-    images: [{ uri: 'https://dummyimage.com/600x400/000/fff&text=Image1' }],
+    content:
+      'Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend',
   },
   {
-    id: '2',
+    id: 5,
+    type: PostType.TEXT,
+    user: users.u5,
+    timestamp: getTimeAgo(1), // 1 hour ago
+    likes: 3200,
+    shares: 450,
+    comments: [comments.c4],
+    isLiked: false,
+    isSaved: false,
+    content:
+      'Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend',
+  },
+  {
+    id: 2,
     type: PostType.TEXT,
     user: users.u2,
     timestamp: getTimeAgo(2), // 2 hours ago
     likes: 12078,
     shares: 1390,
     comments: [comments.c1],
-    isLiked: false,
+    isLiked: true,
     isSaved: false,
     content:
-      'This is a **bold** statement and this is *italic*. Check out https://www.theguardian.com/environment/2024/nov/25/forecasters-and-flood-defences-under-scrutiny-after-uks-storm-bert-ordeal #ReactNative @user',
+      'This is a **bold** statement and **bold** this is *italic*. ~~strike through~~ Check *italic* out **bold**  #ReactNative @user https://www.theguardian.com/environment/2024/nov/25/forecasters-and-flood-defences-under-scrutiny-after-uks-storm-bert-ordeal',
   },
   {
-    id: '3',
+    id: 3,
     type: PostType.TEXT,
     user: users.u3,
     timestamp: getTimeAgo(120), // 5 days ago
@@ -116,8 +130,8 @@ export const posts: PostData[] = [
       'Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend',
   },
   {
-    id: '4',
-    type: PostType.IMAGE,
+    id: 4,
+    type: PostType.TEXT,
     user: users.u4,
     timestamp: getTimeAgo(5), // 5 hours ago
     likes: 4500,
@@ -125,28 +139,11 @@ export const posts: PostData[] = [
     comments: [comments.c2],
     isLiked: true,
     isSaved: true,
-    images: [
-      { uri: 'https://dummyimage.com/600x400/000/fff&text=Image2' },
-      { uri: 'https://dummyimage.com/600x400/000/fff&text=Image3' },
-    ],
+    content:
+      'Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend',
   },
   {
-    id: '5',
-    type: PostType.VIDEO,
-    user: users.u5,
-    timestamp: getTimeAgo(1), // 1 hour ago
-    likes: 3200,
-    shares: 450,
-    comments: [comments.c4],
-    isLiked: false,
-    isSaved: false,
-    videoUri:
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    thumbnailUri: 'https://dummyimage.com/600x400/000/fff&text=VideoThumbnail',
-    duration: 120, // Duration in seconds
-  },
-  {
-    id: '6',
+    id: 6,
     type: PostType.VIDEO,
     user: users.u5,
     timestamp: getTimeAgo(3), // 3 hours ago

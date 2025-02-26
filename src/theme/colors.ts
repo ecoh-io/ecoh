@@ -13,7 +13,7 @@ export const lightColors = {
   backdrop: 'rgba(0, 0, 0, 0.5)', // Overlay backdrop
 
   // Text Colors
-  text: '#000000', // Primary text color
+  text: '#333', // Primary text color
   onBackground: '#000000', // Text on background
   onSurface: '#000000', // Text on surface
   onGradient: '#FFFFFF',

@@ -7,19 +7,17 @@ import {
   TouchableOpacity,
   Linking,
   ActivityIndicator,
-  FlatList,
-  Dimensions,
   Share,
+  LayoutChangeEvent,
 } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import { Ionicons } from '@expo/vector-icons'; // Ensure you have expo/vector-icons installed
 
 interface LinkPreviewComponentProps {
   preview: {
     title?: string;
     description?: string;
-    images?: string[];
+    image?: string;
     url: string;
   };
 }
@@ -27,10 +25,14 @@ interface LinkPreviewComponentProps {
 const LinkPreviewComponent: React.FC<LinkPreviewComponentProps> = ({
   preview,
 }) => {
-  const { title, description, images, url } = preview;
+  const { title, description, image, url } = preview;
   const { colors } = useTheme();
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  // Compute image height based on container's width (e.g., 60% of container's width)
+  const imageHeight = containerWidth ? containerWidth * 0.55 : 200;
 
   const handlePress = () => {
     Linking.openURL(url).catch((err) =>
@@ -55,53 +57,53 @@ const LinkPreviewComponent: React.FC<LinkPreviewComponentProps> = ({
     }
   };
 
+  const onContainerLayout = (event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setContainerWidth(width);
+  };
+
   return (
     <TouchableOpacity
       onPress={handlePress}
       style={[
         styles.container,
-        { backgroundColor: colors.background, borderColor: colors.secondary },
+        {
+          backgroundColor: colors.background,
+          borderColor: colors.secondary,
+        },
       ]}
+      onLayout={onContainerLayout}
       accessible
       accessibilityRole="link"
       accessibilityLabel={`Link preview for ${title || getDomain(url)}`}
       activeOpacity={0.8}
     >
-      {images && images.length > 0 ? (
-        <View style={styles.imageContainer}>
-          <FlatList
-            data={images}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => `${item}-${index}`}
-            renderItem={({ item }) => (
-              <Image
-                source={{ uri: item }}
-                style={styles.image}
-                onLoadStart={() => setImageLoading(true)}
-                onLoadEnd={() => setImageLoading(false)}
-                onError={() => {
-                  setImageLoading(false);
-                  setImageError(true);
-                }}
-                resizeMode="cover"
-              />
-            )}
+      <View style={[styles.imageContainer, { height: imageHeight }]}>
+        <Image
+          source={{
+            uri: image || 'https://dummyimage.com/600x400/000/fff&text=John',
+          }}
+          style={styles.image}
+          onLoadStart={() => setImageLoading(true)}
+          onLoadEnd={() => setImageLoading(false)}
+          onError={() => {
+            setImageLoading(false);
+            setImageError(true);
+          }}
+          resizeMode="cover"
+        />
+        {imageLoading && (
+          <ActivityIndicator
+            style={[styles.loadingIndicator, { top: imageHeight / 2 - 10 }]}
           />
-          {imageLoading && (
-            <ActivityIndicator
-              style={styles.loadingIndicator}
-              size="small"
-              color={colors.primary}
-            />
-          )}
-        </View>
-      ) : (
-        <View style={[styles.image, styles.placeholderImage]}>
-          <Ionicons name="link" size={24} color={colors.text} />
-        </View>
-      )}
+        )}
+        {imageError && (
+          <View style={[styles.errorContainer, { top: imageHeight / 2 - 20 }]}>
+            <Text style={styles.errorText}>Failed to load image</Text>
+          </View>
+        )}
+      </View>
+
       <View style={styles.textContainer}>
         <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
           {title || getDomain(url)}
@@ -122,43 +124,33 @@ const LinkPreviewComponent: React.FC<LinkPreviewComponentProps> = ({
   );
 };
 
-const IMAGE_WIDTH = 125;
-const IMAGE_HEIGHT = 140;
-
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    marginTop: 16,
+    width: '100%', // Respect parent's width and padding
+    flexDirection: 'column',
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   imageContainer: {
-    width: IMAGE_WIDTH,
-    height: IMAGE_HEIGHT,
+    width: '100%',
     borderTopLeftRadius: 12,
-    borderBottomLeftRadius: 12,
+    borderTopRightRadius: 12,
     overflow: 'hidden',
     position: 'relative',
   },
   image: {
-    width: IMAGE_WIDTH,
-    height: IMAGE_HEIGHT,
-    resizeMode: 'contain',
-  },
-  placeholderImage: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#e0e0e0',
+    width: '100%',
+    height: '100%',
   },
   loadingIndicator: {
     position: 'absolute',
-    top: IMAGE_HEIGHT / 2 - 10,
-    left: IMAGE_WIDTH / 2 - 10,
+    left: '50%',
+    marginLeft: -10, // half the indicator width
   },
   errorContainer: {
     position: 'absolute',
-    top: IMAGE_HEIGHT / 2 - 20,
-    left: IMAGE_WIDTH / 2 - 40,
+    left: '50%',
+    marginLeft: -40, // adjust based on text width
     width: 80,
     alignItems: 'center',
   },
@@ -170,30 +162,21 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
     flexDirection: 'column',
-    paddingTop: 8,
     paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
   },
   title: {
     fontSize: typography.fontSizes.body,
-    fontFamily: typography.fontFamilies.poppins.bold,
-    marginBottom: 6,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   description: {
     fontSize: typography.fontSizes.button,
     fontFamily: typography.fontFamilies.poppins.regular,
-    marginBottom: 8,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
   domain: {
     fontSize: typography.fontSizes.caption,
-    fontFamily: typography.fontFamilies.poppins.bold,
-  },
-  shareButton: {
-    padding: 4,
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
 });
 

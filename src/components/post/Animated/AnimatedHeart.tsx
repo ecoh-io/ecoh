@@ -1,46 +1,22 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  withDelay,
-  runOnJS,
-} from 'react-native-reanimated';
 import { FontAwesome } from '@expo/vector-icons';
+import { AnimatedWrapper } from '../../Animations/Animations';
 
 interface AnimatedHeartProps {
   visible: boolean;
-  onAnimationComplete: () => void;
 }
 
-const AnimatedHeart: React.FC<AnimatedHeartProps> = ({
-  visible,
-  onAnimationComplete,
-}) => {
-  const opacity = useSharedValue(0);
-  const scale = useSharedValue(0.5);
-
-  React.useEffect(() => {
-    if (visible) {
-      opacity.value = withTiming(1, { duration: 300 });
-      scale.value = withTiming(1.5, { duration: 300 }, () => {
-        opacity.value = withTiming(0, { duration: 300 }, () => {
-          runOnJS(onAnimationComplete)();
-        });
-      });
-    }
-  }, [visible]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ scale: scale.value }],
-  }));
-
+const AnimatedHeart: React.FC<AnimatedHeartProps> = ({ visible }) => {
   return (
-    <Animated.View style={[styles.heartContainer, animatedStyle]}>
+    <AnimatedWrapper
+      style={styles.heartContainer}
+      visible={visible}
+      animation="scale-in"
+      duration={300}
+    >
       <FontAwesome name="heart" size={50} color="#e0245e" />
-    </Animated.View>
+    </AnimatedWrapper>
   );
 };
 

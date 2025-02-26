@@ -1,13 +1,17 @@
-import React, { useCallback, useContext, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+// src/screens/FeedScreen.tsx
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { typography } from '@/src/theme/typography';
-import { ScrollContext } from '@/src/context/ScrollContext';
 import Post, { PostType } from '@/src/components/post/Post';
 import { posts } from '@/src/lib/data';
-import { FlashList } from '@shopify/flash-list';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -15,193 +19,212 @@ import Animated, {
   runOnJS,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
+import { withFeedManager } from '@/src/components/Feed/withFeedManager';
+import { debounce } from 'lodash';
 
+// Extra props provided by the feed manager HOC
+// Production-level constants
 const HEADER_HEIGHT = 60;
-const SCROLL_THRESHOLD = 10;
-const ANIMATION_DURATION = 200;
 const TAB_BAR_HEIGHT = 90;
 const CONTENT_PADDING_TOP = HEADER_HEIGHT + 10;
 
-const viewabilityConfig = {
-  itemVisiblePercentThreshold: 80,
-};
+export interface FeedScreenProps {
+  videoRefs: React.MutableRefObject<{ [key: number]: any }>;
+  onViewableItemsChanged: (info: {
+    viewableItems: any[];
+    changed: any[];
+  }) => void;
+  viewabilityConfig: { itemVisiblePercentThreshold: number };
+  loading?: boolean;
+  estimatedItemHeight?: number;
+}
 
-const keyExtractor = (item: any) => item.id.toString();
-
-// Create an animated version of FlashList
-const AnimatedFlashList = Animated.createAnimatedComponent(FlashList);
-
-const FeedScreen: React.FC = () => {
+const FeedScreen: React.FC<FeedScreenProps> = ({
+  videoRefs,
+  onViewableItemsChanged,
+  viewabilityConfig,
+  loading = false,
+  estimatedItemHeight = 300,
+}) => {
   const { colors } = useTheme();
-  const { setTabBarVisible } = useContext(ScrollContext);
+  const [currentVisibleIndex, setCurrentVisibleIndex] = useState<number>(0);
+  // Use a ref so that our renderItem always refers to the latest value without re-rendering every time.
+  const currentVisibleIndexRef = useRef(currentVisibleIndex);
 
-  // Shared values for header animation
+  // Debounce updates to reduce excessive state changes
+  const updateVisibleIndexDebounced = useMemo(
+    () =>
+      debounce((index: number) => {
+        setCurrentVisibleIndex(index);
+        currentVisibleIndexRef.current = index;
+      }, 50),
+    [],
+  );
+
+  // Shared values for header animation on the UI thread
   const headerOpacity = useSharedValue(1);
   const headerTranslateY = useSharedValue(0);
 
-  const [currentVisibleIndex, setCurrentVisibleIndex] = useState<number>(0);
-
-  // Animated styles for the header
   const animatedHeaderStyle = useAnimatedStyle(() => ({
     opacity: headerOpacity.value,
     transform: [{ translateY: headerTranslateY.value }],
   }));
 
-  // Shared values for scroll handling
-  const prevScrollY = useSharedValue(0);
-  const headerVisible = useSharedValue(true);
-  const isAnimating = useSharedValue(false);
-
-  // Scroll handler using Reanimated's useAnimatedScrollHandler
-  const animatedScrollHandler = useAnimatedScrollHandler({
+  // High-performance scroll handler using Reanimated worklets
+  const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-      const currentScrollY = event.contentOffset.y;
-      const deltaY = currentScrollY - prevScrollY.value;
-
-      if (
-        deltaY > SCROLL_THRESHOLD &&
-        headerVisible.value &&
-        !isAnimating.value
-      ) {
-        isAnimating.value = true;
-        headerOpacity.value = withTiming(0, { duration: ANIMATION_DURATION });
-        headerTranslateY.value = withTiming(
-          -HEADER_HEIGHT,
-          { duration: ANIMATION_DURATION },
-          () => {
-            headerVisible.value = false;
-            if (typeof setTabBarVisible === 'function') {
-              runOnJS(setTabBarVisible)(false);
-            } else {
-              console.error('setTabBarVisible is not a function');
-            }
-            isAnimating.value = false;
-          },
-        );
-      } else if (
-        deltaY < -SCROLL_THRESHOLD &&
-        !headerVisible.value &&
-        !isAnimating.value
-      ) {
-        isAnimating.value = true;
-        headerOpacity.value = withTiming(1, { duration: ANIMATION_DURATION });
-        headerTranslateY.value = withTiming(
-          0,
-          { duration: ANIMATION_DURATION },
-          () => {
-            headerVisible.value = true;
-            if (typeof setTabBarVisible === 'function') {
-              runOnJS(setTabBarVisible)(true);
-            } else {
-              console.error('setTabBarVisible is not a function');
-            }
-            isAnimating.value = false;
-          },
-        );
-      }
-
-      prevScrollY.value = currentScrollY;
+      const offsetY = event.contentOffset.y;
+      // Immediate UI updates with no duration to avoid lag
+      headerTranslateY.value = -Math.min(offsetY, HEADER_HEIGHT);
+      headerOpacity.value = 1 - Math.min(offsetY / HEADER_HEIGHT, 1);
     },
   });
 
-  const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: any[] }) => {
-      if (viewableItems.length > 0) {
-        const visibleItem = viewableItems.find((item) => item.index !== null);
+  // Combined onViewableItemsChanged: throttle state updates and use a robust "most visible" logic.
+  const combinedOnViewableItemsChanged = useCallback(
+    (info: { viewableItems: any[]; changed: any[] }) => {
+      onViewableItemsChanged(info);
+      if (info.viewableItems.length > 0) {
+        // Choose the item with the highest "visibility" percentage (if provided by your viewability config)
+        const mostVisible = info.viewableItems.reduce((prev, curr) =>
+          (curr?.percentage ?? 0) > (prev?.percentage ?? 0) ? curr : prev,
+        );
         if (
-          visibleItem?.index !== undefined &&
-          visibleItem.index !== currentVisibleIndex
+          mostVisible?.index !== undefined &&
+          mostVisible.index !== currentVisibleIndexRef.current
         ) {
-          setCurrentVisibleIndex(visibleItem.index);
+          updateVisibleIndexDebounced(mostVisible.index);
         }
       }
     },
-    [currentVisibleIndex],
+    [onViewableItemsChanged, updateVisibleIndexDebounced],
   );
 
+  // Dynamic item height measurement with a fallback estimated height.
+  const [itemHeights, setItemHeights] = useState<{ [key: string]: number }>({});
+  const updateItemHeight = useCallback((id: string, height: number) => {
+    setItemHeights((prev) => ({ ...prev, [id]: height }));
+  }, []);
+
+  const getItemLayout = useCallback(
+    (data: any, index: number) => {
+      let offset = 0;
+      for (let i = 0; i < index; i++) {
+        offset += itemHeights[data[i].id] ?? estimatedItemHeight;
+      }
+      const length = itemHeights[data[index].id] ?? estimatedItemHeight;
+      return { length, offset, index };
+    },
+    [itemHeights, estimatedItemHeight],
+  );
+
+  // Memoized renderItem to avoid unnecessary re-renders
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => (
       <Post
         post={item}
         isAutoplay={
-          index === currentVisibleIndex && item.type === PostType.VIDEO
+          index === currentVisibleIndexRef.current &&
+          item.type === PostType.VIDEO
         }
+        registerVideoRef={
+          item.type === PostType.VIDEO
+            ? (ref: any) => {
+                videoRefs.current[index] = ref;
+              }
+            : undefined
+        }
+        onLayout={(event: any) => {
+          const { height } = event.nativeEvent.layout;
+          updateItemHeight(item.id, height);
+        }}
       />
     ),
-    [currentVisibleIndex],
+    [videoRefs, updateItemHeight],
   );
+
+  const keyExtractor = useCallback((item: any) => item.id.toString(), []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Animated Header */}
+      {/* Animated header with pointerEvents adjusted to pass touches through */}
       <Animated.View
         style={[
           styles.header,
-          {
-            backgroundColor: colors.background,
-          },
+          { backgroundColor: colors.background },
           animatedHeaderStyle,
         ]}
+        pointerEvents="box-none"
       >
-        <Text style={[styles.title, { color: colors.text }]}>{'Feed'}</Text>
-        <TouchableOpacity
-          accessibilityLabel="Filter options"
-          accessibilityHint="Opens filter options"
-          onPress={() => {
-            // Implement your filter functionality here
-          }}
-        >
-          <MaterialCommunityIcons
-            name="filter-variant"
-            size={24}
-            color={colors.text}
-          />
-        </TouchableOpacity>
+        <View style={styles.headerContent} pointerEvents="auto">
+          <Text style={[styles.title, { color: colors.text }]}>{'Feed'}</Text>
+          <TouchableOpacity
+            accessibilityLabel="Filter options"
+            accessibilityHint="Opens filter options"
+            onPress={() => {
+              // Implement production-grade filter functionality
+            }}
+          >
+            <MaterialCommunityIcons
+              name="filter-variant"
+              size={24}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+        </View>
       </Animated.View>
 
-      {/* Feed Content */}
-      <AnimatedFlashList
+      {/* Loading indicator */}
+      {loading && (
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          style={styles.loadingIndicator}
+        />
+      )}
+
+      <Animated.FlatList
         data={posts}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         contentContainerStyle={styles.content}
-        estimatedItemSize={300} // Adjust this value based on your item size
-        onScroll={animatedScrollHandler}
         scrollEventThrottle={16}
-        onViewableItemsChanged={onViewableItemsChanged}
+        onScroll={scrollHandler}
+        onViewableItemsChanged={combinedOnViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={5}
+        updateCellsBatchingPeriod={50}
+        windowSize={10}
+        initialNumToRender={5}
+        // Use getItemLayout when possible to speed up scroll calculations.
+        getItemLayout={posts.length > 0 ? getItemLayout : undefined}
+        // For even further optimization, consider a custom CellRendererComponent.
       />
     </View>
   );
 };
 
-// Stylesheet
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   header: {
-    position: 'absolute', // Fixed at the top
+    position: 'absolute',
     top: 0,
-    left: 0,
-    right: 0,
+    width: '100%',
     height: HEADER_HEIGHT,
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    zIndex: 1000, // Ensure the header is above other content
+    zIndex: 10,
   },
-  title: {
-    fontFamily: typography.fontFamilies.poppins.bold,
-    fontSize: typography.fontSizes.title,
-  },
-  content: {
-    paddingTop: CONTENT_PADDING_TOP, // Space below the header
-    paddingBottom: TAB_BAR_HEIGHT, // Extra space to prevent content from being hidden behind the tab bar
+  headerContent: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingTop: 10,
   },
+  title: { fontSize: 20, fontWeight: 'bold' },
+  content: { paddingTop: HEADER_HEIGHT + 10, paddingBottom: 20 },
+  loadingIndicator: { marginTop: HEADER_HEIGHT + 20 },
 });
 
-export default FeedScreen;
+export default withFeedManager(FeedScreen);

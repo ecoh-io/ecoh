@@ -9,7 +9,7 @@ export interface creatAlbumPayoload {
 }
 
 export const fetchAlbums = async (): Promise<Album[]> => {
-  const { data } = await axiosInstance.get<Album[]>('/albums');
+  const { data } = await axiosInstance.get<Album[]>('/albums/');
   return data;
 };
 

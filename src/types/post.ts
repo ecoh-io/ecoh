@@ -35,7 +35,7 @@ export interface Comment {
  * Contains common fields shared across all post types.
  */
 export interface BasePost {
-  id: string; // Unique ID for the post
+  id: number; // Unique ID for the post
   type: PostType; // Type of the post (image, text, video)
   user: User; // User who created the post
   timestamp: Date; // Date and time of the post

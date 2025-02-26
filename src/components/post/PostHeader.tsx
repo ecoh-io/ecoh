@@ -54,7 +54,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         </View>
 
         <Text
-          style={[styles.userHandle, { color: colors.highlight }]}
+          style={[styles.userHandle, { color: colors.secondary }]}
           numberOfLines={1}
           ellipsizeMode="tail"
           accessible
@@ -81,39 +81,39 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingTop: 14,
+    paddingBottom: 7,
   },
   avatar: {
-    width: 48,
-    height: 48,
+    width: 42,
+    height: 42,
     borderRadius: 24, // Perfect circle
     marginRight: 12,
   },
   userInfo: {
+    flexDirection: 'column',
+    gap: 2,
     flex: 1,
     justifyContent: 'center',
   },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
   },
   username: {
     fontSize: 16,
-    fontFamily: typography.fontFamilies.poppins.bold,
-    maxWidth: '80%',
+    fontFamily: typography.fontFamilies.poppins.semiBold,
+    maxWidth: '75%',
   },
   userHandle: {
     fontSize: 14,
-    fontFamily: typography.fontFamilies.poppins.semiBold,
+    fontFamily: typography.fontFamilies.poppins.medium,
     marginTop: 2,
-    color: '#6b6b6b',
-    maxWidth: '50%',
+    maxWidth: '75%',
   },
   timestampRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 'auto',
   },
   timestamp: {
     fontSize: 14,
@@ -123,7 +123,8 @@ const styles = StyleSheet.create({
   rightSection: {
     flexDirection: 'column',
     alignItems: 'flex-end',
-    justifyContent: 'space-between',
+
+    gap: 2,
   },
 });
 

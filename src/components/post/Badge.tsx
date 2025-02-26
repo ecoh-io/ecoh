@@ -1,39 +1,38 @@
 import React from 'react';
-import { Text, ViewStyle, TextStyle, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient from Expo
+import { Text, ViewStyle, TextStyle, StyleSheet, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { typography } from '@/src/theme/typography';
 
 interface BadgeProps {
   type: 'connection' | 'following';
 }
 
-const Badge: React.FC<BadgeProps> = ({ type }) => {
+const followingColor = 'rgba(29, 155, 240,0.3)';
+
+const Badge: React.FC<BadgeProps> = React.memo(({ type }) => {
   const badgeText = type === 'connection' ? 'Connection' : 'Following';
 
-  // Define solid background color for "following"
-  const followingColor = 'rgba(29, 155, 240,0.3)';
-
-  // Styles for the badge text
-  const textStyle: TextStyle = {
-    color: '#fff',
-    fontSize: typography.fontSizes.button,
-    fontFamily: typography.fontFamilies.poppins.medium,
+  // Common badge container style for padding and border radius.
+  const containerStyle: ViewStyle = {
+    ...styles.badgeContainer,
+    ...(type === 'following' && {
+      backgroundColor: followingColor,
+    }),
   };
 
-  // Styles for the badge container
-  const badgeContainer: ViewStyle = {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
+  // Badge specific styles
+  const textStyle: TextStyle = {
+    ...styles.badgeText,
+    ...(type === 'following' && {
+      color: '#1D9BF0',
+    }),
   };
 
   if (type === 'connection') {
     return (
       <LinearGradient
         colors={['#00c6ff', '#0072ff']}
-        style={badgeContainer}
+        style={containerStyle}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         accessible
@@ -44,24 +43,31 @@ const Badge: React.FC<BadgeProps> = ({ type }) => {
     );
   } else {
     return (
-      <Text
-        style={[
-          textStyle,
-          {
-            backgroundColor: followingColor,
-            paddingHorizontal: 6,
-            paddingVertical: 2,
-            borderRadius: 4,
-            color: '#1D9BF0',
-          },
-        ]}
-        accessible
-        accessibilityLabel={badgeText}
-      >
-        {badgeText}
-      </Text>
+      <View style={containerStyle}>
+        <Text style={textStyle} accessible accessibilityLabel={badgeText}>
+          {badgeText}
+        </Text>
+      </View>
     );
   }
-};
+});
+
+const styles = StyleSheet.create({
+  badgeContainer: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    fontSize: typography.fontSizes.caption,
+    fontFamily: typography.fontFamilies.poppins.medium,
+    color: '#fff',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 16,
+  },
+});
 
 export default Badge;

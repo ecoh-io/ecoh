@@ -10,15 +10,11 @@ import {
 import Carousel from 'react-native-reanimated-carousel';
 import { ImagePost, MediaContent } from '@/src/types/post';
 import { useTheme } from '@/src/theme/ThemeContext';
-import AnimatedHeart from '../Animated/AnimatedHeart';
 import PaginationIndicator from '../PaginationIndicator';
 
 interface ImagePostProps {
   post: ImagePost;
-  onDoubleTap: () => void;
 }
-
-const DOUBLE_TAP_DELAY = 300; // milliseconds
 
 interface ImageItemProps {
   item: MediaContent;
@@ -73,37 +69,15 @@ const ImageItem: React.FC<ImageItemProps> = memo(
   (prevProps, nextProps) => prevProps.item === nextProps.item,
 );
 
-const ImagePostComponent: React.FC<ImagePostProps> = ({
-  post,
-  onDoubleTap,
-}) => {
-  const [showHeart, setShowHeart] = useState(false);
+const ImagePostComponent: React.FC<ImagePostProps> = ({ post }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
-  const lastTap = useRef<number>(0);
 
   const { images } = post;
 
   const itemWidth = useMemo(() => width, [width]); // Full screen width
   const itemHeight = useMemo(() => width, [width]); // Square aspect ratio
-
-  // Handler for double-tap gesture
-  const handleDoubleTap = useCallback(() => {
-    const now = Date.now();
-    if (lastTap.current && now - lastTap.current < DOUBLE_TAP_DELAY) {
-      onDoubleTap();
-      setShowHeart(true);
-      lastTap.current = 0; // Reset after double-tap
-    } else {
-      lastTap.current = now;
-    }
-  }, [onDoubleTap]);
-
-  // Handler to hide the heart after animation completes
-  const handleAnimationComplete = useCallback(() => {
-    setShowHeart(false);
-  }, []);
 
   return (
     <View style={styles.wrapper}>
@@ -113,60 +87,39 @@ const ImagePostComponent: React.FC<ImagePostProps> = ({
           { width, height: itemHeight, backgroundColor: colors.background },
         ]}
       >
-        <TouchableWithoutFeedback
-          onPress={handleDoubleTap}
-          accessibilityLabel="Double-tap to like"
-          accessibilityRole="button"
-        >
-          <View style={styles.carouselWrapper}>
-            {images.length === 1 ? (
-              // Render single image without Carousel
-              <ImageItem
-                item={images[0]}
-                itemWidth={itemWidth}
-                itemHeight={itemHeight}
-              />
-            ) : images.length > 1 ? (
-              // Render Carousel for multiple images
-              <Carousel
-                width={itemWidth}
-                height={itemHeight}
-                data={images}
-                scrollAnimationDuration={500}
-                onSnapToItem={(index) => setCurrentIndex(index)}
-                renderItem={({ item }) => (
-                  <ImageItem
-                    item={item}
-                    itemWidth={itemWidth}
-                    itemHeight={itemHeight}
-                  />
-                )}
-                style={{
-                  overflow: 'visible',
-                }}
-                mode={'horizontal-stack'} // Changed to 'horizontal-snap' for better single-item handling
-                modeConfig={{
-                  snapDirection: 'left',
-                }}
-                panGestureHandlerProps={{
-                  activeOffsetX: [-10, 10],
-                }}
-                customConfig={() => ({
-                  type: 'positive',
-                  viewCount: 1,
-                })}
-                loop={false} // Disable looping
-                pagingEnabled={true}
-              />
-            ) : null}
-          </View>
-        </TouchableWithoutFeedback>
-        {showHeart && (
-          <AnimatedHeart
-            visible={showHeart}
-            onAnimationComplete={handleAnimationComplete}
-          />
-        )}
+        <View style={styles.carouselWrapper}>
+          {images.length === 1 ? (
+            // Render single image without Carousel
+            <ImageItem
+              item={images[0]}
+              itemWidth={itemWidth}
+              itemHeight={itemHeight}
+            />
+          ) : images.length > 1 ? (
+            // Render Carousel for multiple images
+            <Carousel
+              width={itemWidth}
+              height={itemHeight}
+              data={images}
+              snapEnabled={true}
+              pagingEnabled={true}
+              scrollAnimationDuration={300}
+              onSnapToItem={(index) => setCurrentIndex(index)}
+              renderItem={({ item }) => (
+                <ImageItem
+                  item={item}
+                  itemWidth={itemWidth}
+                  itemHeight={itemHeight}
+                />
+              )}
+              style={{
+                width: itemWidth,
+              }}
+              loop={false} // Disable looping
+            />
+          ) : null}
+        </View>
+
         {images.length > 1 && (
           <PaginationIndicator
             count={images.length}
@@ -192,19 +145,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   imageItemContainer: {
-    flex: 1,
-    shadowColor: '#000', // Dark shadow color
-    shadowOffset: { width: 0, height: 4 }, // Slight lift
-    shadowOpacity: 0.25, // Balanced opacity for a subtle shadow
-    shadowRadius: 10, // Larger radius for a smoother shadow
-    elevation: 12, // High elevation for Android
-    backgroundColor: '#000', // Solid black background for better image contrast
     overflow: 'hidden', // Prevent shadow bleed with borderRadius
-    marginHorizontal: 10,
-    marginVertical: 8,
     borderRadius: 32,
+    marginHorizontal: 10,
   },
-
   galleryImage: {
     width: '100%',
     height: '100%',
@@ -219,7 +163,7 @@ const styles = StyleSheet.create({
   },
   pagination: {
     position: 'absolute',
-    bottom: 10,
+    bottom: 5,
     alignSelf: 'center',
   },
 });

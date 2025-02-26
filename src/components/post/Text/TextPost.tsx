@@ -12,8 +12,7 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import AnimatedHeart from '../Animated/AnimatedHeart';
+
 import { TextPost } from '@/src/types/post';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
@@ -21,7 +20,8 @@ import ParsedText from 'react-native-parsed-text';
 import { extractUrls } from '@/src/utils/extractUrls'; // Utility to extract URLs
 import { useLinkPreviews } from '@/src/hooks/useLinkPreviews'; // Custom hook to fetch metadata
 import LinkPreviewComponent from '../LinkPreviewComponent'; // Component to render previews
-import { runOnJS } from 'react-native-reanimated'; // Import runOnJS
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 // Enable LayoutAnimation on Android
 if (
@@ -39,9 +39,23 @@ interface TextPostProps {
   onMentionPress?: (mention: string) => void;
   onLinkPress?: (url: string) => void;
   onReact?: (reaction: string) => void;
-  readMoreText?: string;
-  readLessText?: string;
 }
+
+const SecureUrlText: React.FC<{ url: string; isSecure: boolean }> = ({
+  url,
+  isSecure,
+}) => {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+      <Ionicons
+        name={isSecure ? 'lock-closed' : 'lock-open'}
+        size={18}
+        color={isSecure ? '#8BC34A' : '#FF9800'}
+      />
+      <Text style={styles.urlText}>{url}</Text>
+    </View>
+  );
+};
 
 const TextPostComponent: React.FC<TextPostProps> = ({
   post,
@@ -51,12 +65,9 @@ const TextPostComponent: React.FC<TextPostProps> = ({
   onMentionPress,
   onLinkPress,
   onReact,
-  readMoreText = 'Read more',
-  readLessText = 'Read less',
 }) => {
   const [showHeart, setShowHeart] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [shouldShowReadMore, setShouldShowReadMore] = useState(false);
   const { colors } = useTheme();
 
   // Extract unique URLs from post content
@@ -66,7 +77,7 @@ const TextPostComponent: React.FC<TextPostProps> = ({
   const { previews, loading, error } = useLinkPreviews(urls);
 
   // Maximum number of lines before truncation
-  const MAX_LINES = 3;
+  const MAX_LINES = 7;
 
   // Handler for double-tap gesture (Like)
   const handleDoubleTap = useCallback(() => {
@@ -77,28 +88,11 @@ const TextPostComponent: React.FC<TextPostProps> = ({
     setShowHeart(true);
   }, [onDoubleTap, onLike]);
 
-  // Handler to hide the heart after animation completes
-  const handleAnimationComplete = useCallback(() => {
-    setShowHeart(false);
-  }, []);
-
   // Toggle expanded state with animation
   const toggleExpanded = useCallback(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setIsExpanded((prev) => !prev);
   }, []);
-
-  // Memoize the double-tap gesture to prevent re-creation on each render
-  const doubleTapGesture = useMemo(
-    () =>
-      Gesture.Tap()
-        .numberOfTaps(2)
-        .maxDelay(300)
-        .onEnd(() => {
-          runOnJS(handleDoubleTap)();
-        }),
-    [handleDoubleTap],
-  );
 
   // Accessibility handler for keyboard actions
   const handleAccessibilityAction = useCallback(
@@ -129,27 +123,46 @@ const TextPostComponent: React.FC<TextPostProps> = ({
     [onMentionPress],
   );
 
+  const truncateUrl = (
+    url: string,
+    maxLength: number = 30,
+  ): { truncated: string; original: string; isSecure: boolean } => {
+    const original = url;
+
+    const isSecure = original.startsWith('https://');
+
+    // Remove protocol (http:// or https://)
+    url = url.replace(/^(https?:\/\/)/, '');
+
+    // Remove www.
+    url = url.replace(/^www\./, '');
+
+    if (url.length <= maxLength) return { truncated: url, original, isSecure };
+
+    // Truncate the remaining part
+    const truncated = url.slice(0, maxLength - 1) + '...';
+
+    return { truncated, original, isSecure };
+  };
+
+  const urlMap = useMemo(() => {
+    return urls.reduce((acc, url) => {
+      const { truncated, original, isSecure } = truncateUrl(url);
+      acc[truncated] = { original, isSecure };
+      return acc;
+    }, {} as Record<string, { original: string; isSecure: boolean }>);
+  }, [urls]);
+
   const handleUrlPressInternal = useCallback(
-    (url: string) => {
+    (truncatedUrl: string) => {
+      const { original } = urlMap[truncatedUrl] || { original: truncatedUrl };
       onLinkPress
-        ? onLinkPress(url)
-        : Linking.openURL(url).catch((err) =>
+        ? onLinkPress(original)
+        : Linking.openURL(original).catch((err) =>
             console.error("Couldn't load page", err),
           );
     },
-    [onLinkPress],
-  );
-
-  // Handler to determine if "Read More" should be shown
-  const handleTextLayout = useCallback(
-    (e: any) => {
-      if (e.nativeEvent.lines.length > MAX_LINES && !isExpanded) {
-        setShouldShowReadMore(true);
-      } else {
-        setShouldShowReadMore(false);
-      }
-    },
-    [isExpanded],
+    [onLinkPress, urlMap],
   );
 
   // Function to render the parsed text with styles and actions
@@ -159,12 +172,15 @@ const TextPostComponent: React.FC<TextPostProps> = ({
         style={[styles.textContent, { color: colors.text }]}
         numberOfLines={isExpanded ? undefined : MAX_LINES}
         ellipsizeMode="tail"
-        onTextLayout={handleTextLayout}
         parse={[
           {
             type: 'url',
             style: styles.urlText,
             onPress: handleUrlPressInternal,
+            renderText: (matchingString: string) => {
+              const { truncated, isSecure } = truncateUrl(matchingString);
+              return <SecureUrlText url={truncated} isSecure={isSecure} />;
+            },
           },
           {
             pattern: /#(\w+)/,
@@ -176,12 +192,41 @@ const TextPostComponent: React.FC<TextPostProps> = ({
             style: styles.mentionText,
             onPress: handleMentionPressInternal,
           },
-          { pattern: /\*\*(.*?)\*\*/, style: styles.boldText },
-          { pattern: /__(.*?)__/, style: styles.boldText },
-          { pattern: /\*(.*?)\*/, style: styles.italicText },
-          { pattern: /_(.*?)_/, style: styles.italicText },
-          { pattern: /~~(.*?)~~/, style: styles.strikethroughText },
-          { pattern: /`(.*?)`/, style: styles.codeText },
+          {
+            pattern: /\*\*(.*?)\*\*/,
+            renderText: (matchingString, matches) => {
+              return matches[1];
+            },
+            style: styles.boldText,
+          },
+          {
+            pattern: /__(.*?)__/,
+            renderText: (matchingString, matches) => {
+              return matches[1];
+            },
+            style: styles.boldText,
+          },
+          {
+            pattern: /\*(.*?)\*/,
+            renderText: (matchingString, matches) => {
+              return matches[1];
+            },
+            style: styles.italicText,
+          },
+          {
+            pattern: /_(.*?)_/,
+            renderText: (matchingString, matches) => {
+              return matches[1];
+            },
+            style: styles.italicText,
+          },
+          {
+            pattern: /~~(.*?)~~/,
+            renderText: (matchingString, matches) => {
+              return matches[1];
+            },
+            style: styles.strikethroughText,
+          },
         ]}
         childrenProps={{ allowFontScaling: false }}
       >
@@ -195,90 +240,51 @@ const TextPostComponent: React.FC<TextPostProps> = ({
     handleHashtagPressInternal,
     handleMentionPressInternal,
     handleUrlPressInternal,
-    handleTextLayout,
-  ]);
-
-  // Function to render "Read More"/"Read Less" link
-  const renderReadMore = useMemo(() => {
-    if (!shouldShowReadMore) {
-      return null;
-    }
-    return (
-      <TouchableOpacity
-        onPress={toggleExpanded}
-        style={styles.readMoreContainer}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel={isExpanded ? 'Read less' : 'Read more'}
-      >
-        <Text style={[styles.readMoreText, { color: '#4e8cff' }]}>
-          {isExpanded ? readLessText : readMoreText}
-        </Text>
-      </TouchableOpacity>
-    );
-  }, [
-    shouldShowReadMore,
-    isExpanded,
-    toggleExpanded,
-    readMoreText,
-    readLessText,
   ]);
 
   return (
-    <GestureDetector gesture={doubleTapGesture}>
-      <TouchableWithoutFeedback
-        onPress={toggleExpanded} // Enable tapping anywhere to expand/collapse
-        accessibilityRole="button"
-        accessibilityLabel={
-          isExpanded
-            ? 'Post content expanded. Double-tap to like.'
-            : 'Post content. Double-tap to like. Tap to expand.'
-        }
-        accessibilityHint="Double-tap to like this post. Tap to expand or collapse the content."
-        onAccessibilityAction={handleAccessibilityAction}
-        accessibilityActions={[{ name: 'activate' }]}
-      >
-        <View style={[styles.container]}>
-          {/* Parsed Text with Read More/Less */}
-          <View>
-            {renderParsedText}
-            {renderReadMore}
-          </View>
+    <TouchableWithoutFeedback
+      onPress={toggleExpanded} // Enable tapping anywhere to expand/collapse
+      accessibilityRole="button"
+      accessibilityLabel={
+        isExpanded
+          ? 'Post content expanded. Double-tap to like.'
+          : 'Post content. Double-tap to like. Tap to expand.'
+      }
+      accessibilityHint="Double-tap to like this post. Tap to expand or collapse the content."
+      onAccessibilityAction={handleAccessibilityAction}
+      accessibilityActions={[{ name: 'activate' }]}
+    >
+      <View style={[styles.container]}>
+        {/* Parsed Text with Read More/Less */}
+        <View style={styles.textContainer}>{renderParsedText}</View>
 
-          {/* Render URL Previews */}
-          {previews.map((preview, index) => (
-            <LinkPreviewComponent key={index} preview={preview} />
-          ))}
-
-          {showHeart && (
-            <AnimatedHeart
-              visible={showHeart}
-              onAnimationComplete={handleAnimationComplete}
-            />
-          )}
-        </View>
-      </TouchableWithoutFeedback>
-    </GestureDetector>
+        {/* Render URL Previews */}
+        {previews.map((preview, index) => (
+          <LinkPreviewComponent key={index} preview={preview} />
+        ))}
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 // Stylesheet
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 4,
-    paddingVertical: 8,
+    flexDirection: 'column',
+    gap: 14,
     position: 'relative', // Ensure heart can be positioned absolutely if needed
   },
   textContent: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 22,
     fontFamily: typography.fontFamilies.poppins.regular,
   },
   boldText: {
-    fontWeight: '700', // Adjusted for better readability
+    fontFamily: typography.fontFamilies.poppins.bold,
   },
   italicText: {
-    fontStyle: 'italic',
+    fontFamily: typography.fontFamilies.poppins.italic,
   },
   strikethroughText: {
     textDecorationLine: 'line-through',
@@ -293,18 +299,19 @@ const styles = StyleSheet.create({
     color: '#1DA1F2', // Example color for hashtags
   },
   mentionText: {
-    color: '#FF4500', // Example color for mentions
+    color: '#3498db', // Example color for mentions
   },
   urlText: {
     color: '#4e8cff',
-    textDecorationLine: 'underline',
+    fontSize: 16,
+    lineHeight: 22,
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
   readMoreContainer: {
     marginTop: 4,
   },
-  readMoreText: {
-    fontSize: 14,
-    fontFamily: typography.fontFamilies.poppins.bold,
+  textContainer: {
+    position: 'relative',
   },
 });
 

@@ -8,6 +8,7 @@ import {
   Poppins_700Bold,
   Poppins_800ExtraBold,
   Poppins_900Black,
+  Poppins_400Regular_Italic,
 } from '@expo-google-fonts/poppins';
 
 // Font family definitions
@@ -22,6 +23,7 @@ export const fontFamilies = {
     bold: 'Poppins_700Bold',
     extraBold: 'Poppins_800ExtraBold',
     black: 'Poppins_900Black',
+    italic: 'Poppins_400Regular_Italic',
   },
 };
 
@@ -60,6 +62,7 @@ export const fonts = {
   Poppins_700Bold,
   Poppins_800ExtraBold,
   Poppins_900Black,
+  Poppins_400Regular_Italic,
 };
 
 // Main typography object
