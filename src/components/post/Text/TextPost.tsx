@@ -46,14 +46,14 @@ const SecureUrlText: React.FC<{ url: string; isSecure: boolean }> = ({
   isSecure,
 }) => {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+    <Text style={styles.urlText}>
       <Ionicons
         name={isSecure ? 'lock-closed' : 'lock-open'}
-        size={18}
+        size={16}
         color={isSecure ? '#8BC34A' : '#FF9800'}
-      />
-      <Text style={styles.urlText}>{url}</Text>
-    </View>
+      />{' '}
+      {url}
+    </Text>
   );
 };
 
@@ -125,7 +125,7 @@ const TextPostComponent: React.FC<TextPostProps> = ({
 
   const truncateUrl = (
     url: string,
-    maxLength: number = 30,
+    maxLength: number = 45,
   ): { truncated: string; original: string; isSecure: boolean } => {
     const original = url;
 
@@ -140,7 +140,7 @@ const TextPostComponent: React.FC<TextPostProps> = ({
     if (url.length <= maxLength) return { truncated: url, original, isSecure };
 
     // Truncate the remaining part
-    const truncated = url.slice(0, maxLength - 1) + '...';
+    const truncated = url.slice(0, maxLength - 5) + '...';
 
     return { truncated, original, isSecure };
   };
@@ -260,6 +260,7 @@ const TextPostComponent: React.FC<TextPostProps> = ({
         <View style={styles.textContainer}>{renderParsedText}</View>
 
         {/* Render URL Previews */}
+
         {previews.map((preview, index) => (
           <LinkPreviewComponent key={index} preview={preview} />
         ))}
@@ -274,6 +275,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 14,
     position: 'relative', // Ensure heart can be positioned absolutely if needed
+    paddingLeft: 25,
   },
   textContent: {
     fontSize: 16,
@@ -301,11 +303,19 @@ const styles = StyleSheet.create({
   mentionText: {
     color: '#3498db', // Example color for mentions
   },
+  secureUrlContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    display: 'flex',
+  },
   urlText: {
     color: '#4e8cff',
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 21,
     fontFamily: typography.fontFamilies.poppins.medium,
+    textDecorationLine: 'underline',
+    textDecorationColor: '#4e8cff',
   },
   readMoreContainer: {
     marginTop: 4,

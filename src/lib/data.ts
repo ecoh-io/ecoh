@@ -92,7 +92,7 @@ export const posts: PostData[] = [
   },
   {
     id: 5,
-    type: PostType.TEXT,
+    type: PostType.IMAGE,
     user: users.u5,
     timestamp: getTimeAgo(1), // 1 hour ago
     likes: 3200,
@@ -100,8 +100,10 @@ export const posts: PostData[] = [
     comments: [comments.c4],
     isLiked: false,
     isSaved: false,
-    content:
-      'Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend',
+    images: [
+      { uri: 'https://dummyimage.com/600x400/000/fff&text=Image2' },
+      { uri: 'https://dummyimage.com/600x400/000/fff&text=Image3' },
+    ],
   },
   {
     id: 2,

@@ -52,6 +52,8 @@ export interface BasePost {
 export interface MediaContent {
   uri: string; // URI of the media (image or video)
   thumbnailUri?: string; // Optional thumbnail URI (for videos or other media types)
+  width: number; // Width of the media
+  height: number; // Height of the media
 }
 
 /**

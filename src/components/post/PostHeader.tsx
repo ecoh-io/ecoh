@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
     paddingBottom: 7,
   },
   avatar: {
-    width: 42,
-    height: 42,
+    width: 46,
+    height: 46,
     borderRadius: 24, // Perfect circle
     marginRight: 12,
   },

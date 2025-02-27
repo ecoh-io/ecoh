@@ -158,12 +158,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#ccc',
+    flexDirection: 'column',
+    gap: 14,
   },
   content: {
-    paddingLeft: 40,
+    marginLeft: 0,
   },
   footer: {
-    paddingLeft: 40,
+    paddingLeft: 0,
   },
 });
 
