@@ -1,5 +1,5 @@
 // src/components/TextPost/index.tsx
-import React, { memo, useState, useCallback, useMemo } from 'react';
+import React, { memo, useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   TouchableWithoutFeedback,
@@ -25,34 +25,31 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export interface TextPostProps extends ActionBarProps {
+export interface TextPostProps
+  extends Omit<ActionBarProps, 'likes' | 'commentsCount' | 'echoCount'> {
   post: TextPost;
   onDoubleTap?: () => void;
   onHashtagPress?: (hashtag: string) => void;
   onMentionPress?: (mention: string) => void;
   onLinkPress?: (url: string) => void;
+  renderActionBar?: () => React.ReactNode;
 }
 
 const TextPostComponent: React.FC<TextPostProps> = ({
   post,
-  onLike,
   onHashtagPress,
   onMentionPress,
   onLinkPress,
-  onCommentPress,
-  onShare,
-  onSave,
+  renderActionBar,
 }) => {
   const { colors } = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const { comments, isLiked, isSaved, likes, echo } = post;
 
   // Extract URLs from the post content
   const urls = useMemo(() => extractUrls(post.content), [post.content]);
 
   // Fetch metadata for extracted URLs
-  const { previews, loading, error } = useLinkPreviews(urls);
+  const { previews } = useLinkPreviews(urls);
 
   /**
    * Expand/collapse text with a layout animation
@@ -105,23 +102,16 @@ const TextPostComponent: React.FC<TextPostProps> = ({
           ))}
         </View>
       </TouchableWithoutFeedback>
-      <ActionBar
-        commentsCount={comments.length}
-        isLiked={isLiked}
-        isSaved={isSaved}
-        likes={likes}
-        onCommentPress={onCommentPress}
-        onLike={onLike}
-        onSave={onSave}
-        onShare={onShare}
-        sharesCount={echo}
-      />{' '}
+      {renderActionBar && renderActionBar()}
       {/* Custom action bar for like, share, etc. */}
     </View>
   );
 };
 
-export default memo(
-  TextPostComponent,
-  (prevProps, nextProps) => prevProps.post.id === nextProps.post.id,
-);
+export default memo(TextPostComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.isLiked === nextProps.isLiked &&
+    prevProps.post.id === nextProps.post.id &&
+    prevProps.isSaved === nextProps.isSaved
+  );
+});

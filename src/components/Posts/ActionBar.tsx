@@ -11,7 +11,7 @@ import AnimatedSaveButton from '../Animations/Save/AnimatedSaveButton';
 export interface ActionBarProps {
   likes: number;
   commentsCount: number;
-  sharesCount?: number;
+  echoCount?: number;
   isLiked: boolean;
   isSaved: boolean;
   onLike: () => void;
@@ -50,7 +50,7 @@ const ActionWithCount: React.FC<ActionWithCountProps> = memo(
 const ActionBar: React.FC<ActionBarProps> = ({
   likes = 0,
   commentsCount = 0,
-  sharesCount = 0, // Default to 0 if not provided
+  echoCount = 0, // Default to 0 if not provided
   isLiked,
   isSaved,
   onLike,
@@ -74,8 +74,8 @@ const ActionBar: React.FC<ActionBarProps> = ({
     [commentsCount, formatNumber],
   );
   const formattedShares = useMemo(
-    () => formatNumber(sharesCount),
-    [sharesCount, formatNumber],
+    () => formatNumber(echoCount),
+    [echoCount, formatNumber],
   );
 
   return (
@@ -93,7 +93,11 @@ const ActionBar: React.FC<ActionBarProps> = ({
               },
             ]}
           >
-            <AnimatedLikeButton isLiked={isLiked} onLike={onLike} />
+            <AnimatedLikeButton
+              isLiked={isLiked}
+              onLike={onLike}
+              key={`like-button-${isLiked}`}
+            />
             <Text style={[styles.countText, { color: colors.text }]}>
               {formattedLikes}
             </Text>
@@ -114,9 +118,9 @@ const ActionBar: React.FC<ActionBarProps> = ({
           <ActionWithCount
             onPress={onShare}
             icon={<Feather name="send" size={18} color="#000" />}
-            count={sharesCount}
+            count={echoCount}
             accessibilityLabel={`Share. ${formattedShares} ${
-              sharesCount === 1 ? 'share' : 'shares'
+              echoCount === 1 ? 'share' : 'shares'
             }`}
             colors={colors}
           />
@@ -131,7 +135,11 @@ const ActionBar: React.FC<ActionBarProps> = ({
             },
           ]}
         >
-          <AnimatedSaveButton isSaved={isSaved} onSave={onSave} />
+          <AnimatedSaveButton
+            isSaved={isSaved}
+            onSave={onSave}
+            key={`save-button-${isSaved}`}
+          />
         </View>
       </View>
     </View>
@@ -180,7 +188,7 @@ export default memo(
   (prevProps, nextProps) =>
     prevProps.likes === nextProps.likes &&
     prevProps.commentsCount === nextProps.commentsCount &&
-    prevProps.sharesCount === nextProps.sharesCount &&
+    prevProps.echoCount === nextProps.echoCount &&
     prevProps.isLiked === nextProps.isLiked &&
     prevProps.isSaved === nextProps.isSaved,
 );

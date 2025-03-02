@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import { StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
@@ -16,9 +16,9 @@ const AnimatedLikeButton: React.FC<AnimatedLikeButtonProps> = ({
   onLike,
 }) => {
   const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onLike();
-  }, [onLike]);
+  }, [onLike, isLiked]);
 
   const renderIcon = useCallback(() => {
     return isLiked ? (
@@ -61,4 +61,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(AnimatedLikeButton);
+export default memo(AnimatedLikeButton, (prevProps, nextProps) => {
+  return prevProps.isLiked === nextProps.isLiked;
+});

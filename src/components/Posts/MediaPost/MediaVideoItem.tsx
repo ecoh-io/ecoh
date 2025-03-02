@@ -24,62 +24,45 @@ const MediaVideoItem = forwardRef<VideoRefHandle, MediaVideoItemProps>(
       instance.muted = true; // start muted
     });
 
-    console.log('ref', ref);
+    const videoRef: VideoRefHandle = {
+      playAsync: () => {
+        try {
+          player.play();
+        } catch (error) {
+          console.error('Error playing video:', error);
+        }
+      },
+      pauseAsync: () => {
+        try {
+          player.pause();
+        } catch (error) {
+          console.error('Error pausing video:', error);
+        }
+      },
+      current: async () => {
+        return player.currentTime;
+      },
+    };
 
-    // forward methods to parent
-    useImperativeHandle(
-      ref,
-      () => ({
-        playAsync: () => {
-          try {
-            player.play();
-          } catch (error) {
-            console.error('Error playing video:', error);
-          }
-        },
-        pauseAsync: () => {
-          try {
-            player.pause();
-          } catch (error) {
-            console.error('Error pausing video:', error);
-          }
-        },
-        current: async () => {
-          return player.currentTime;
-        },
-      }),
-      [player],
-    );
+    useImperativeHandle(ref, () => videoRef, [player]);
 
     useEffect(() => {
       if (onVideoRefReady) {
-        onVideoRefReady({
-          playAsync: () => {
-            try {
-              player.play();
-            } catch (error) {
-              console.error('Error playing video:', error);
-            }
-          },
-          pauseAsync: () => {
-            try {
-              player.pause();
-            } catch (error) {
-              console.error('Error pausing video:', error);
-            }
-          },
-          current: async () => {
-            return player.currentTime;
-          },
-        });
+        onVideoRefReady(videoRef);
+
+        // Autoplay if isAutoplay is true
+        if (isAutoplay) {
+          videoRef.playAsync();
+        }
       }
+
       // Cleanup: pass null if unmounting
       return () => {
         if (onVideoRefReady) {
           onVideoRefReady(null);
         }
       };
-    }, [onVideoRefReady, player]);
+    }, [onVideoRefReady, player, isAutoplay, videoRef]);
 
     return (
       <View ref={videoContainerRef} style={styles.wrapper}>

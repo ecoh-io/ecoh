@@ -69,7 +69,6 @@ const useLocationSearch = (minLength: number = 3, delay: number = 500) => {
                 return null;
               }
 
-              console.log(detail.data.result);
               const addressComponents = detail.data.result.address_components;
               const geometry = detail.data.result.geometry;
 

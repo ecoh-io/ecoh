@@ -4,7 +4,6 @@ import {
   View,
   StyleSheet,
   useWindowDimensions,
-  Text,
   Platform,
   UIManager,
   LayoutAnimation,
@@ -28,30 +27,29 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-interface MediaPostProps extends ActionBarProps {
+interface MediaPostProps
+  extends Omit<ActionBarProps, 'likes' | 'commentsCount' | 'echoCount'> {
   post: MediaPost;
   onVideoRefReady: (videoRef: VideoRefHandle | null) => void;
   onHashtagPress?: (hashtag: string) => void;
   onMentionPress?: (mention: string) => void;
   onLinkPress?: (url: string) => void;
+  renderActionBar?: () => React.ReactNode;
 }
 
 const MediaPostComponent: React.FC<MediaPostProps> = ({
   post,
   onVideoRefReady,
-  onCommentPress,
-  onLike,
-  onSave,
-  onShare,
   onHashtagPress,
   onMentionPress,
   onLinkPress,
+  renderActionBar,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const [isExpanded, setIsExpanded] = useState(false);
-  const { comments, isLiked, isSaved, likes, echo, media } = post;
+  const { media } = post;
 
   // For a square-ish display, we make itemWidth == screen width,
   // and itemHeight == screen width. Adjust as needed.
@@ -79,12 +77,7 @@ const MediaPostComponent: React.FC<MediaPostProps> = ({
   );
 
   const renderSingleMedia = () => (
-    <MediaItem
-      item={media[0]}
-      itemWidth={itemWidth}
-      itemHeight={itemHeight}
-      onVideoRefReady={onVideoRefReady}
-    />
+    <MediaItem item={media[0]} onVideoRefReady={onVideoRefReady} />
   );
 
   const renderCarousel = () => (
@@ -94,6 +87,7 @@ const MediaPostComponent: React.FC<MediaPostProps> = ({
       itemHeight={itemHeight}
       currentIndex={currentIndex}
       setCurrentIndex={setCurrentIndex}
+      onVideoRefReady={onVideoRefReady}
     />
   );
 
@@ -112,25 +106,15 @@ const MediaPostComponent: React.FC<MediaPostProps> = ({
         {media.length === 1 ? renderSingleMedia() : renderCarousel()}
       </View>
 
-      {media.length > 1 && (
-        <PaginationIndicator
-          count={media.length}
-          currentIndex={currentIndex}
-          color={colors.secondary}
-        />
-      )}
       <View style={{ marginHorizontal: 10 }}>
-        <ActionBar
-          commentsCount={comments.length}
-          isLiked={isLiked}
-          isSaved={isSaved}
-          likes={likes}
-          onCommentPress={onCommentPress}
-          onLike={onLike}
-          onSave={onSave}
-          onShare={onShare}
-          sharesCount={echo}
-        />
+        {media.length > 1 && (
+          <PaginationIndicator
+            count={media.length}
+            currentIndex={currentIndex}
+            color={colors.secondary}
+          />
+        )}
+        {renderActionBar && renderActionBar()}
         <TouchableWithoutFeedback
           onPress={toggleExpanded}
           accessibilityRole="button"
@@ -158,13 +142,16 @@ const MediaPostComponent: React.FC<MediaPostProps> = ({
 };
 
 export default memo(MediaPostComponent, (prev, next) => {
-  if (prev.post.id !== next.post.id) return false;
-  if (prev.post.media.length !== next.post.media.length) return false;
-
-  return prev.post.media.every((m, idx) => {
-    const nextM = next.post.media[idx];
-    return m.url === nextM.url && m.type === nextM.type;
-  });
+  return (
+    prev.post.id === next.post.id &&
+    prev.isLiked === next.isLiked &&
+    prev.isSaved === next.isSaved &&
+    prev.post.media.length === next.post.media.length &&
+    prev.post.media.every((m, idx) => {
+      const nextM = next.post.media[idx];
+      return m.url === nextM.url && m.type === nextM.type;
+    })
+  );
 });
 
 const styles = StyleSheet.create({

@@ -8,16 +8,12 @@ import { styles } from './styles';
 
 interface MediaItemProps {
   item: Media;
-  itemWidth: number;
-  itemHeight: number;
   isAutoplay?: boolean; // can pass down if you want autoplay for videos
   onVideoRefReady?: (videoRef: any) => void;
 }
 
 const MediaItem: React.FC<MediaItemProps> = ({
   item,
-  itemWidth,
-  itemHeight,
   isAutoplay = true,
   onVideoRefReady,
 }) => {

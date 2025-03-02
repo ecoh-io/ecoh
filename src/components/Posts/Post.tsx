@@ -1,5 +1,11 @@
 // src/components/Posts/Post.tsx
-import React, { useCallback, memo, useMemo, useReducer } from 'react';
+import React, {
+  useCallback,
+  memo,
+  useMemo,
+  useReducer,
+  useEffect,
+} from 'react';
 import { View, StyleSheet, Dimensions, LayoutChangeEvent } from 'react-native';
 import TextPostComponent from './TextPost/TextPost';
 import MediaPostComponent from './MediaPost/MediaPost';
@@ -7,6 +13,7 @@ import MediaPostComponent from './MediaPost/MediaPost';
 import { PostType, PostData, TextPost, MediaPost } from '@/src/types/post';
 import PostHeader from './PostHeader';
 import { VideoRefHandle } from '../Feed/withFeedManager';
+import ActionBar from './ActionBar';
 
 interface PostProps {
   post: PostData;
@@ -75,7 +82,7 @@ const Post: React.FC<PostProps> = ({
 
   const handleLike = useCallback(() => {
     dispatch({ type: 'TOGGLE_LIKE' });
-  }, []);
+  }, [state.isLiked]); // Add state.isLiked to the dependency array
 
   const handleSave = useCallback(() => {
     dispatch({ type: 'TOGGLE_SAVE' });
@@ -93,54 +100,78 @@ const Post: React.FC<PostProps> = ({
     // show an options menu
   }, []);
 
+  const renderActionBar = useCallback(
+    () => (
+      <ActionBar
+        likes={likesCount}
+        commentsCount={comments.length}
+        isLiked={isLiked}
+        isSaved={isSaved}
+        onLike={handleLike}
+        onCommentPress={handleCommentPress}
+        onShare={handleShare}
+        onSave={handleSave}
+        echoCount={echoCount}
+      />
+    ),
+    [
+      likesCount,
+      comments.length,
+      isLiked,
+      isSaved,
+      echoCount,
+      handleLike,
+      handleCommentPress,
+      handleShare,
+      handleSave,
+    ],
+  );
+
   /**
    * Render the post content based on its type.
    */
   const renderContent = useMemo(() => {
+    // Create common props for the action bar and post content.
+    const commonProps = {
+      post,
+      isLiked,
+      isSaved,
+      onLike: handleLike,
+      onCommentPress: handleCommentPress,
+      onShare: handleShare,
+      onSave: handleSave,
+      renderActionBar,
+    };
+
     switch (type) {
       case PostType.TEXT:
-        return (
-          <TextPostComponent
-            post={post as TextPost}
-            onDoubleTap={handleLike}
-            likes={likesCount}
-            commentsCount={comments.length}
-            isLiked={isLiked}
-            isSaved={isSaved}
-            onLike={handleLike}
-            onCommentPress={handleCommentPress}
-            onShare={handleShare}
-            onSave={handleSave}
-            sharesCount={echoCount}
-          />
-        );
+        return <TextPostComponent {...commonProps} post={post as TextPost} />;
       case PostType.MEDIA:
         return (
           <MediaPostComponent
+            {...commonProps}
             post={post as MediaPost}
             onVideoRefReady={(videoRef) => {
               if (registerVideoRef) {
                 registerVideoRef(id, videoRef);
               }
             }}
-            likes={likesCount}
-            commentsCount={comments.length}
-            isLiked={isLiked}
-            isSaved={isSaved}
-            onLike={handleLike}
-            onCommentPress={handleCommentPress}
-            onShare={handleShare}
-            onSave={handleSave}
-            sharesCount={echoCount}
           />
         );
       default:
         console.warn(`Unsupported post type: ${type}`);
         return null;
     }
-  }, [type, post, handleLike, isAutoplay, registerVideoRef, id]);
-
-  console.log('registerVideoRef', registerVideoRef);
+  }, [
+    type,
+    post,
+    handleLike,
+    isAutoplay,
+    registerVideoRef,
+    handleSave,
+    id,
+    state,
+  ]);
 
   return (
     <View style={styles.postContainer} onLayout={onLayout}>

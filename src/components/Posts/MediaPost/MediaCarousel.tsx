@@ -37,8 +37,6 @@ const MediaCarousel: React.FC<MediaCarouselProps> = ({
         renderItem={({ item, index }) => (
           <MediaItem
             item={item}
-            itemWidth={itemWidth}
-            itemHeight={itemHeight}
             isAutoplay={index === currentIndex} // or false if you only autoplay the current one
             onVideoRefReady={onVideoRefReady}
           />
