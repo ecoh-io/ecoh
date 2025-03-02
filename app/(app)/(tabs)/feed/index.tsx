@@ -1,26 +1,26 @@
 // src/screens/FeedScreen.tsx
+
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
   View,
   Text,
-  FlatList,
   ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/src/theme/ThemeContext';
-import Post, { PostType } from '@/src/components/post/Post';
 import { posts } from '@/src/lib/data';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
-  runOnJS,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
 import { withFeedManager } from '@/src/components/Feed/withFeedManager';
 import { debounce } from 'lodash';
+import { PostData, PostType } from '@/src/types/post';
+import Post from '@/src/components/Posts/Post';
+import { MediaType } from '@/src/enums/media-type.enum';
 
 // Extra props provided by the feed manager HOC
 // Production-level constants
@@ -48,7 +48,8 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const [currentVisibleIndex, setCurrentVisibleIndex] = useState<number>(0);
-  // Use a ref so that our renderItem always refers to the latest value without re-rendering every time.
+
+  // Use a ref so that our renderItem always refers to the latest value without re-rendering
   const currentVisibleIndexRef = useRef(currentVisibleIndex);
 
   // Debounce updates to reduce excessive state changes
@@ -102,8 +103,17 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
 
   // Dynamic item height measurement with a fallback estimated height.
   const [itemHeights, setItemHeights] = useState<{ [key: string]: number }>({});
-  const updateItemHeight = useCallback((id: string, height: number) => {
-    setItemHeights((prev) => ({ ...prev, [id]: height }));
+  const updateItemHeight = useCallback((id: string, newHeight: number) => {
+    setItemHeights((prev) => {
+      // If there's no change, return the same object => no re-render
+      if (prev[id] === newHeight) {
+        return prev;
+      }
+      return {
+        ...prev,
+        [id]: newHeight,
+      };
+    });
   }, []);
 
   const getItemLayout = useCallback(
@@ -120,23 +130,25 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
 
   // Memoized renderItem to avoid unnecessary re-renders
   const renderItem = useCallback(
-    ({ item, index }: { item: any; index: number }) => (
+    ({ item, index }: { item: PostData; index: number }) => (
       <Post
         post={item}
         isAutoplay={
           index === currentVisibleIndexRef.current &&
-          item.type === PostType.VIDEO
+          item.type === PostType.MEDIA &&
+          item.media.some((m) => m.type === MediaType.VIDEO)
         }
         registerVideoRef={
-          item.type === PostType.VIDEO
+          item.type === PostType.MEDIA &&
+          item.media.some((m) => m.type === MediaType.VIDEO)
             ? (ref: any) => {
                 videoRefs.current[index] = ref;
               }
             : undefined
         }
-        onLayout={(event: any) => {
+        onLayout={(event) => {
           const { height } = event.nativeEvent.layout;
-          updateItemHeight(item.id, height);
+          updateItemHeight(item.id, height); // now conditionally sets state
         }}
       />
     ),
@@ -197,9 +209,7 @@ const FeedScreen: React.FC<FeedScreenProps> = ({
         updateCellsBatchingPeriod={50}
         windowSize={10}
         initialNumToRender={5}
-        // Use getItemLayout when possible to speed up scroll calculations.
         getItemLayout={posts.length > 0 ? getItemLayout : undefined}
-        // For even further optimization, consider a custom CellRendererComponent.
       />
     </View>
   );

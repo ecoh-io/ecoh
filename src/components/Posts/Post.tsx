@@ -1,22 +1,17 @@
+// src/components/Posts/Post.tsx
 import React, { useCallback, memo, useMemo, useReducer } from 'react';
 import { View, StyleSheet, Dimensions, LayoutChangeEvent } from 'react-native';
-import PostFooter from './PostFooter';
-import PostHeader from './PostHeader';
-import ImagePostComponent from './Image/ImagePost';
-import VideoPostComponent, { VideoPostComponentProps } from './Video/VideoPost';
-import TextPostComponent from './Text/TextPost';
-import { ImagePost, PostData, TextPost, VideoPost } from '@/src/types/post';
+import TextPostComponent from './TextPost/TextPost';
+import MediaPostComponent from './MediaPost/MediaPost';
 
-export enum PostType {
-  IMAGE = 'image',
-  TEXT = 'text',
-  VIDEO = 'video',
-}
+import { PostType, PostData, TextPost, MediaPost } from '@/src/types/post';
+import PostHeader from './PostHeader';
+import { VideoRefHandle } from '../Feed/withFeedManager';
 
 interface PostProps {
   post: PostData;
   isAutoplay?: boolean;
-  registerVideoRef?: (id: number, ref: any) => void;
+  registerVideoRef?: (id: string, ref: VideoRefHandle | null) => void;
   onLayout?: (event: LayoutChangeEvent) => void;
 }
 
@@ -25,14 +20,14 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 interface PostState {
   isLiked: boolean;
   likesCount: number;
-  sharesCount: number;
+  echoCount: number;
   isSaved: boolean;
 }
 
 type PostAction =
   | { type: 'TOGGLE_LIKE' }
   | { type: 'TOGGLE_SAVE' }
-  | { type: 'INCREMENT_SHARE' };
+  | { type: 'INCREMENT_ECHO' };
 
 const postReducer = (state: PostState, action: PostAction): PostState => {
   switch (action.type) {
@@ -44,8 +39,8 @@ const postReducer = (state: PostState, action: PostAction): PostState => {
       };
     case 'TOGGLE_SAVE':
       return { ...state, isSaved: !state.isSaved };
-    case 'INCREMENT_SHARE':
-      return { ...state, sharesCount: state.sharesCount + 1 };
+    case 'INCREMENT_ECHO':
+      return { ...state, echoCount: state.echoCount + 1 };
     default:
       return state;
   }
@@ -58,10 +53,11 @@ const Post: React.FC<PostProps> = ({
   onLayout,
 }) => {
   const {
+    id,
     type,
     isLiked: initialLiked,
     likes: initialLikes,
-    shares: initialShares,
+    echo: initialShares,
     isSaved: initialSaved,
     comments,
     user,
@@ -71,11 +67,11 @@ const Post: React.FC<PostProps> = ({
   const [state, dispatch] = useReducer(postReducer, {
     isLiked: initialLiked,
     likesCount: initialLikes,
-    sharesCount: initialShares,
+    echoCount: initialShares,
     isSaved: initialSaved,
   });
 
-  const { isLiked, likesCount, sharesCount, isSaved } = state;
+  const { isLiked, likesCount, echoCount, isSaved } = state;
 
   const handleLike = useCallback(() => {
     dispatch({ type: 'TOGGLE_LIKE' });
@@ -86,44 +82,65 @@ const Post: React.FC<PostProps> = ({
   }, []);
 
   const handleCommentPress = useCallback(() => {
-    // Navigate to comments screen or open modal.
+    // navigate to comments screen or open a modal
   }, []);
 
   const handleShare = useCallback(() => {
-    dispatch({ type: 'INCREMENT_SHARE' });
+    dispatch({ type: 'INCREMENT_ECHO' });
   }, []);
 
   const handleOptionsPress = useCallback(() => {
-    // Show options menu.
+    // show an options menu
   }, []);
 
+  /**
+   * Render the post content based on its type.
+   */
   const renderContent = useMemo(() => {
     switch (type) {
-      case PostType.IMAGE:
-        return <ImagePostComponent post={post as ImagePost} />;
       case PostType.TEXT:
         return (
-          <TextPostComponent post={post as TextPost} onDoubleTap={handleLike} />
+          <TextPostComponent
+            post={post as TextPost}
+            onDoubleTap={handleLike}
+            likes={likesCount}
+            commentsCount={comments.length}
+            isLiked={isLiked}
+            isSaved={isSaved}
+            onLike={handleLike}
+            onCommentPress={handleCommentPress}
+            onShare={handleShare}
+            onSave={handleSave}
+            sharesCount={echoCount}
+          />
         );
-      case PostType.VIDEO:
+      case PostType.MEDIA:
         return (
-          <VideoPostComponent
-            // Pass the ref callback so the parent (feed manager) can register this video instance.
-            ref={(ref) => {
+          <MediaPostComponent
+            post={post as MediaPost}
+            onVideoRefReady={(videoRef) => {
               if (registerVideoRef) {
-                registerVideoRef(post.id, ref);
+                registerVideoRef(id, videoRef);
               }
             }}
-            post={post as VideoPost}
-            isAutoplay={isAutoplay}
-            onDoubleTap={handleLike}
+            likes={likesCount}
+            commentsCount={comments.length}
+            isLiked={isLiked}
+            isSaved={isSaved}
+            onLike={handleLike}
+            onCommentPress={handleCommentPress}
+            onShare={handleShare}
+            onSave={handleSave}
+            sharesCount={echoCount}
           />
         );
       default:
         console.warn(`Unsupported post type: ${type}`);
         return null;
     }
-  }, [type, post, handleLike, isAutoplay, registerVideoRef]);
+  }, [type, post, handleLike, isAutoplay, registerVideoRef, id]);
+
+  console.log('registerVideoRef', registerVideoRef);
 
   return (
     <View style={styles.postContainer} onLayout={onLayout}>
@@ -132,20 +149,8 @@ const Post: React.FC<PostProps> = ({
         timestamp={timestamp}
         onOptionsPress={handleOptionsPress}
       />
+
       <View style={styles.content}>{renderContent}</View>
-      <View style={styles.footer}>
-        <PostFooter
-          likes={likesCount}
-          commentsCount={comments.length}
-          isLiked={isLiked}
-          isSaved={isSaved}
-          onLike={handleLike}
-          onCommentPress={handleCommentPress}
-          onShare={handleShare}
-          onSave={handleSave}
-          sharesCount={sharesCount}
-        />
-      </View>
     </View>
   );
 };
@@ -160,6 +165,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     flexDirection: 'column',
     gap: 14,
+    paddingVertical: 10,
   },
   content: {
     marginLeft: 0,

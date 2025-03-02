@@ -13,7 +13,7 @@ import {
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 
-interface LinkPreviewComponentProps {
+interface LinkPreviewProps {
   preview: {
     title?: string;
     description?: string;
@@ -22,9 +22,7 @@ interface LinkPreviewComponentProps {
   };
 }
 
-const LinkPreviewComponent: React.FC<LinkPreviewComponentProps> = ({
-  preview,
-}) => {
+const LinkPreview: React.FC<LinkPreviewProps> = ({ preview }) => {
   const { title, description, image, url } = preview;
   const { colors } = useTheme();
   const [imageLoading, setImageLoading] = useState(true);
@@ -180,4 +178,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LinkPreviewComponent;
+export default LinkPreview;

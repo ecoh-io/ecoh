@@ -1,10 +1,11 @@
+import { Media } from './Media';
+
 /**
  * Enum representing the types of posts.
  */
 export enum PostType {
-  IMAGE = 'image',
   TEXT = 'text',
-  VIDEO = 'video',
+  MEDIA = 'media',
 }
 
 /**
@@ -35,33 +36,24 @@ export interface Comment {
  * Contains common fields shared across all post types.
  */
 export interface BasePost {
-  id: number; // Unique ID for the post
+  id: string; // Unique ID for the post
   type: PostType; // Type of the post (image, text, video)
   user: User; // User who created the post
   timestamp: Date; // Date and time of the post
   likes: number; // Number of likes on the post
-  shares: number; // Number of shares of the post
+  echo: number; // Number of shares of the post
   comments: Comment[]; // List of comments on the post
   isLiked: boolean; // Whether the current user has liked the post
   isSaved: boolean; // Whether the post is saved by the current user
 }
 
 /**
- * Interface for media content (shared across different post types).
- */
-export interface MediaContent {
-  uri: string; // URI of the media (image or video)
-  thumbnailUri?: string; // Optional thumbnail URI (for videos or other media types)
-  width: number; // Width of the media
-  height: number; // Height of the media
-}
-
-/**
  * Interface for an image post.
  */
-export interface ImagePost extends BasePost {
-  type: PostType.IMAGE; // Type set to 'image'
-  images: MediaContent[]; // List of images with their URIs
+export interface MediaPost extends BasePost {
+  type: PostType.MEDIA; // Type set to 'image'
+  media: Media[]; // List of images with their URIs
+  content: string; // Caption for the post
 }
 
 /**
@@ -73,16 +65,6 @@ export interface TextPost extends BasePost {
 }
 
 /**
- * Interface for a video post.
- */
-export interface VideoPost extends BasePost {
-  type: PostType.VIDEO; // Type set to 'video'
-  videoUri: string; // URI for the video
-  thumbnailUri: string; // URI for the video's thumbnail
-  duration: number; // Duration of the video in seconds
-}
-
-/**
  * Union type representing all possible post data types.
  */
-export type PostData = ImagePost | TextPost | VideoPost;
+export type PostData = MediaPost | TextPost;

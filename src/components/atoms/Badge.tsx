@@ -7,8 +7,6 @@ interface BadgeProps {
   type: 'connection' | 'following';
 }
 
-const followingColor = 'rgba(29, 155, 240,0.3)';
-
 const Badge: React.FC<BadgeProps> = React.memo(({ type }) => {
   const badgeText = type === 'connection' ? 'Connection' : 'Following';
 
@@ -16,7 +14,7 @@ const Badge: React.FC<BadgeProps> = React.memo(({ type }) => {
   const containerStyle: ViewStyle = {
     ...styles.badgeContainer,
     ...(type === 'following' && {
-      backgroundColor: followingColor,
+      backgroundColor: '#e6f0ff',
     }),
   };
 
@@ -24,7 +22,7 @@ const Badge: React.FC<BadgeProps> = React.memo(({ type }) => {
   const textStyle: TextStyle = {
     ...styles.badgeText,
     ...(type === 'following' && {
-      color: '#1D9BF0',
+      color: '#0072ff',
     }),
   };
 

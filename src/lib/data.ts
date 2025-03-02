@@ -1,3 +1,4 @@
+import { MediaType } from '../enums/media-type.enum';
 import { PostData, PostType, User, Comment } from '../types/post';
 
 // Helper function for generating timestamps
@@ -78,12 +79,12 @@ const comments: Record<string, Comment> = {
 // Define post data
 export const posts: PostData[] = [
   {
-    id: 1,
+    id: '1',
     type: PostType.TEXT,
     user: users.u1,
     timestamp: getTimeAgo(5), // 5 hours ago
     likes: 4,
-    shares: 300,
+    echo: 300,
     comments: [comments.c2],
     isLiked: true,
     isSaved: true,
@@ -91,40 +92,61 @@ export const posts: PostData[] = [
       'Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend',
   },
   {
-    id: 5,
-    type: PostType.IMAGE,
+    id: '2',
+    type: PostType.MEDIA,
     user: users.u5,
     timestamp: getTimeAgo(1), // 1 hour ago
     likes: 3200,
-    shares: 450,
+    echo: 450,
     comments: [comments.c4],
     isLiked: false,
     isSaved: false,
-    images: [
-      { uri: 'https://dummyimage.com/600x400/000/fff&text=Image2' },
-      { uri: 'https://dummyimage.com/600x400/000/fff&text=Image3' },
+    media: [
+      {
+        url: 'https://dummyimage.com/600x400/000/fff&text=Image2',
+        id: '1',
+        type: MediaType.IMAGE,
+        key: 'image1',
+        uploadedBy: users.u5.id,
+      },
+      {
+        url: 'https://dummyimage.com/600x400/000/fff&text=Image3',
+        id: '2',
+        type: MediaType.IMAGE,
+        key: 'image2',
+        uploadedBy: users.u5.id,
+      },
+      {
+        url: 'https://www.w3schools.com/html/movie.mp4',
+        id: '3',
+        type: MediaType.VIDEO,
+        key: 'video1',
+        uploadedBy: users.u5.id,
+      },
     ],
+    content:
+      'This is a **bold** statement and **bold** this is *italic*. ~~strike through~~ Check *italic* out **bold**  #ReactNative @user This is a **bold** statement and **bold** this is *italic*. ~~strike through~~ Check *italic* out',
   },
   {
-    id: 2,
+    id: '3',
     type: PostType.TEXT,
     user: users.u2,
     timestamp: getTimeAgo(2), // 2 hours ago
     likes: 12078,
-    shares: 1390,
+    echo: 1390,
     comments: [comments.c1],
     isLiked: true,
     isSaved: false,
     content:
-      'This is a **bold** statement and **bold** this is *italic*. ~~strike through~~ Check *italic* out **bold**  #ReactNative @user https://www.theguardian.com/environment/2024/nov/25/forecasters-and-flood-defences-under-scrutiny-after-uks-storm-bert-ordeal',
+      'This is a **bold** statement and **bold** this is *italic*. ~~strike through~~ Check *italic* out **bold**  #ReactNative @user This is a **bold** statement and **bold** this is *italic*. ~~strike through~~ Check *italic* out',
   },
   {
-    id: 3,
+    id: '4',
     type: PostType.TEXT,
     user: users.u3,
     timestamp: getTimeAgo(120), // 5 days ago
     likes: 250,
-    shares: 190,
+    echo: 190,
     comments: [comments.c2, comments.c3],
     isLiked: true,
     isSaved: true,
@@ -132,12 +154,12 @@ export const posts: PostData[] = [
       'Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend',
   },
   {
-    id: 4,
+    id: '5',
     type: PostType.TEXT,
     user: users.u4,
     timestamp: getTimeAgo(5), // 5 hours ago
     likes: 4500,
-    shares: 300,
+    echo: 300,
     comments: [comments.c2],
     isLiked: true,
     isSaved: true,
@@ -145,17 +167,23 @@ export const posts: PostData[] = [
       'Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! Here are some images from my recent trip! #Travel @friend',
   },
   {
-    id: 6,
-    type: PostType.VIDEO,
+    id: '6',
+    type: PostType.MEDIA,
     user: users.u5,
     timestamp: getTimeAgo(3), // 3 hours ago
     likes: 1500,
-    shares: 200,
+    echo: 200,
     comments: [comments.c5],
     isLiked: true,
     isSaved: false,
-    videoUri: 'https://www.w3schools.com/html/movie.mp4',
-    thumbnailUri: 'https://dummyimage.com/600x400/000/fff&text=Video2',
-    duration: 90, // Duration in seconds
+    media: [
+      {
+        url: 'https://www.w3schools.com/html/movie.mp4',
+        id: '1',
+        type: MediaType.VIDEO,
+        key: 'video1',
+        uploadedBy: users.u5.id,
+      },
+    ],
   },
 ];

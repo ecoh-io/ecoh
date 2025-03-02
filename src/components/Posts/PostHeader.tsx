@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { User } from '@/src/types/post';
-import AnimatedOptionsButton from './Animated/AnimatedOptionsButton';
-import VerifiedBadge from './VerifiedBadge';
-import Badge from './Badge';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import { getShortTimeAgo } from '@/src/lib/timeHelpers';
+import VerifiedBadge from '../atoms/VerifiedBadge';
+import Badge from '../atoms/Badge';
 
 interface PostHeaderProps {
   user: User;
@@ -70,7 +69,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           <Text style={[styles.timestamp, { color: colors.secondary }]}>
             {timeAgo}
           </Text>
-          <AnimatedOptionsButton onPress={onOptionsPress} />
         </View>
       </View>
     </View>

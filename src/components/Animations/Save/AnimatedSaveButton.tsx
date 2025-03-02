@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AnimatedWrapper } from '@/src/components/Animations/Animations';

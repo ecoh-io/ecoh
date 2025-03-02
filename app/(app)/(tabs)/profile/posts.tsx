@@ -1,12 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { posts } from '@/src/lib/data';
-import Post from '@/src/components/post/Post';
 import { PostType } from '@/src/types/post';
 import { Tabs } from 'react-native-collapsible-tab-view';
 import { typography } from '@/src/theme/typography';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Post from '@/src/components/Posts/Post';
 
 const viewabilityConfig = {
   itemVisiblePercentThreshold: 80, // Consider item viewable when 80% visible
@@ -34,7 +33,7 @@ const PostsScreen: React.FC = () => {
       <Post
         post={item}
         isAutoplay={
-          index === currentVisibleIndex && item.type === PostType.VIDEO
+          index === currentVisibleIndex && item.type === PostType.MEDIA
         }
       />
     ),

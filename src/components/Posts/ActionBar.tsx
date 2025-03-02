@@ -1,14 +1,14 @@
 import React, { useMemo, memo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import AnimatedLikeButton from './Animated/AnimatedLikeButton';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import AnimatedSaveButton from './Animated/AnimatedSaveButton';
 import { formatNumber } from '@/src/lib/helpers';
 import { Colors } from '@/src/types/color';
+import AnimatedLikeButton from '../Animations/Like/AnimatedLikeButton';
+import AnimatedSaveButton from '../Animations/Save/AnimatedSaveButton';
 
-interface PostFooterProps {
+export interface ActionBarProps {
   likes: number;
   commentsCount: number;
   sharesCount?: number;
@@ -47,7 +47,7 @@ const ActionWithCount: React.FC<ActionWithCountProps> = memo(
     prevProps.accessibilityLabel === nextProps.accessibilityLabel,
 );
 
-const PostFooter: React.FC<PostFooterProps> = ({
+const ActionBar: React.FC<ActionBarProps> = ({
   likes = 0,
   commentsCount = 0,
   sharesCount = 0, // Default to 0 if not provided
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
 });
 
 export default memo(
-  PostFooter,
+  ActionBar,
   (prevProps, nextProps) =>
     prevProps.likes === nextProps.likes &&
     prevProps.commentsCount === nextProps.commentsCount &&

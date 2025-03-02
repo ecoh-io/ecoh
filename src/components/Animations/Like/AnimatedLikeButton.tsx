@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AnimatedWrapper } from '@/src/components/Animations/Animations';
@@ -45,7 +45,7 @@ const AnimatedLikeButton: React.FC<AnimatedLikeButtonProps> = ({
     >
       <TouchableWithoutFeedback
         onPress={handlePress}
-        style={{ width: 32, height: 32 }}
+        style={{ width: 38, height: 38 }}
       >
         {renderIcon()}
       </TouchableWithoutFeedback>

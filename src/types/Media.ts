@@ -1,5 +1,4 @@
 import { MediaType } from '../enums/media-type.enum';
-import { Album } from './Album';
 
 export type Media = {
   id: string;
@@ -7,4 +6,5 @@ export type Media = {
   key: string;
   type: MediaType;
   uploadedBy: string;
+  thumbnailUrl?: string;
 };
