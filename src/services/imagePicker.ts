@@ -38,17 +38,18 @@ export const pickSingleImage = async (
  * Note: `allowsMultipleSelection` is supported only on certain platforms/versions.
  * @returns An array of selected image assets or null if cancelled.
  */
-export const pickMultipleImages = async (): Promise<
-  ImagePicker.ImagePickerAsset[] | null
-> => {
+export const pickMultipleImages = async (
+  mediaType: ImagePicker.MediaTypeOptions = ImagePicker.MediaTypeOptions.All,
+): Promise<ImagePicker.ImagePickerAsset[] | null> => {
   const hasPermission = await requestMediaLibraryPermission();
   if (!hasPermission) return null;
 
   try {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: mediaType,
       allowsMultipleSelection: true,
       quality: 0.8,
+      videoMaxDuration: 60,
     });
 
     if (result.canceled || result.assets.length === 0) {

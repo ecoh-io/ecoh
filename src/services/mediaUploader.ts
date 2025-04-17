@@ -6,11 +6,31 @@ import { MediaType } from '@/src/enums/media-type.enum';
 /** Callback type to report upload progress (0 to 100) */
 export type UploadProgressCallback = (progress: number) => void;
 
+/** Callback type to report individual upload progress with asset ID */
+export type MultiUploadProgressCallback = (
+  assetId: string,
+  progress: number,
+) => void;
+
 /** Response shape for the pre-signed URL request */
 export interface PresignedUrlResponse {
   url: string;
   key: string;
   mediaId: string;
+}
+
+/** Request shape for multiple uploads */
+export interface MultiUploadRequest {
+  type: string;
+  mimetype: string;
+  albumId?: string;
+  tags?: string[];
+}
+
+/** Response shape for multiple uploads */
+export interface MultiUploadResult {
+  uri: string;
+  id: string;
 }
 
 /**
@@ -28,6 +48,21 @@ export const requestPresignedUrl = async (
     type: mediaType,
     mimetype: imageAsset.mimeType,
     userId,
+  });
+  return data;
+};
+
+/**
+ * Requests multiple pre-signed URLs from your media service.
+ * @param uploads - Array of upload requests with type, mimetype, and optional albumId and tags
+ * @param userId - The ID of the current user
+ * @returns Array of presigned URL responses
+ */
+export const requestMultiplePresignedUrls = async (
+  uploads: MultiUploadRequest[],
+): Promise<PresignedUrlResponse[]> => {
+  const { data } = await axiosInstance.post(`/media/multiple-presigned-urls`, {
+    uploads,
   });
   return data;
 };
@@ -119,6 +154,16 @@ export const completeUpload = async (
 };
 
 /**
+ * Completes multiple uploads by notifying the media service in a single request.
+ * @param uploads - Array of upload information (mediaId, key, userId)
+ */
+export const completeMultipleUploads = async (
+  uploads: Array<{ mediaId: string; key: string; userId: string }>,
+): Promise<void> => {
+  await axiosInstance.post(`/media/complete-multiple-uploads`, uploads);
+};
+
+/**
  * Runs the full image upload flow:
  * 1. Request a pre-signed URL.
  * 2. Convert the image URI to a Blob.
@@ -159,6 +204,89 @@ export const uploadImage = async (
     return { uri: imageAsset.uri, id: mediaId };
   } catch (error) {
     console.error('Error in uploadImage:', error);
+    throw error;
+  }
+};
+
+/**
+ * Uploads multiple images in parallel with individual progress tracking.
+ * @param imageAssets - Array of selected image assets
+ * @param userId - The current user's ID
+ * @param onUploadProgress - Callback to report progress for each image
+ * @param mediaType - Type of media (defaults to PROFILE_PICTURE)
+ * @param albumId - Optional album ID to associate with the uploads
+ * @param tags - Optional tags to associate with the uploads
+ * @returns Array of objects containing the image URIs and IDs
+ */
+export const uploadMultipleImages = async (
+  imageAssets: ImagePicker.ImagePickerAsset[],
+  userId: string,
+  onUploadProgress: MultiUploadProgressCallback,
+  mediaType: string = MediaType.PROFILE_PICTURE,
+  albumId?: string,
+  tags?: string[],
+): Promise<MultiUploadResult[]> => {
+  try {
+    // Step 1: Prepare upload requests for all images
+    const uploadRequests: MultiUploadRequest[] = imageAssets.map((asset) => ({
+      type: mediaType,
+      mimetype: asset.mimeType || 'image/jpeg', // Fallback mimetype
+      albumId,
+      tags,
+    }));
+
+    // Step 2: Request pre-signed URLs for all images
+    const presignedResponses = await requestMultiplePresignedUrls(
+      uploadRequests,
+    );
+
+    // Step 3: Upload all images in parallel
+    const uploadPromises = imageAssets.map(async (asset, index) => {
+      const presignedData = presignedResponses[index];
+
+      // Create a progress callback for this specific asset
+      const assetProgressCallback = (progress: number) => {
+        onUploadProgress(asset.assetId || asset.uri, progress);
+      };
+
+      // Convert the image URI to a Blob
+      const blob = await getBlobFromUri(asset.uri);
+
+      // Upload the Blob to S3 with progress tracking
+      await uploadToS3(
+        presignedData.url,
+        blob,
+        asset.mimeType || 'image/jpeg',
+        assetProgressCallback,
+      );
+
+      // Return the result for this asset along with completion data
+      return {
+        result: {
+          uri: asset.uri,
+          id: presignedData.mediaId,
+        },
+        completionData: {
+          mediaId: presignedData.mediaId,
+          key: presignedData.key,
+          userId,
+        },
+      };
+    });
+
+    // Wait for all uploads to complete
+    const results = await Promise.all(uploadPromises);
+
+    // Extract completion data for all uploads
+    const completionData = results.map((r) => r.completionData);
+
+    // Complete all uploads in a single request
+    await completeMultipleUploads(completionData);
+
+    // Return just the results
+    return results.map((r) => r.result);
+  } catch (error) {
+    console.error('Error in uploadMultipleImages:', error);
     throw error;
   }
 };

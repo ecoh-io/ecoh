@@ -1,18 +1,17 @@
 import React, { memo, useCallback, useRef, useState } from 'react';
 import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
-import ProfileHeader from '@/src/components/Header/ProfileHeader';
 import ProfileTabBar from '@/app/components/ProfileTabBar';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { useAuthStore } from '@/src/store/AuthStore';
-import Screen from '@/src/UI/Screen';
 import { Tabs } from 'react-native-collapsible-tab-view';
 import PostsScreen from './posts';
 import MediaScreen from './media';
 import TagsScreen from './tags';
 import SavedScreen from './saved';
 import { useRouter } from 'expo-router';
-import ProfileInfo from '@/src/components/Profile/ProfileInfo';
-import ProfileDescription from '@/src/components/Profile/ProfileDescription';
+import Screen from '@/src/components/layout/Screen';
+import { Description } from '@/src/components/organisms/Profile';
+import { Info, ProfileHeader } from '@/src/components/molecules/Profile';
 
 const ProfileLayout: React.FC = () => {
   const { colors, isDark } = useTheme();
@@ -36,8 +35,8 @@ const ProfileLayout: React.FC = () => {
           username={user?.username || ''}
           onEditPress={() => router.push('/(app)/edit')}
         />
-        {user && <ProfileInfo user={user} colors={colors} />}
-        {user && <ProfileDescription user={user} colors={colors} />}
+        {user && <Info user={user} colors={colors} />}
+        {user && <Description user={user} colors={colors} />}
       </View>
     ),
     [colors, user, onHeaderLayout, router],

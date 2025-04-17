@@ -1,4 +1,10 @@
-export { default as RegistrationHeader } from './header';
-export { default as Header } from './heading';
-export { default as Footer } from './footer';
-export { default as UsernameCheck } from './usernameCheck';
+export { default as Input } from './Input';
+export { default as Button } from './Button';
+export { default as VerifiedBadge } from './VerifiedBadge';
+export { default as UsernameAvailabilityIndicator } from './UsernameAvailabilityIndicator';
+export { default as RadioButton } from './RadioButton';
+export { default as Header } from './Header';
+export { default as RelationshipBadge } from './RelationshipBadge';
+export { default as SecureUrlText } from './SecureUrlText';
+export { default as PaginationIndicator } from './PaginationIndicator';
+export { default as CircularProgressIndicator } from './CircularProgressIndicator';

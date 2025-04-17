@@ -1,5 +1,5 @@
-import RadioButtonGroup from '@/src/components/atoms/radioButtonGroup';
-import Header from '@/src/components/Profile/Edit/Header';
+import { EditHeader } from '@/src/components/molecules/Profile';
+import RadioButtonGroup from '@/src/components/molecules/RadioButtonGroup';
 import { useEdit } from '@/src/context/EditContext';
 import { Gender, genderOptions } from '@/src/enums/gender.enum';
 import { useTheme } from '@/src/theme/ThemeContext';
@@ -25,7 +25,7 @@ const GenderScreen: React.FC = () => {
         backgroundColor: colors.background,
       }}
     >
-      <Header
+      <EditHeader
         title="Gender"
         colors={colors}
         save={() => updateGender(gender)}

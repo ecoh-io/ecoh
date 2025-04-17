@@ -1,12 +1,12 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { PostType } from '@/src/types/post';
 import { Tabs } from 'react-native-collapsible-tab-view';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { posts } from '@/src/lib/data';
 import { typography } from '@/src/theme/typography';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Post from '@/src/components/Posts/Post';
+import { Post } from '@/src/components/organisms/Posts';
 
 const MediaScreen: React.FC = () => {
   const [currentVisibleIndex, setCurrentVisibleIndex] = useState<number>(0); // Track current visible post index

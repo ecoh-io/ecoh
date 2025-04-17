@@ -1,4 +1,4 @@
-import RegistrationHeader from '@/src/components/atoms/header';
+import RegistrationHeader from '@/src/components/organisms/RegistrationHeader';
 import { RegistrationProvider } from '@/src/context/RegistrationContext';
 import { Stack } from 'expo-router';
 
@@ -10,13 +10,11 @@ export default function Layout() {
         initialRouteName="index"
         screenOptions={{
           headerShown: false,
+          animation: 'fade',
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="username" />
-        <Stack.Screen name="date-of-birth" />
-        <Stack.Screen name="password" />
-        <Stack.Screen name="identifier" />
+        <Stack.Screen name="security" />
         <Stack.Screen name="one-time-passcode" />
       </Stack>
     </RegistrationProvider>

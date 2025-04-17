@@ -1,9 +1,8 @@
-import Header from '@/src/components/Profile/Edit/Header';
+import { Input } from '@/src/components/atoms';
+import { EditHeader } from '@/src/components/molecules/Profile';
 import { useEdit } from '@/src/context/EditContext';
-import { useAuthStore } from '@/src/store/AuthStore';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import Input from '@/src/UI/Input';
 import { Ionicons } from '@expo/vector-icons';
 import { useFormik } from 'formik';
 import { useMemo } from 'react';
@@ -52,7 +51,7 @@ const Name: React.FC = () => {
         paddingHorizontal: 12,
       }}
     >
-      <Header
+      <EditHeader
         title="Name"
         colors={colors}
         save={formik.handleSubmit}

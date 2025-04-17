@@ -10,21 +10,20 @@ import {
 import { useRouter } from 'expo-router';
 import { typography } from '@/src/theme/typography';
 import { useTheme } from '@/src/theme/ThemeContext';
-import Input from '@/src/UI/Input';
 import * as Yup from 'yup';
-import FormikEcohDropdown from '@/src/UI/Dropdown/FormikDropdown';
 import { Visibility } from '@/src/enums/visibility.enum';
 import { FormikProvider, useFormik } from 'formik';
 import { Entypo } from '@expo/vector-icons';
-import Button from '@/src/UI/Button';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useMediaUploader } from '@/src/hooks/useMediaUploader';
 import { pickSingleImage } from '@/src/services/imagePicker';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { useCreateAlbum } from '@/src/api/album/useAlbumMutations';
 import { MediaType } from '@/src/enums/media-type.enum';
+import Input from '@/src/components/atoms/Input';
+import Button from '@/src/components/atoms/Button';
+import FormikEcohDropdown from '@/src/components/molecules/Dropdown/FormikWrapper';
 
 const CreateAlbumSchema = Yup.object().shape({
   name: Yup.string().required('Album name is required'),

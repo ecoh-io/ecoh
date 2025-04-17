@@ -1,15 +1,12 @@
-import { UsernameCheck } from '@/src/components/atoms';
-import Header from '@/src/components/Profile/Edit/Header';
+import { Input, UsernameAvailabilityIndicator } from '@/src/components/atoms';
+import { EditHeader } from '@/src/components/molecules/Profile';
 import { useEdit } from '@/src/context/EditContext';
-import { useAuthStore } from '@/src/store/AuthStore';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { typography } from '@/src/theme/typography';
-import Input from '@/src/UI/Input';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFormik } from 'formik';
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import * as yup from 'yup';
 
 interface FormValues {
@@ -146,7 +143,7 @@ const UserName: React.FC = () => {
         paddingHorizontal: 12,
       }}
     >
-      <Header
+      <EditHeader
         title="Username"
         colors={colors}
         save={formik.handleSubmit}
@@ -171,7 +168,7 @@ const UserName: React.FC = () => {
             onBlur={formik.handleBlur('username')}
             error={formik.touched.username ? formik.errors.username : undefined}
           />
-          <UsernameCheck
+          <UsernameAvailabilityIndicator
             isAvailable={isAvailable}
             isChecking={isChecking}
             error={formik.errors.username}

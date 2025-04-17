@@ -1,4 +1,4 @@
-import Screen from '@/src/UI/Screen';
+import Screen from '@/src/components/layout/Screen';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { Stack } from 'expo-router';
 

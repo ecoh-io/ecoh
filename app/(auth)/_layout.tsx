@@ -1,7 +1,7 @@
-import Screen from '@/src/UI/Screen';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { Stack } from 'expo-router';
 import { UnauthenticatedRoute } from '../components/UnauthenticatedRoute';
+import Screen from '@/src/components/layout/Screen';
 
 export default function Layout() {
   const { colors, isDark } = useTheme();

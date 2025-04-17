@@ -4,6 +4,7 @@ import axiosInstance from '../axiosInstance';
 export interface AuthenticationPayload {
   identifier: string;
   password: string;
+  isEmail: boolean;
 }
 
 export interface AuthenticationResponse {

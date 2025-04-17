@@ -11,11 +11,15 @@ import {
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Input from '@/src/UI/Input';
-import Button from '@/src/UI/Button';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import { useLoginUser } from '@/src/api/authentication/useAuthenticationMutations';
+import MailIcon from '@/src/icons/MailIcon';
+import LockIcon from '@/src/icons/LockIcon';
+import AccountIcon from '@/src/icons/AccountIcon';
+import Button from '@/src/components/atoms/Button';
+import Input from '@/src/components/atoms/Input';
+import { Header } from '@/src/components/atoms';
 
 interface FormValues {
   identifier: string;
@@ -137,6 +141,12 @@ const Login: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.formContainer}>
+        <Header
+          title="Sign in to your account"
+          subtitle="Enter your email or mobile number to access your account."
+          icon={<AccountIcon size={32} color={colors.text} />}
+        />
+
         {/* Email Input */}
         <Input
           placeholder="Email"
@@ -150,13 +160,9 @@ const Login: React.FC = () => {
             formik.touched.identifier ? formik.errors.identifier : undefined
           }
           LeftAccessory={() => (
-            <Ionicons
-              name="mail"
-              size={24}
-              color={getIconColor('identifier')}
-              style={styles.icon}
-              accessibilityLabel="Email Icon"
-            />
+            <View style={styles.icon}>
+              <MailIcon size={24} color={colors.secondary} />
+            </View>
           )}
           accessibilityLabel="Email Input"
         />
@@ -172,13 +178,9 @@ const Login: React.FC = () => {
           error={formik.touched.password ? formik.errors.password : undefined}
           secureTextEntry={!showPassword}
           LeftAccessory={() => (
-            <Ionicons
-              name="lock-closed"
-              size={24}
-              color={getIconColor('password')}
-              style={styles.icon}
-              accessibilityLabel="Password Icon"
-            />
+            <View style={styles.icon}>
+              <LockIcon size={24} color={colors.secondary} />
+            </View>
           )}
           RightAccessory={() => (
             <TouchableOpacity
@@ -201,30 +203,27 @@ const Login: React.FC = () => {
 
         {renderErrorMessage}
         {/* Sign In Button */}
-        <Button
-          variant="primary"
-          gradientColors={['#00c6ff', '#0072ff']}
-          onPress={handleSignInPress}
-          disabled={!formik.isValid || formik.isSubmitting || isPending}
-          loading={formik.isSubmitting || isPending}
-          title="Sign In"
-          size="large"
-          accessibilityLabel="Sign In Button"
-        />
-
-        {/* Forgot Password */}
-        <TouchableOpacity
-          style={styles.forgotPasswordButton}
-          onPress={handleForgotPassword}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="Forgot Password"
-        >
-          <Text style={[styles.forgotPasswordText, { color: colors.text }]}>
-            Forgot Password?
-          </Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'column', gap: 14 }}>
+          {/* Forgot Password */}
+          <Button
+            variant="secondary"
+            size="large"
+            onPress={handleForgotPassword}
+            title="Forgot Password?"
+            accessibilityLabel="Forgot Password Button"
+          />
+        </View>
       </View>
+      <Button
+        variant="primary"
+        gradientColors={['#00c6ff', '#0072ff']}
+        onPress={handleSignInPress}
+        disabled={!formik.isValid || formik.isSubmitting || isPending}
+        loading={formik.isSubmitting || isPending}
+        title="Sign In"
+        size="large"
+        accessibilityLabel="Sign In Button"
+      />
     </View>
   );
 };
@@ -244,7 +243,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: typography.fontSizes.title,
-    fontFamily: typography.fontFamilies.poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.bold,
     marginTop: 12,
   },
   formContainer: {
@@ -272,16 +271,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
   },
-
-  forgotPasswordButton: {
-    alignSelf: 'center',
-    marginTop: 8,
-  },
-  forgotPasswordText: {
-    fontSize: 16,
-    textDecorationLine: 'underline',
-    fontFamily: typography.fontFamilies.poppins.semiBold,
-  },
   socialContainer: {
     alignItems: 'center',
     marginVertical: 16,
@@ -289,5 +278,18 @@ const styles = StyleSheet.create({
   orText: {
     fontSize: 16,
     marginVertical: 8,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  subtitle: {
+    fontFamily: typography.fontFamilies.poppins.medium,
+    fontSize: typography.fontSizes.body,
+  },
+  logo: {
+    width: 40,
+    height: 40,
   },
 });

@@ -5,7 +5,7 @@ import { Tabs } from 'react-native-collapsible-tab-view';
 import { typography } from '@/src/theme/typography';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Post from '@/src/components/Posts/Post';
+import { Post } from '@/src/components/organisms/Posts';
 
 const viewabilityConfig = {
   itemVisiblePercentThreshold: 80, // Consider item viewable when 80% visible

@@ -1,21 +1,18 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import SocialChip from '@/src/components/atoms/socialChip';
 import { SOCIAL_PLATFORMS } from '@/src/constants/SocialPlatforms';
 import { useTheme } from '@/src/theme/ThemeContext';
-import Button from '@/src/UI/Button';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
-import Header from '@/src/components/Profile/Edit/Header';
 import { typography } from '@/src/theme/typography';
 import { useEdit } from '@/src/context/EditContext';
 import { FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
-import FormikEcohDropdown from '@/src/UI/Dropdown/FormikDropdown';
-import {
-  AnimatedWrapper,
-  AnimationType,
-} from '@/src/components/Animations/Animations';
-import Input from '@/src/UI/Input';
+import { Button, Input } from '@/src/components/atoms';
+import { AnimationType } from '@/src/animation/AnimatedWrapper/types';
+import AnimatedWrapper from '@/src/animation/AnimatedWrapper';
+import SocialChip from '@/src/components/molecules/SocialChip';
+import FormikEcohDropdown from '@/src/components/molecules/Dropdown/FormikWrapper';
+import { EditHeader } from '@/src/components/molecules/Profile';
 
 interface SocialLinksState {
   [platformKey: string]: string;
@@ -114,7 +111,7 @@ const Links: React.FC = () => {
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <View style={styles.container}>
-        <Header
+        <EditHeader
           title="Links"
           colors={colors}
           save={save}

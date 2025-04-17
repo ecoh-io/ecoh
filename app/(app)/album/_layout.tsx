@@ -1,6 +1,6 @@
+import Screen from '@/src/components/layout/Screen';
 import { EditProvider } from '@/src/context/EditContext';
 import { useTheme } from '@/src/theme/ThemeContext';
-import Screen from '@/src/UI/Screen';
 import { Slot, Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';

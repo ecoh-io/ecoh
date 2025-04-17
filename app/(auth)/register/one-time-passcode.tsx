@@ -1,13 +1,13 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRegistration } from '@/src/context/RegistrationContext';
-import OTPInput from '@/src/UI/OTPInput';
-import Button from '@/src/UI/Button';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { Footer, Header } from '@/src/components/atoms';
 import { useConfirmUser } from '@/src/api/authentication/useAuthenticationMutations';
+import Button from '@/src/components/atoms/Button';
+import OTP from '@/src/components/molecules/OTP';
+import { Header } from '@/src/components/atoms';
 
 interface FormValues {
   OTP: string;
@@ -77,7 +77,7 @@ export default function OneTimePasscode() {
         subtitle={`To confirm your account, enter the 6-digit code that we sent to ${state.formData.identifier}`}
       />
       <View style={styles.formContainer}>
-        <OTPInput
+        <OTP
           length={6}
           value={formik.values.OTP}
           onChange={(value) => formik.setFieldValue('OTP', value)}
@@ -95,10 +95,13 @@ export default function OneTimePasscode() {
           size="large"
         />
       </View>
-      <Footer
+      <Button
+        variant="primary"
+        gradientColors={['#00c6ff', '#0072ff']}
         onPress={handleContinuePress}
-        isDisabled={!formik.isValid || formik.isSubmitting}
-        isLoading={formik.isSubmitting}
+        disabled={!formik.isValid || formik.isSubmitting}
+        title={'Continue'}
+        size="large"
       />
     </View>
   );

@@ -4,7 +4,7 @@ export const lightColors = {
   onPrimary: '#FFFFFF', // Text/icon color on primary background
 
   // Secondary Colors
-  secondary: '#ccc', // Secondary brand color
+  secondary: '#E5E7EB', // Secondary brand color
   onSecondary: '#000000', // Text/icon color on secondary background
 
   // Background Colors
@@ -25,7 +25,7 @@ export const lightColors = {
   placeholder: 'rgba(0, 0, 0, 0.54)', // Placeholder text color
 
   // Error Colors
-  error: '#C11C32', // Error color
+  error: '#E54848', // Error color
   onError: '#FFFFFF', // Text/icon color on error background
 
   // Success Colors

@@ -1,10 +1,10 @@
-import Header from '@/src/components/Profile/Edit/Header';
+import Input from '@/src/components/atoms/Input';
+import { EditHeader } from '@/src/components/molecules/Profile';
 import { useEdit } from '@/src/context/EditContext';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import Input from '@/src/UI/Input';
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { View } from 'react-native';
 
 const MAX_BIO_LENGTH = 150;
@@ -31,7 +31,7 @@ const Bio: React.FC = () => {
         backgroundColor: colors.background,
       }}
     >
-      <Header
+      <EditHeader
         title="Bio"
         colors={colors}
         save={() => updateBio(bio)}

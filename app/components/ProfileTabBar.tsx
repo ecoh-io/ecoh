@@ -15,7 +15,7 @@ import {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { AnimatedWrapper } from '@/src/components/Animations/Animations';
+import AnimatedWrapper from '@/src/animation/AnimatedWrapper';
 
 type Tab = { name: string };
 

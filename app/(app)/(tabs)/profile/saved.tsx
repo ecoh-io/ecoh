@@ -5,7 +5,7 @@ import { typography } from '@/src/theme/typography';
 import { PostType } from '@/src/types/post';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'react-native-collapsible-tab-view';
-import Post from '@/src/components/Posts/Post';
+import { Post } from '@/src/components/organisms/Posts';
 
 const SavedScreen: React.FC = () => {
   const [currentVisibleIndex, setCurrentVisibleIndex] = useState<number>(0); // Track current visible post index

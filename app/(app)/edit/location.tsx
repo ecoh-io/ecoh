@@ -1,5 +1,5 @@
-import LocationSearchBar from '@/src/components/LocationSearchBar';
-import Header from '@/src/components/Profile/Edit/Header';
+import LocationSearchBar from '@/src/components/molecules/LocationSearchBar';
+import { EditHeader } from '@/src/components/molecules/Profile';
 import { useEdit } from '@/src/context/EditContext';
 import { ILocation } from '@/src/interfaces/location';
 import { useTheme } from '@/src/theme/ThemeContext';
@@ -57,7 +57,7 @@ const LocationScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header
+      <EditHeader
         title="Location"
         colors={colors}
         save={save}

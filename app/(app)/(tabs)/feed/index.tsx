@@ -16,11 +16,12 @@ import Animated, {
   useAnimatedStyle,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
-import { withFeedManager } from '@/src/components/Feed/withFeedManager';
 import { debounce } from 'lodash';
 import { PostData, PostType } from '@/src/types/post';
-import Post from '@/src/components/Posts/Post';
+
 import { MediaType } from '@/src/enums/media-type.enum';
+import { Post } from '@/src/components/organisms/Posts';
+import { withFeedManager } from '@/src/hoc/withFeedManger';
 
 // Extra props provided by the feed manager HOC
 // Production-level constants

@@ -2,11 +2,11 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { Href, useRouter } from 'expo-router';
-import TouchableRow from '@/src/components/Profile/Edit/TouchableRow/TouchableRow';
-import ProfileInfo from '@/src/components/Profile/Edit/ProfileInfo';
-import Header from '@/src/components/Profile/Edit/Header';
 import { useEdit } from '@/src/context/EditContext';
 import { getGenderDisplay } from '@/src/enums/gender.enum';
+import TouchableRow from '@/src/components/molecules/TouchableRow';
+import ProfileInfo from '@/src/components/organisms/Profile/EditProfileInfo';
+import { EditHeader } from '@/src/components/molecules/Profile';
 
 const useEditProfileNavigation = () => {
   const router = useRouter();
@@ -41,7 +41,7 @@ const EditProfileScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header title="Edit profile" colors={colors} />
+      <EditHeader title="Edit profile" colors={colors} />
 
       <ProfileInfo user={user} colors={colors} />
 

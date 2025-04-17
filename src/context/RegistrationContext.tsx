@@ -8,12 +8,13 @@ import React, {
 import * as Yup from 'yup';
 import { Href, useRouter } from 'expo-router';
 import { validateSchemaPartially } from '../lib/validationHelpers';
+import { useRegisterUser } from '../api/authentication/useAuthenticationMutations';
 
 // Define the shape of the form data
 export interface FormData {
   name: string;
   username: string;
-  dateOfBirth: string;
+  dateOfBirth: Date | null;
   password: string;
   identifier?: string;
   code: string;
@@ -24,29 +25,34 @@ interface RegistrationState {
   currentStep: number;
   formData: FormData;
   errors: Record<string, string>;
+  fieldError: { field: string; message: string } | null;
+  isSubmitting: boolean;
 }
 
 const initialState: RegistrationState = {
   currentStep: 0,
   formData: {
     name: '',
-    dateOfBirth: '',
+    dateOfBirth: null,
     identifier: '',
     code: '',
     password: '',
     username: '',
   },
   errors: {},
+  fieldError: null,
+  isSubmitting: false,
 };
 
 // Define action types
 type RegistrationAction =
   | { type: 'SET_FORM_DATA'; payload: Partial<FormData> }
   | { type: 'SET_ERRORS'; payload: Record<string, string> }
+  | { type: 'SET_FIELD_ERROR'; payload: { field: string; message: string } }
+  | { type: 'CLEAR_FIELD_ERROR' }
   | { type: 'NEXT_STEP' }
   | { type: 'PREV_STEP' }
   | { type: 'CLEAR_FORM_DATA' };
-
 // Reducer function
 const registrationReducer = (
   state: RegistrationState,
@@ -69,6 +75,16 @@ const registrationReducer = (
           ...action.payload,
         },
       };
+    case 'SET_FIELD_ERROR':
+      return {
+        ...state,
+        fieldError: action.payload,
+      };
+    case 'CLEAR_FIELD_ERROR':
+      return {
+        ...state,
+        fieldError: null,
+      };
     case 'NEXT_STEP':
       return { ...state, currentStep: state.currentStep + 1 };
     case 'PREV_STEP':
@@ -89,8 +105,10 @@ const registrationReducer = (
 interface RegistrationContextProps {
   state: RegistrationState;
   steps: string[];
+  isSubmitting: boolean;
   setFormData: (newData: Partial<FormData>) => void;
   setErrors: (newErrors: Record<string, string>) => void;
+  setFieldError: (field: string, message: string) => void;
   validateStep: (
     validationSchema: Yup.ObjectSchema<any>,
     fieldsToValidate: Array<keyof FormData>,
@@ -121,14 +139,7 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
 }) => {
   const [state, dispatch] = useReducer(registrationReducer, initialState);
   const router = useRouter();
-  const steps = [
-    'Name',
-    'Username',
-    'Date of birth',
-    'Password',
-    'Identifer',
-    'Confirm',
-  ];
+  const steps = ['Identity', 'Password'];
 
   // Function to update form data
   const setFormData = useCallback((newData: Partial<FormData>) => {
@@ -138,6 +149,10 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
   // Function to update errors
   const setErrors = useCallback((newErrors: Record<string, string>) => {
     dispatch({ type: 'SET_ERRORS', payload: newErrors });
+  }, []);
+
+  const setFieldError = useCallback((field: string, message: string) => {
+    dispatch({ type: 'SET_FIELD_ERROR', payload: { field, message } });
   }, []);
 
   // Function to navigate to the next step
@@ -182,11 +197,7 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
   // Function to navigate to the appropriate screen
   const goToNextScreen = useCallback(() => {
     const stepRoutes: Record<number, Href> = {
-      0: '/(auth)/register/username',
-      1: '/(auth)/register/date-of-birth',
-      2: '/(auth)/register/password',
-      3: '/(auth)/register/identifier',
-      4: '/(auth)/register/one-time-passcode',
+      0: '/(auth)/register/security',
     };
 
     const nextRoute = stepRoutes[state.currentStep];
@@ -196,6 +207,33 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
       return;
     }
   }, [router, state.currentStep]);
+
+  const { mutateAsync: register, isPending: isSubmitting } = useRegisterUser({
+    onSuccess: () => {
+      router.push('/(auth)/register/one-time-passcode');
+    },
+    onError: (error: any) => {
+      // Example: handle server-side identifier (email/phone) error
+      if (error.status === 409) {
+        setFieldError('identifier', error.message.message);
+        prevStep();
+      } else {
+        setErrors({ server: error.message });
+      }
+    },
+  });
+
+  const registerUser = useCallback(async () => {
+    try {
+      await register({
+        identifier: state.formData.identifier!,
+        password: state.formData.password,
+        isEmail: true,
+      });
+    } catch (err) {
+      console.error('Registration failed:', err);
+    }
+  }, [register, state.formData]);
 
   // Function to handle submitting the step
   const handleSubmitStep = useCallback(
@@ -212,6 +250,7 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
       if (isValid) {
         setFormData(formData);
         if (state.currentStep === steps.length - 1) {
+          await registerUser();
           return;
         }
         nextStep();
@@ -226,6 +265,8 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
       value={{
         state,
         steps,
+        isSubmitting,
+        setFieldError,
         setFormData,
         setErrors,
         validateStep,

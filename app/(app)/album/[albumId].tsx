@@ -18,10 +18,11 @@ import { useDeleteAlbum } from '@/src/api/album/useAlbumMutations';
 import { pickMultipleImages } from '@/src/services/imagePicker';
 import { typography } from '@/src/theme/typography';
 import { Media } from '@/src/types/Media';
-import GridItem from '@/src/components/Albums/GridItem';
-import Header from '@/src/components/Albums/Header';
-import EditFooter from '@/src/components/Albums/EditFooter';
-import { AnimatedWrapper } from '@/src/components/Animations/Animations';
+import { useMultipleMediaUploader } from '@/src/hooks/useMultipleMediaUploader';
+import { MediaType } from '@/src/enums/media-type.enum';
+import { useAuthStore } from '@/src/store/AuthStore';
+import { Footer, GridItem, Header } from '@/src/components/molecules/Albums';
+import AnimatedWrapper from '@/src/animation/AnimatedWrapper';
 
 // --- Constants & Grid Sizing ---
 const TOTAL_CELLS = 12;
@@ -43,6 +44,7 @@ export type GridDataItem =
 
 // --- Main Screen Component ---
 const AlbumDetailsScreen: React.FC = () => {
+  const user = useAuthStore((state) => state.user);
   const { albumId } = useLocalSearchParams();
   const { data: album, isLoading } = useAlbum(albumId?.toString() || '');
   const { colors } = useTheme();
@@ -65,11 +67,17 @@ const AlbumDetailsScreen: React.FC = () => {
   const [selectedImage, setSelectedImage] =
     useState<ImagePicker.ImagePickerAsset | null>(null);
 
+  const [isUploading, setIsUploading] = useState(false);
+
+  const { uploadProgress, error, handleMultipleUpload } =
+    useMultipleMediaUploader(user!.id, MediaType.VIDEO);
+
   // When album data is available, set local album media state
   useEffect(() => {
     if (album?.mediaItems) {
       setAlbumMedia(album.mediaItems);
     }
+    console.log('album', JSON.stringify(album, null, 2));
   }, [album]);
 
   // --- Handlers ---
@@ -94,6 +102,27 @@ const AlbumDetailsScreen: React.FC = () => {
         const newAssets = imageAssets.filter((img) => !existing.has(img.uri));
         return [...prev, ...newAssets];
       });
+      try {
+        setIsUploading(true);
+        const uploadedMedia = await handleMultipleUpload(
+          imageAssets,
+          albumId?.toString(),
+        );
+
+        // Show success message
+        Alert.alert(
+          'Upload Complete',
+          `Successfully uploaded ${uploadedMedia.length} images to the album.`,
+        );
+      } catch (err) {
+        console.error('Failed to upload images:', err);
+        Alert.alert(
+          'Upload Failed',
+          'There was an error uploading your images. Please try again.',
+        );
+      } finally {
+        setIsUploading(false);
+      }
     }
   }, []);
 
@@ -190,7 +219,14 @@ const AlbumDetailsScreen: React.FC = () => {
         );
       } else {
         // item is a media item
-        const selected = selectedForDeletion.has(item.uri);
+        const uri = 'uri' in item ? item.uri : item.url;
+        const assetId = 'assetId' in item ? item.assetId : '';
+        const selected = selectedForDeletion.has(uri);
+        const progress =
+          assetId && uploadProgress[assetId] ? uploadProgress[assetId] : 0;
+        const isCurrentlyUploading =
+          isUploading && progress > 0 && progress < 1;
+
         return (
           <GridItem
             item={item}
@@ -199,6 +235,8 @@ const AlbumDetailsScreen: React.FC = () => {
             selected={selected}
             toggleSelect={toggleSelectForDeletion}
             colors={colors}
+            uploadProgress={progress}
+            isUploading={isCurrentlyUploading}
           />
         );
       }
@@ -242,7 +280,7 @@ const AlbumDetailsScreen: React.FC = () => {
       </View>
 
       <AnimatedWrapper visible={editMode} animation="fade-in">
-        <EditFooter
+        <Footer
           selectedCount={selectedForDeletion.size}
           onDelete={handleDeleteSelected}
         />

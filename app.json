@@ -11,15 +11,18 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "Anthony.McMillan.ecoh",
+      "icon": "./assets/images/Logo.png",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
-        }
-      }
+        },
+        "UILaunchStoryboardName": "SplashScreen"
+      },
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/Logo.png",
         "backgroundColor": "#ffffff"
       }
     },
@@ -34,7 +37,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/Applogo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
