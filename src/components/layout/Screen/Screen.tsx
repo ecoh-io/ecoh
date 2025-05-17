@@ -34,6 +34,7 @@ function ScrollableScreen(props: ScreenProps) {
     preset,
     style,
     scrollToggleThreshold,
+    keyboardOffset = 0, // bring in the offset
   } = props;
 
   const scrollRef = useRef<ScrollView>(null);
@@ -49,6 +50,12 @@ function ScrollableScreen(props: ScreenProps) {
       ref={scrollRef}
       keyboardShouldPersistTaps={keyboardShouldPersistTaps}
       scrollEnabled={scrollEnabled}
+      style={[styles.outer, scrollViewProps?.style, style]}
+      contentContainerStyle={[
+        styles.inner,
+        scrollViewProps?.contentContainerStyle,
+        contentContainerStyle,
+      ]}
       onLayout={(e: LayoutChangeEvent) => {
         onLayout(e);
         scrollViewProps?.onLayout?.(e);
@@ -57,15 +64,15 @@ function ScrollableScreen(props: ScreenProps) {
         onContentSizeChange(w, h);
         scrollViewProps?.onContentSizeChange?.(w, h);
       }}
-      style={[styles.outer, scrollViewProps?.style, style]}
-      contentContainerStyle={[
-        styles.inner,
-        scrollViewProps?.contentContainerStyle,
-        contentContainerStyle,
-      ]}
       {...scrollViewProps}
     >
-      {children}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={keyboardOffset}
+        style={{ flex: 1 }}
+      >
+        {children}
+      </KeyboardAvoidingView>
     </ScrollView>
   );
 }
@@ -74,31 +81,20 @@ function Screen(props: ScreenProps) {
   const {
     backgroundColor,
     safeAreaEdges,
-    keyboardOffset = 0,
     StatusBarProps,
     statusBarStyle = 'dark',
-    KeyboardAvoidingViewProps,
   } = props;
 
   const safeAreaStyle = useSafeAreaInsetsStyle(safeAreaEdges);
 
-  useEffect(() => Keyboard.dismiss, []);
-
   return (
     <View style={[styles.container, { backgroundColor }, safeAreaStyle]}>
       <StatusBar style={statusBarStyle} {...StatusBarProps} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={keyboardOffset}
-        style={[styles.keyboardAvoidingView, KeyboardAvoidingViewProps?.style]}
-        {...KeyboardAvoidingViewProps}
-      >
-        {isFixed(props.preset) ? (
-          <FixedScreen {...props} />
-        ) : (
-          <ScrollableScreen {...props} />
-        )}
-      </KeyboardAvoidingView>
+      {isFixed(props.preset) ? (
+        <FixedScreen {...props} />
+      ) : (
+        <ScrollableScreen {...props} />
+      )}
     </View>
   );
 }

@@ -1,74 +1,116 @@
-import React from 'react';
-import { View } from 'react-native';
-import MailIcon from '@/src/icons/MailIcon';
+import React, { useEffect, useState } from 'react';
+import { View, LayoutChangeEvent } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
+
 import { styles } from './styles';
 import { IdentifierProps } from './types';
-import MobileNumber from '../MobileNumber';
+
+import MailIcon from '@/src/icons/MailIcon';
+import PhoneIcon from '@/src/icons/PhoneIcon';
+
+import MobileNumberInput from '../MobileNumber/MobileNumber';
 import SegmentedToggle from '../SegmentedToggle';
-import { Input } from '../../atoms';
+import { EcohInput } from '../../atoms/EcohInput/EcohInput';
 
 const Identifier: React.FC<IdentifierProps> = ({
-  emailRef,
-  mobileRef,
   isEmail,
   toggleInputMode,
-  iconColor,
-  countryCode,
   formik,
-  handleCountryCodePress,
-  handleMobileChange,
-  showCountryPicker,
-  setShowCountryPicker,
-  handleCountrySelect,
+  onCountryChange,
 }) => {
+  const emailOpacity = useSharedValue(isEmail ? 1 : 0);
+  const mobileOpacity = useSharedValue(isEmail ? 0 : 1);
+
+  const [containerHeight, setContainerHeight] = useState(0);
+
+  useEffect(() => {
+    if (isEmail) {
+      emailOpacity.value = withTiming(1, { duration: 160 });
+      mobileOpacity.value = withTiming(0, { duration: 160 });
+    } else {
+      emailOpacity.value = withTiming(0, { duration: 160 });
+      mobileOpacity.value = withTiming(1, { duration: 160 });
+    }
+  }, [isEmail]);
+
+  const emailStyle = useAnimatedStyle(() => ({
+    opacity: emailOpacity.value,
+    position: 'absolute',
+    width: '100%',
+    pointerEvents: emailOpacity.value > 0.5 ? 'auto' : 'none',
+  }));
+
+  const mobileStyle = useAnimatedStyle(() => ({
+    opacity: mobileOpacity.value,
+    position: 'absolute',
+    width: '100%',
+    pointerEvents: mobileOpacity.value > 0.5 ? 'auto' : 'none',
+  }));
+
   const handleToggle = (index: number) => {
-    if ((isEmail && index === 0) || (!isEmail && index === 1)) {
+    const wantsEmail = index === 1;
+    if (wantsEmail !== isEmail) {
       toggleInputMode();
     }
   };
 
-  const error = formik.touched.identifier
-    ? formik.errors.identifier
-    : undefined;
+  const handleLayout = (e: LayoutChangeEvent, type: 'email' | 'mobile') => {
+    if ((type === 'email' && isEmail) || (type === 'mobile' && !isEmail)) {
+      setContainerHeight(e.nativeEvent.layout.height);
+    }
+  };
 
   return (
     <View style={styles.wrapper}>
       <SegmentedToggle
-        options={['Mobile', 'Email']}
+        options={[
+          { label: 'Mobile', icon: <PhoneIcon size={18} /> },
+          { label: 'Email', icon: <MailIcon size={18} /> },
+        ]}
         activeIndex={isEmail ? 1 : 0}
         onChange={handleToggle}
       />
 
-      {isEmail ? (
-        <Input
-          ref={emailRef}
-          placeholder="Email"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={formik.values.identifier}
-          onChangeText={formik.handleChange('identifier')}
-          onBlur={formik.handleBlur('identifier')}
-          error={error}
-          LeftAccessory={() => (
-            <View style={styles.icon}>
-              <MailIcon size={24} color={iconColor} />
-            </View>
-          )}
-        />
-      ) : (
-        <MobileNumber
-          ref={mobileRef}
-          value={formik.values.identifier}
-          countryCode={countryCode}
-          onCountryCodePress={handleCountryCodePress}
-          onChangeText={handleMobileChange}
-          onBlur={formik.handleBlur('identifier')}
-          error={error}
-          showCountryPicker={showCountryPicker}
-          setShowCountryPicker={setShowCountryPicker}
-          handleCountrySelect={handleCountrySelect}
-        />
-      )}
+      <View
+        style={{ height: containerHeight || undefined, position: 'relative' }}
+      >
+        <Animated.View
+          onLayout={(e) => handleLayout(e, 'email')}
+          style={emailStyle}
+        >
+          <EcohInput
+            label="Email"
+            name="email"
+            formik={formik}
+            icon={(color) => <MailIcon size={24} color={color} />}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="emailAddress"
+            autoComplete="email"
+            importantForAutofill="yes"
+            helperText="Email"
+          />
+        </Animated.View>
+
+        <Animated.View
+          onLayout={(e) => handleLayout(e, 'mobile')}
+          style={mobileStyle}
+        >
+          <MobileNumberInput
+            label="Mobile Number"
+            name="mobile"
+            formik={formik}
+            initialCountry="GB"
+            onCountryChange={onCountryChange}
+          />
+        </Animated.View>
+      </View>
     </View>
   );
 };

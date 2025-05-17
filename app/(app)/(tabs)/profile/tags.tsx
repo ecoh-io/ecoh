@@ -42,7 +42,6 @@ const TagsScreen: React.FC = () => {
 
   const handleAddMediaPost = () => {
     // TODO: Implement the logic to add a new media post
-    console.log('Add new media post');
   };
 
   const EmptyState: React.FC = () => {

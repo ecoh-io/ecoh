@@ -1,5 +1,6 @@
 export interface UsernameAvailabilityIndicatorProps {
-  isChecking: boolean;
-  isAvailable: boolean | null;
+  isChecking: boolean | null;
+  isAvailable: boolean | undefined;
   error?: string;
+  value: string;
 }

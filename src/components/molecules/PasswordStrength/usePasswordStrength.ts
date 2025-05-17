@@ -20,3 +20,13 @@ export function usePasswordStrength(password: string): {
 
   return { level, score: Math.min(score, 5) };
 }
+
+// In usePasswordStrength.ts
+
+export function getPasswordStrength(password: string): {
+  level: 'Too Weak' | 'Weak' | 'Medium' | 'Strong' | 'Very Strong';
+  score: number;
+} {
+  const { score, level } = usePasswordStrength(password); // your internal scoring logic
+  return { score, level };
+}

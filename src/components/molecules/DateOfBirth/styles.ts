@@ -4,17 +4,24 @@ import { typography } from '@/src/theme/typography';
 export const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
-    gap: 8,
-    marginVertical: 8,
+    gap: 6,
   },
   label: {
-    fontSize: 15,
+    position: 'absolute',
+    top: -6, // sits just above the border
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    zIndex: 1,
+    fontSize: 12,
+    left: 14,
+    color: '#333',
     fontFamily: typography.fontFamilies.poppins.medium,
+    pointerEvents: 'none',
   },
   inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
+    height: 52,
     paddingHorizontal: 14,
     borderRadius: 16,
     borderWidth: 1.5,
@@ -22,9 +29,15 @@ export const styles = StyleSheet.create({
   icon: {
     marginRight: 10,
   },
+  innerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
   inputText: {
     fontSize: 16,
     flex: 1,
+    lineHeight: 23,
     fontFamily: typography.fontFamilies.poppins.medium,
   },
   helperTextRow: {
@@ -40,7 +53,9 @@ export const styles = StyleSheet.create({
     marginRight: 2,
   },
   errorText: {
-    fontSize: 14,
+    fontSize: 12,
+    lineHeight: 16,
+    color: 'red',
     fontFamily: typography.fontFamilies.poppins.medium,
   },
   errorChip: {

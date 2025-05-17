@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { StyleSheet, View } from 'react-native';
@@ -14,17 +8,12 @@ import { useRegistration } from '@/src/context/RegistrationContext';
 import IdentityIcon from '@/src/icons/IdentityIcon';
 import NameIcon from '@/src/icons/NameIcon';
 import UserNameIcon from '@/src/icons/UserNameIcon';
-import Input from '@/src/components/atoms/Input';
 import DateOfBirth from '@/src/components/molecules/DateOfBirth';
 import { Button, Header } from '@/src/components/atoms';
 import UsernameAvailabilityIndicator from '@/src/components/atoms/UsernameAvailabilityIndicator';
-
-const checkUsernameAvailability = async (
-  username: string,
-): Promise<boolean> => {
-  await new Promise((resolve) => setTimeout(resolve, 500)); // Simulated delay
-  return username !== 'test'; // "test" is taken
-};
+import { EcohInput } from '@/src/components/atoms/EcohInput/EcohInput';
+import { useUsernameAvailability } from '@/src/api/authentication/authenticationQuery';
+import { useDebounce } from 'use-debounce';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -36,9 +25,11 @@ const validationSchema = Yup.object().shape({
     .required('Date of birth is required')
     .max(
       new Date(new Date().setFullYear(new Date().getFullYear() - 16)),
-      'You must be at least 16 years old',
+      'You must be at least 16 years old to continue.',
     ),
 });
+
+const usernameSchema = validationSchema.fields.username as Yup.StringSchema;
 
 interface FormValues {
   name: string;
@@ -49,9 +40,7 @@ interface FormValues {
 export default function Identity() {
   const { state, handleSubmitStep } = useRegistration();
   const { colors } = useTheme();
-
-  const [isChecking, setIsChecking] = useState(false);
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const [fieldDirty, setFieldDirty] = useState<{ [key: string]: boolean }>({});
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -77,128 +66,115 @@ export default function Identity() {
         setSubmitting(false);
       }
     },
-    validateOnBlur: true,
-    validateOnChange: false,
+    validateOnBlur: false,
+    validateOnChange: true,
   });
 
-  const nameIconColor = useMemo(
-    () =>
-      formik.errors.name && formik.touched.name
-        ? colors.error
-        : colors.secondary,
-    [formik.errors.name, formik.touched.name],
+  const username = formik.values.username;
+  const [debouncedUsername] = useDebounce(username, 500);
+  const latestCheckedUsername = useRef('');
+
+  const shouldCheck = debouncedUsername.length >= 3 && !formik.errors.username;
+  const { data: isAvailable, isFetching } = useUsernameAvailability(
+    debouncedUsername,
+    shouldCheck,
   );
 
-  const usernameIconColor = useMemo(
-    () =>
-      formik.errors.username && formik.touched.username
-        ? colors.error
-        : colors.secondary,
-    [formik.errors.username, formik.touched.username],
-  );
-
-  const setIsAvailableRef = useRef(setIsAvailable);
-  const setIsCheckingRef = useRef(setIsChecking);
-  const setFieldErrorRef = useRef(formik.setFieldError);
-
-  useEffect(() => {
-    setIsAvailableRef.current = setIsAvailable;
-    setIsCheckingRef.current = setIsChecking;
-    setFieldErrorRef.current = formik.setFieldError;
-  });
-
-  const debouncedCheckAvailability = useRef(
-    _.debounce(async (username: string) => {
-      try {
-        const available = await checkUsernameAvailability(username);
-        setIsAvailableRef.current(available);
-
-        if (!available) {
-          setFieldErrorRef.current('username', 'Username is already taken');
-        } else {
-          setFieldErrorRef.current('username', undefined);
-        }
-      } catch {
-        setIsAvailableRef.current(null);
-      } finally {
-        setIsCheckingRef.current(false);
-      }
-    }, 500),
-  ).current;
-
-  useEffect(() => {
-    return () => debouncedCheckAvailability.cancel();
-  }, []);
-
+  // Whenever username changes, mark as dirty
   const handleUsernameChange = useCallback(
     (text: string) => {
-      formik.handleChange('username')(text);
-      setIsAvailable(null);
-      setIsChecking(true);
-      debouncedCheckAvailability(text);
+      formik.setFieldValue('username', text);
+      formik.setFieldTouched('username', true, false);
+      markDirty('username');
     },
     [formik],
   );
 
+  // If not available, set field error
   useEffect(() => {
-    console.log('Formik Errors:', formik.errors); // Add this line
-  }, [formik.errors]);
+    // Whenever the debouncedUsername changes, clear the error to prevent flicker
+    if (shouldCheck) {
+      formik.setFieldError('username', undefined);
+    }
+    // When the query completes, set error if not available
+    if (shouldCheck && isAvailable === false) {
+      formik.setFieldError('username', 'Username is already taken');
+    }
+    // If available, clear the error (only if it was from "already taken")
+    if (shouldCheck && isAvailable === true) {
+      if (formik.errors.username === 'Username is already taken') {
+        formik.setFieldError('username', undefined);
+      }
+    }
+  }, [debouncedUsername, isAvailable, shouldCheck]);
+
+  const isDisabled =
+    !formik.values.name ||
+    !formik.values.username ||
+    !formik.values.dateOfBirth;
 
   const handleContinuePress = useCallback(() => {
     formik.handleSubmit();
   }, [formik]);
+
+  const markDirty = useCallback((name: string) => {
+    setFieldDirty((prev) => ({ ...prev, [name]: true }));
+  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.formContainer}>
         <Header
           title="Your identity"
-          subtitle="Set a display name and unique username to represent you on Ecoh."
+          subtitle="Start shaping your identity with your name and a unique username"
           icon={<IdentityIcon size={32} color={colors.text} />}
         />
 
-        <Input
-          placeholder="Name"
-          value={formik.values.name}
-          onChangeText={formik.handleChange('name')}
-          onBlur={formik.handleBlur('name')}
-          error={formik.touched.name ? formik.errors.name : undefined}
-          LeftAccessory={() => (
-            <View style={styles.icon}>
-              <NameIcon size={24} color={nameIconColor} />
-            </View>
-          )}
+        <EcohInput
+          label="Name"
+          name="name"
+          formik={formik}
+          dirty={!!fieldDirty['name']}
+          onChangeText={(text) => {
+            formik.setFieldValue('name', text);
+            markDirty('name');
+          }}
+          icon={(color) => <NameIcon size={24} color={color} />}
+          helperText="How you’ll appear on your profile."
         />
 
-        <Input
-          placeholder="Username"
-          value={formik.values.username}
-          onChangeText={handleUsernameChange}
-          onBlur={formik.handleBlur('username')}
-          error={formik.touched.username ? formik.errors.username : undefined}
-          LeftAccessory={() => (
-            <View style={styles.icon}>
-              <UserNameIcon size={24} color={usernameIconColor} />
-            </View>
-          )}
-          RightAccessory={() => (
+        <EcohInput
+          label="Username"
+          name="username"
+          formik={formik}
+          dirty={!!fieldDirty['username']}
+          onChangeText={(text) => {
+            handleUsernameChange(text);
+          }}
+          icon={(color) => <UserNameIcon size={24} color={color} />}
+          rightAccessory={
             <UsernameAvailabilityIndicator
               isAvailable={isAvailable}
-              isChecking={isChecking}
+              isChecking={isFetching}
               error={
-                formik.touched.username ? formik.errors.username : undefined
+                formik.touched.username && !!fieldDirty['username']
+                  ? formik.errors.username
+                  : undefined
               }
+              value={formik.values.username}
             />
-          )}
+          }
+          helperText="How others find you on Ecoh"
         />
 
         <DateOfBirth
+          label="Date of Birth"
           value={formik.values.dateOfBirth}
           onChange={(date) => formik.setFieldValue('dateOfBirth', date)}
           error={
             formik.touched.dateOfBirth ? formik.errors.dateOfBirth : undefined
           }
-          helperText="This won't be shown publicly"
+          helperText="Used to verify your age. It won’t appear on your profile"
           setFieldError={formik.setFieldError}
           setFieldTouched={formik.setFieldTouched}
         />
@@ -208,7 +184,7 @@ export default function Identity() {
         variant="primary"
         gradientColors={['#00c6ff', '#0072ff']}
         onPress={handleContinuePress}
-        disabled={!formik.isValid || formik.isSubmitting}
+        disabled={formik.isSubmitting || isDisabled}
         title={'Continue'}
         size="large"
       />
@@ -224,7 +200,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    gap: 14,
+    gap: 21,
   },
   icon: {
     alignSelf: 'center',

@@ -4,8 +4,8 @@ export const lightColors = {
   onPrimary: '#FFFFFF', // Text/icon color on primary background
 
   // Secondary Colors
-  secondary: '#E5E7EB', // Secondary brand color
-  onSecondary: '#000000', // Text/icon color on secondary background
+  secondary: '#D1D5DB', // Secondary brand color
+  onSecondary: '#9CA3AF', // Text/icon color on secondary background
 
   // Background Colors
   background: '#FFFFFF', // Main background color
@@ -49,7 +49,9 @@ export const lightColors = {
 
   gradient: ['#00c6ff', '#0072ff'],
 
-  testGray: '#ECF2F5',
+  default: '#D1D5DB',
+  filled: '#999999',
+  focused: 'black',
 };
 
 export const darkColors = {

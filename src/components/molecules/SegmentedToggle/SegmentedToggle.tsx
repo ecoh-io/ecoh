@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  LayoutChangeEvent,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { styles } from './styles';
 import { SegmentedToggleProps } from './types';
+import * as Haptics from 'expo-haptics';
 
 const SegmentedToggle: React.FC<SegmentedToggleProps> = ({
   options,
@@ -16,61 +17,72 @@ const SegmentedToggle: React.FC<SegmentedToggleProps> = ({
   onChange,
 }) => {
   const { colors } = useTheme();
-  const sliderAnim = useRef(new Animated.Value(0)).current;
-  const [segmentWidth, setSegmentWidth] = useState(0);
+
+  const [segmentLayouts, setSegmentLayouts] = useState<number[]>([]);
+  const translateX = useSharedValue(0);
+  const segmentWidth = useSharedValue(0);
 
   useEffect(() => {
-    Animated.spring(sliderAnim, {
-      toValue: activeIndex * segmentWidth,
-      useNativeDriver: true,
-      speed: 20,
-      bounciness: 8,
-    }).start();
-  }, [activeIndex, segmentWidth]);
+    if (segmentLayouts.length === options.length) {
+      const offset = segmentLayouts
+        .slice(0, activeIndex)
+        .reduce((acc, w) => acc + w, 0);
+      translateX.value = withTiming(offset, {
+        duration: 200,
+        easing: Easing.out(Easing.exp),
+      });
+      segmentWidth.value = withTiming(segmentLayouts[activeIndex], {
+        duration: 200,
+        easing: Easing.out(Easing.exp),
+      });
+    }
+  }, [activeIndex, segmentLayouts]);
 
-  const handleLayout = (e: LayoutChangeEvent) => {
-    const totalWidth = e.nativeEvent.layout.width;
-    setSegmentWidth(totalWidth / options.length);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    width: segmentWidth.value,
+  }));
+
+  const handleLayout = (index: number, width: number) => {
+    setSegmentLayouts((prev) => {
+      const updated = [...prev];
+      updated[index] = width;
+      return updated;
+    });
   };
 
   return (
-    <View style={styles.container} onLayout={handleLayout}>
-      {/* Sliding active background */}
-      {segmentWidth > 0 && (
-        <Animated.View
-          style={[
-            styles.activeSegment,
-            {
-              width: segmentWidth - 8,
-              transform: [{ translateX: sliderAnim }],
-              marginLeft: 4,
-            },
-          ]}
-        />
+    <View style={styles.container}>
+      {segmentLayouts.length === options.length && (
+        <Animated.View style={[styles.activeSegment, animatedStyle]} />
       )}
 
       {options.map((option, index) => {
-        const isActive = activeIndex === index;
+        const isActive = index === activeIndex;
+
         return (
           <TouchableOpacity
-            key={option}
-            onPress={() => onChange(index)}
-            style={[
-              styles.segment,
-              {
-                backgroundColor: isActive ? colors.testGray : colors.background,
-              },
-            ]}
+            key={option.label}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onChange(index);
+            }}
+            style={styles.segment}
             activeOpacity={0.9}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isActive }}
+            onLayout={(e) => handleLayout(index, e.nativeEvent.layout.width)}
           >
-            <Text
-              style={[
-                isActive ? styles.activeText : styles.inactiveText,
-                { color: isActive ? '#000' : colors.onSecondary },
-              ]}
-            >
-              {option}
-            </Text>
+            <View style={styles.iconLabelWrapper}>
+              {option.icon && (
+                <View style={styles.iconWrapper}>{option.icon}</View>
+              )}
+              <Text
+                style={[isActive ? styles.activeText : styles.inactiveText]}
+              >
+                {option.label}
+              </Text>
+            </View>
           </TouchableOpacity>
         );
       })}

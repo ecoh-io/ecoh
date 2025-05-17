@@ -7,7 +7,7 @@ import { UsernameAvailabilityIndicatorProps } from './types';
 
 const UsernameAvailabilityIndicator: React.FC<
   UsernameAvailabilityIndicatorProps
-> = ({ isChecking, isAvailable, error }) => {
+> = ({ isChecking, isAvailable, error, value }) => {
   const { colors } = useTheme();
 
   if (error) {
@@ -31,7 +31,7 @@ const UsernameAvailabilityIndicator: React.FC<
     );
   }
 
-  if (isAvailable) {
+  if (isAvailable && !error && value && value.length > 0) {
     return (
       <View style={styles.container}>
         <Ionicons

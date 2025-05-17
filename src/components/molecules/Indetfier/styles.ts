@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   wrapper: {
-    gap: 12,
+    gap: 16,
   },
   icon: {
     alignItems: 'center',

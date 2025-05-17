@@ -12,13 +12,12 @@ import { memo } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { useEdit } from '@/src/context/EditContext';
-import CircularProgressIndicator from '@/src/components/CircularProgressIndicator/CircularProgressIndicator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useMediaUploader } from '@/src/hooks/useMediaUploader';
 import { User } from '@/src/types/user';
-import { Button } from '@/src/components/atoms';
+import { Button, CircularProgressIndicator } from '@/src/components/atoms';
 import { styles } from './styles';
 
 const DEFAULT_PROFILE_IMAGE_URL = 'https://via.placeholder.com/100';

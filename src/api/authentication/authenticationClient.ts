@@ -19,8 +19,12 @@ export interface ConfirmPayload {
   code: string;
   name: string;
   username: string;
-  dateOfBirth: string;
+  dateOfBirth: Date;
   password: string;
+}
+
+export interface UserNameCheckResponse {
+  available: boolean;
 }
 
 export const loginUser = async (
@@ -66,4 +70,13 @@ export const confrimUser = async (
     },
   );
   return response.data;
+};
+
+export const checkUsername = async (username: string): Promise<boolean> => {
+  if (!username) throw new Error('Username is required');
+  const res = await axiosInstance.get<UserNameCheckResponse>(
+    `/users/${encodeURIComponent(username)}/available`,
+    { headers: { skipAuthInterceptor: true } },
+  );
+  return res.data.available;
 };

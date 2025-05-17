@@ -1,8 +1,8 @@
 import { typography } from '@/src/theme/typography';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export const styles = StyleSheet.create({
-  wrapper: {
+  container: {
     marginBottom: 0,
   },
   inputWrapper: {
@@ -18,35 +18,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 54,
   },
-  label: {
-    position: 'absolute',
-    top: -8, // sits just above the border
-    backgroundColor: '#fff',
-    paddingHorizontal: 4,
-    zIndex: 1,
-    fontSize: 12,
-    left: 14,
-    color: '#333',
-    fontFamily: typography.fontFamilies.poppins.medium,
-    pointerEvents: 'none',
-  },
-  countryCodeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  flag: {
-    fontSize: 18,
-    marginRight: 4,
-  },
-  code: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginRight: 6,
-  },
-  divider: {
-    width: 1,
-    height: 24,
+  iconContainer: {
+    // leave empty or size your icon here
   },
   input: {
     flex: 1,
@@ -58,17 +31,35 @@ export const styles = StyleSheet.create({
     height: 54,
     fontFamily: typography.fontFamilies.poppins.medium,
   },
+  floatingLabel: {
+    position: 'absolute',
+    top: -8, // sits just above the border
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    zIndex: 1,
+    fontSize: 12,
+    left: 12,
+    color: '#333',
+    fontFamily: typography.fontFamilies.poppins.medium,
+    pointerEvents: 'none',
+  },
   errorText: {
-    marginTop: 4,
     fontSize: 12,
     lineHeight: 16,
     color: 'red',
     fontFamily: typography.fontFamilies.poppins.medium,
   },
+  helperTextRow: {
+    flexDirection: 'row',
+    width: '90%',
+    gap: 4,
+    marginTop: 8,
+  },
   helperText: {
     fontSize: 12,
-    color: '#888',
-    marginTop: 4,
-    marginLeft: 4,
+    fontFamily: typography.fontFamilies.poppins.medium,
+  },
+  helperIcon: {
+    marginRight: 2,
   },
 });

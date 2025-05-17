@@ -1,5 +1,6 @@
+import { FormikHelpers, FormikValues } from 'formik';
 import { CountryCode } from 'libphonenumber-js/types';
-import { TextInputProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import { TextInputProps } from 'react-native';
 
 export interface ICountryCode {
   code: string;
@@ -8,17 +9,9 @@ export interface ICountryCode {
 }
 
 export interface MobileNumberInputProps extends TextInputProps {
-  label?: string;
-  error?: string;
-  helperText?: string;
-  containerStyle?: StyleProp<ViewStyle>;
-  inputStyle?: StyleProp<TextStyle>;
-  labelStyle?: StyleProp<TextStyle>;
-  errorStyle?: StyleProp<TextStyle>;
-  helperTextStyle?: StyleProp<TextStyle>;
-  countryCode: ICountryCode;
-  onCountryCodePress: () => void;
-  showCountryPicker: boolean;
-  setShowCountryPicker: (val: boolean) => void;
-  handleCountrySelect: (country: ICountryCode) => void;
+  name: string;
+  label: string;
+  formik: FormikValues & FormikHelpers<any>;
+  initialCountry?: CountryCode;
+  onCountryChange?: (country: ICountryCode) => void;
 }

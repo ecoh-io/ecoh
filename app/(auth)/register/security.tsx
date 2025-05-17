@@ -1,20 +1,31 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import {
+  KeyboardAvoidingView,
+  InputAccessoryView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRegistration } from '@/src/context/RegistrationContext';
 import { useTheme } from '@/src/theme/ThemeContext';
 import LockIcon from '@/src/icons/LockIcon';
-import { AsYouType, parsePhoneNumberWithError } from 'libphonenumber-js';
-import { CountryCode } from 'libphonenumber-js/types';
-import PasswordStrength from '@/src/components/molecules/PasswordStrength';
-import { ICountryCode } from '@/src/components/molecules/MobileNumber';
 import Identifier from '@/src/components/molecules/Indetfier/Identifier';
 import { Button, Header, Input } from '@/src/components/atoms';
+import { EcohInput } from '@/src/components/atoms/EcohInput/EcohInput';
+import { parsePhoneNumberWithError } from 'libphonenumber-js';
+import { ICountryCode } from '@/src/components/molecules/MobileNumber';
+import { CountryCode } from 'libphonenumber-js/types';
+import * as Localization from 'expo-localization';
+import { countryMap } from '@/src/lib/countryMap';
+import { Ionicons } from '@expo/vector-icons';
+import { typography } from '@/src/theme/typography';
 
 interface FormValues {
-  identifier: string;
+  email: string;
+  mobile: string;
   password: string;
   confirmPassword: string;
 }
@@ -33,23 +44,20 @@ const passwordSchema = Yup.object().shape({
     .required('Confirm your password'),
 });
 
-const mobileSchema = (countryCode: CountryCode) =>
-  Yup.object().shape({
-    identifier: Yup.string()
-      .required('Mobile number is required')
-      .test('is-valid-mobile', 'Invalid mobile number', (value) => {
-        if (!value) return false;
-        try {
-          return parsePhoneNumberWithError(value, countryCode).isValid();
-        } catch {
-          return false;
-        }
-      }),
-  });
+const getInitialCountry = (): ICountryCode => {
+  const region = Localization.getLocales()[0].regionCode || 'GB';
+  return countryMap[region] || countryMap['GB'];
+};
 
-const emailSchema = Yup.object().shape({
-  identifier: Yup.string().email('Invalid email').required('Email is required'),
-});
+const PasswordTipBar = () => (
+  <View style={styles.tipBar}>
+    <Text style={styles.tipText}>
+      Use 8+ characters with uppercase, lowercase, number, and symbol.
+    </Text>
+  </View>
+);
+
+const inputAccessoryViewID = 'uniqueID';
 
 // 🧠 Component
 export default function Security() {
@@ -57,42 +65,50 @@ export default function Security() {
   const { handleSubmitStep, isSubmitting } = useRegistration();
 
   const [isEmail, setIsEmail] = useState(false);
-  const [showCountryPicker, setShowCountryPicker] = useState(false);
-  const [countryCode, setCountryCode] = useState<ICountryCode>({
-    code: '+44',
-    flag: '🇬🇧',
-    country: 'GB',
-  });
-
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [mobileCountry, setMobileCountry] = useState<ICountryCode>(() =>
+    getInitialCountry(),
+  );
 
   const emailRef = useRef<TextInput>(null);
   const mobileRef = useRef<TextInput>(null);
 
-  const combinedSchema = (isEmail: boolean, country: CountryCode) =>
+  const getValidationSchema = (isEmail: boolean, country: CountryCode) =>
     Yup.object().shape({
-      identifier: isEmail
-        ? emailSchema.fields.identifier
-        : mobileSchema(country).fields.identifier,
+      email: isEmail
+        ? Yup.string().email('Invalid email').required('Email is required')
+        : Yup.string(),
+      mobile: isEmail
+        ? Yup.string()
+        : Yup.string()
+            .required('Mobile number is required')
+            .test('is-valid-mobile', 'Enter a valid mobile number', (value) => {
+              if (!value) return false;
+              try {
+                const parsed = parsePhoneNumberWithError(value, country);
+                return parsed.isValid() && parsed.getType() === 'MOBILE';
+              } catch {
+                return false;
+              }
+            }),
       password: passwordSchema.fields.password,
       confirmPassword: passwordSchema.fields.confirmPassword,
     });
 
   const formik = useFormik<FormValues>({
     initialValues: {
-      identifier: '',
+      email: '',
+      mobile: '',
       password: '',
       confirmPassword: '',
     },
-    validationSchema: combinedSchema(isEmail, countryCode.country),
+    validationSchema: getValidationSchema(isEmail, mobileCountry.country),
     onSubmit: async (values, { setSubmitting }) => {
       try {
         await handleSubmitStep(
-          combinedSchema(isEmail, countryCode.country),
+          getValidationSchema(isEmail, mobileCountry.country),
           ['identifier', 'password'],
           {
-            identifier: values.identifier,
+            identifier: isEmail ? values.email : values.mobile,
             password: values.password,
           },
         );
@@ -103,152 +119,56 @@ export default function Security() {
       }
     },
     validateOnChange: true,
-    validateOnBlur: true,
+    validateOnBlur: false,
   });
 
-  // 🔁 Memoized Handlers
   const toggleInputMode = useCallback(() => {
-    formik.resetForm();
     setIsEmail((prev) => !prev);
   }, [formik]);
-
-  const handleCountryCodePress = useCallback(() => {
-    mobileRef.current?.blur();
-    setShowCountryPicker(true);
-  }, []);
-
-  const handleCountrySelect = useCallback(
-    (country: ICountryCode) => {
-      setCountryCode(country);
-      setShowCountryPicker(false);
-      formik.validateField('identifier');
-    },
-    [formik],
-  );
-
-  const formatPhoneNumber = useCallback(
-    (value: string) => {
-      if (value.includes('(') && !value.includes(')')) {
-        return value.replace('(', '');
-      }
-      return new AsYouType(countryCode.country as CountryCode).input(value);
-    },
-    [countryCode.country],
-  );
-
-  const handleMobileChange = useCallback(
-    (text: string) => {
-      const formatted = formatPhoneNumber(text);
-      formik.setFieldValue('identifier', formatted);
-    },
-    [formatPhoneNumber, formik],
-  );
-
-  const togglePasswordVisibility = useCallback(() => {
-    setPasswordVisible((prev) => !prev);
-  }, []);
-
-  const toggleConfirmPasswordVisibility = useCallback(() => {
-    setConfirmPasswordVisible((prev) => !prev);
-  }, []);
 
   const handleContinuePress = useCallback(() => {
     formik.handleSubmit();
   }, [formik]);
 
-  const getIconColor = useCallback(
-    (field: keyof FormValues) => {
-      return formik.errors[field] && formik.touched[field]
-        ? colors.error
-        : colors.secondary;
-    },
-    [formik.errors, formik.touched, colors],
-  );
-
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.formContainer}>
         <Header
           title="Your security"
-          subtitle="Set your login and password details to keep your Ecoh account safe and secure."
+          subtitle="Set up how you'll sign in and keep your account protected."
           icon={<LockIcon size={32} color={colors.text} />}
         />
 
         <Identifier
-          countryCode={countryCode}
           emailRef={emailRef}
           mobileRef={mobileRef}
           formik={formik}
           isEmail={isEmail}
-          iconColor={getIconColor('identifier')}
-          handleCountryCodePress={handleCountryCodePress}
-          handleMobileChange={handleMobileChange}
           toggleInputMode={toggleInputMode}
-          handleCountrySelect={handleCountrySelect}
-          showCountryPicker={showCountryPicker}
-          setShowCountryPicker={setShowCountryPicker}
+          onCountryChange={(country) => setMobileCountry(country)}
         />
 
-        <View style={{ flexDirection: 'column', gap: 8 }}>
-          <Input
-            placeholder="Password"
-            secureTextEntry={!passwordVisible}
-            value={formik.values.password}
-            onChangeText={formik.handleChange('password')}
-            onBlur={formik.handleBlur('password')}
-            error={formik.touched.password ? formik.errors.password : undefined}
-            LeftAccessory={() => (
-              <View style={styles.icon}>
-                <LockIcon size={24} color={getIconColor('password')} />
-              </View>
-            )}
-            RightAccessory={() => (
-              <TouchableOpacity
-                onPress={togglePasswordVisibility}
-                style={styles.iconButton}
-              >
-                <Ionicons
-                  name={passwordVisible ? 'eye' : 'eye-off'}
-                  size={26}
-                  color={colors.secondary}
-                />
-              </TouchableOpacity>
-            )}
-          />
+        <EcohInput
+          label="Password"
+          name="password"
+          formik={formik}
+          icon={(color) => <LockIcon size={24} color={color} />}
+          secureTextEntry
+          textContentType="password" // iOS + Android autofill context
+          autoComplete="password" // Android + iOS 12+
+          importantForAutofill="yes"
+          inputAccessoryViewID={inputAccessoryViewID}
+        />
 
-          <View style={{ width: '50%' }}>
-            <PasswordStrength password={formik.values.password} />
-          </View>
-        </View>
-
-        <Input
-          placeholder="Confirm Password"
-          secureTextEntry={!confirmPasswordVisible}
-          value={formik.values.confirmPassword}
-          onChangeText={formik.handleChange('confirmPassword')}
-          onBlur={formik.handleBlur('confirmPassword')}
-          error={
-            formik.touched.confirmPassword
-              ? formik.errors.confirmPassword
-              : undefined
-          }
-          LeftAccessory={() => (
-            <View style={styles.icon}>
-              <LockIcon size={24} color={getIconColor('confirmPassword')} />
-            </View>
-          )}
-          RightAccessory={() => (
-            <TouchableOpacity
-              onPress={toggleConfirmPasswordVisibility}
-              style={styles.iconButton}
-            >
-              <Ionicons
-                name={confirmPasswordVisible ? 'eye' : 'eye-off'}
-                size={26}
-                color={colors.secondary}
-              />
-            </TouchableOpacity>
-          )}
+        <EcohInput
+          label="Confrim password"
+          name="confirmPassword"
+          formik={formik}
+          icon={(color) => <LockIcon size={24} color={color} />}
+          secureTextEntry
         />
       </View>
 
@@ -257,10 +177,18 @@ export default function Security() {
         gradientColors={['#00c6ff', '#0072ff']}
         onPress={handleContinuePress}
         disabled={!formik.isValid || formik.isSubmitting}
-        title={'Confirm'}
+        title={'Create Account'}
         size="large"
       />
-    </View>
+
+      <InputAccessoryView nativeID={inputAccessoryViewID}>
+        <View style={styles.tipBar}>
+          <Text style={styles.tipText}>
+            Use 8+ characters with uppercase, lowercase, number, and symbol.
+          </Text>
+        </View>
+      </InputAccessoryView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -273,7 +201,7 @@ const styles = StyleSheet.create({
   formContainer: {
     flex: 1,
     flexDirection: 'column',
-    gap: 14,
+    gap: 16,
   },
   icon: {
     alignSelf: 'center',
@@ -282,5 +210,19 @@ const styles = StyleSheet.create({
   iconButton: {
     alignSelf: 'center',
     marginEnd: 12,
+  },
+  tipBar: {
+    backgroundColor: '#f2f2f2',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    alignItems: 'center',
+  },
+  tipText: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#333',
+    fontFamily: typography.fontFamilies.poppins.medium,
   },
 });

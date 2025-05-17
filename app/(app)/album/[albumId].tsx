@@ -77,7 +77,6 @@ const AlbumDetailsScreen: React.FC = () => {
     if (album?.mediaItems) {
       setAlbumMedia(album.mediaItems);
     }
-    console.log('album', JSON.stringify(album, null, 2));
   }, [album]);
 
   // --- Handlers ---

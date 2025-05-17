@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     fontSize: typography.fontSizes.title,
   },
   subtitle: {
-    fontFamily: typography.fontFamilies.poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
     fontSize: typography.fontSizes.body,
   },
 });

@@ -1,5 +1,8 @@
 export interface SegmentedToggleProps {
-  options: string[];
+  options: Array<{
+    label: string;
+    icon?: React.ReactNode;
+  }>;
   activeIndex: number;
   onChange: (index: number) => void;
 }

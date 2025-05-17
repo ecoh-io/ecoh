@@ -3,22 +3,26 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    marginTop: 6,
     alignSelf: 'stretch',
     alignItems: 'flex-start',
   },
   barContainer: {
     flexDirection: 'row',
-    gap: 6,
-    marginBottom: 4,
+    justifyContent: 'space-between',
+    marginTop: 8,
   },
   segment: {
     flex: 1,
     height: 6,
-    borderRadius: 4,
+    marginHorizontal: 2,
+    borderRadius: 3,
+    backgroundColor: 'gray',
   },
+
   label: {
-    fontSize: 12,
-    fontFamily: typography.fontFamilies.poppins.medium,
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });

@@ -3,11 +3,11 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import Animated, { LinearTransition } from 'react-native-reanimated';
-import { AnimatedWrapper } from '@/src/components/Animations/Animations';
-import CircularProgressIndicator from '@/src/components/CircularProgressIndicator/CircularProgressIndicator';
 import { styles } from './styles';
 import { itemWidth, itemHeight } from '@/app/(app)/album/[albumId]';
 import { GridItemProps } from './types';
+import AnimatedWrapper from '@/src/animation/AnimatedWrapper';
+import { CircularProgressIndicator } from '@/src/components/atoms';
 
 const GridItem: React.FC<GridItemProps> = ({
   item,
