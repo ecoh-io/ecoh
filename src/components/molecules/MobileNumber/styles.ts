@@ -45,8 +45,9 @@ export const styles = StyleSheet.create({
     marginRight: 6,
   },
   divider: {
-    width: 1,
+    width: 2,
     height: 24,
+    borderRadius: 1,
   },
   input: {
     flex: 1,

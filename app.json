@@ -16,7 +16,8 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         },
-        "UILaunchStoryboardName": "SplashScreen"
+        "UILaunchStoryboardName": "SplashScreen",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "buildNumber": "1.0.0"
     },

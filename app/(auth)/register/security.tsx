@@ -1,27 +1,22 @@
 import React, { useCallback, useRef, useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  InputAccessoryView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRegistration } from '@/src/context/RegistrationContext';
 import { useTheme } from '@/src/theme/ThemeContext';
 import LockIcon from '@/src/icons/LockIcon';
 import Identifier from '@/src/components/molecules/Indetfier/Identifier';
-import { Button, Header, Input } from '@/src/components/atoms';
+import { Button, Header } from '@/src/components/atoms';
 import { EcohInput } from '@/src/components/atoms/EcohInput/EcohInput';
 import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import { ICountryCode } from '@/src/components/molecules/MobileNumber';
 import { CountryCode } from 'libphonenumber-js/types';
 import * as Localization from 'expo-localization';
 import { countryMap } from '@/src/lib/countryMap';
-import { Ionicons } from '@expo/vector-icons';
 import { typography } from '@/src/theme/typography';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import PasswordStrengthMeter from '@/src/components/atoms/PasswordStrength/PasswordStrength';
 
 interface FormValues {
   email: string;
@@ -57,12 +52,11 @@ const PasswordTipBar = () => (
   </View>
 );
 
-const inputAccessoryViewID = 'uniqueID';
-
 // 🧠 Component
 export default function Security() {
   const { colors } = useTheme();
   const { handleSubmitStep, isSubmitting } = useRegistration();
+  const [fieldDirty, setFieldDirty] = useState<{ [key: string]: boolean }>({});
 
   const [isEmail, setIsEmail] = useState(false);
   const [mobileCountry, setMobileCountry] = useState<ICountryCode>(() =>
@@ -71,6 +65,8 @@ export default function Security() {
 
   const emailRef = useRef<TextInput>(null);
   const mobileRef = useRef<TextInput>(null);
+  const scrollViewRef = useRef<any>(null);
+  const insets = useSafeAreaInsets();
 
   const getValidationSchema = (isEmail: boolean, country: CountryCode) =>
     Yup.object().shape({
@@ -118,8 +114,8 @@ export default function Security() {
         setSubmitting(false);
       }
     },
-    validateOnChange: true,
     validateOnBlur: false,
+    validateOnChange: true,
   });
 
   const toggleInputMode = useCallback(() => {
@@ -130,78 +126,98 @@ export default function Security() {
     formik.handleSubmit();
   }, [formik]);
 
+  const markDirty = useCallback((name: string) => {
+    setFieldDirty((prev) => ({ ...prev, [name]: true }));
+  }, []);
+
+  const isDisabled =
+    !formik.values.email ||
+    !formik.values.mobile ||
+    !formik.values.password ||
+    !formik.values.confirmPassword;
+
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
-      <View style={styles.formContainer}>
-        <Header
-          title="Your security"
-          subtitle="Set up how you'll sign in and keep your account protected."
-          icon={<LockIcon size={32} color={colors.text} />}
-        />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <KeyboardAwareScrollView
+        ref={scrollViewRef}
+        style={{ backgroundColor: colors.background }}
+        contentContainerStyle={[styles.container, { paddingBottom: 100 }]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bottomOffset={insets.bottom + 210}
+      >
+        <View style={styles.formContainer}>
+          <Header
+            title="Your security"
+            subtitle="Set up how you'll sign in and keep your account protected."
+            icon={<LockIcon size={32} color={colors.text} />}
+          />
 
-        <Identifier
-          emailRef={emailRef}
-          mobileRef={mobileRef}
-          formik={formik}
-          isEmail={isEmail}
-          toggleInputMode={toggleInputMode}
-          onCountryChange={(country) => setMobileCountry(country)}
-        />
+          <Identifier
+            emailRef={emailRef}
+            mobileRef={mobileRef}
+            formik={formik}
+            isEmail={isEmail}
+            toggleInputMode={toggleInputMode}
+            onCountryChange={(country) => setMobileCountry(country)}
+          />
 
-        <EcohInput
-          label="Password"
-          name="password"
-          formik={formik}
-          icon={(color) => <LockIcon size={24} color={color} />}
-          secureTextEntry
-          textContentType="password" // iOS + Android autofill context
-          autoComplete="password" // Android + iOS 12+
-          importantForAutofill="yes"
-          inputAccessoryViewID={inputAccessoryViewID}
-        />
+          <EcohInput
+            label="Password"
+            name="password"
+            formik={formik}
+            dirty={!!fieldDirty['password']}
+            onChangeText={(text) => {
+              formik.setFieldValue('password', text);
+              markDirty('password');
+            }}
+            icon={(color) => <LockIcon size={24} color={color} />}
+            secureTextEntry
+            textContentType="password" // iOS + Android autofill context
+            autoComplete="password" // Android + iOS 12+
+            importantForAutofill="yes"
+            helperText="8+ characters, upper & lowercase, numbers, and symbols."
+          />
 
-        <EcohInput
-          label="Confrim password"
-          name="confirmPassword"
-          formik={formik}
-          icon={(color) => <LockIcon size={24} color={color} />}
-          secureTextEntry
+          <EcohInput
+            label="Confrim password"
+            name="confirmPassword"
+            formik={formik}
+            dirty={!!fieldDirty['confirmPassword']}
+            onChangeText={(text) => {
+              formik.setFieldValue('confirmPassword', text);
+              markDirty('confirmPassword');
+            }}
+            icon={(color) => <LockIcon size={24} color={color} />}
+            secureTextEntry
+            showError={true}
+          />
+        </View>
+      </KeyboardAwareScrollView>
+
+      <View style={styles.buttonBar}>
+        <Button
+          variant="primary"
+          gradientColors={['#00c6ff', '#0072ff']}
+          onPress={handleContinuePress}
+          disabled={formik.isSubmitting || isDisabled}
+          title={'Create Account'}
+          size="large"
         />
       </View>
-
-      <Button
-        variant="primary"
-        gradientColors={['#00c6ff', '#0072ff']}
-        onPress={handleContinuePress}
-        disabled={!formik.isValid || formik.isSubmitting}
-        title={'Create Account'}
-        size="large"
-      />
-
-      <InputAccessoryView nativeID={inputAccessoryViewID}>
-        <View style={styles.tipBar}>
-          <Text style={styles.tipText}>
-            Use 8+ characters with uppercase, lowercase, number, and symbol.
-          </Text>
-        </View>
-      </InputAccessoryView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingTop: 14,
+    justifyContent: 'flex-start',
   },
   formContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 16,
+    gap: 21,
   },
   icon: {
     alignSelf: 'center',
@@ -224,5 +240,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     fontFamily: typography.fontFamilies.poppins.medium,
+  },
+  buttonBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 });

@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
     color: 'red',
-    fontFamily: typography.fontFamilies.poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   helperTextRow: {
     flexDirection: 'row',
@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
   },
   helperText: {
     fontSize: 12,
-    fontFamily: typography.fontFamilies.poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   helperIcon: {
     marginRight: 2,

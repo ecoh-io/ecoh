@@ -3,8 +3,7 @@ import { typography } from '@/src/theme/typography';
 
 export const styles = StyleSheet.create({
   container: {
-    flexDirection: 'column',
-    gap: 6,
+    marginBottom: 0,
   },
   label: {
     position: 'absolute',
@@ -42,12 +41,13 @@ export const styles = StyleSheet.create({
   },
   helperTextRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    width: '90%',
     gap: 4,
+    marginTop: 8,
   },
   helperText: {
     fontSize: 12,
-    fontFamily: typography.fontFamilies.poppins.medium,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   helperIcon: {
     marginRight: 2,
@@ -56,13 +56,6 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
     color: 'red',
-    fontFamily: typography.fontFamilies.poppins.medium,
-  },
-  errorChip: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 16,
-    alignSelf: 'flex-start',
-    marginTop: 4,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
   },
 });

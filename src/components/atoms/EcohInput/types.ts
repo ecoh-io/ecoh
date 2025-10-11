@@ -7,7 +7,7 @@ export interface EcohInputProps extends TextInputProps {
   formik: FormikValues & FormikHelpers<any>;
   icon?: (color: string) => React.ReactNode;
   secureTextEntry?: boolean;
-  rightAccessory?: React.ReactNode;
+  rightAccessory?: (color: string) => React.ReactNode;
   showError?: boolean;
   helperText?: string;
   dirty?: boolean;

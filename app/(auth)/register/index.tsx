@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, TextInput, View } from 'react-native';
 import _ from 'lodash';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { useRegistration } from '@/src/context/RegistrationContext';
@@ -14,6 +14,11 @@ import UsernameAvailabilityIndicator from '@/src/components/atoms/UsernameAvaila
 import { EcohInput } from '@/src/components/atoms/EcohInput/EcohInput';
 import { useUsernameAvailability } from '@/src/api/authentication/authenticationQuery';
 import { useDebounce } from 'use-debounce';
+import {
+  KeyboardAvoidingView,
+  KeyboardAwareScrollView,
+} from 'react-native-keyboard-controller';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -29,8 +34,6 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-const usernameSchema = validationSchema.fields.username as Yup.StringSchema;
-
 interface FormValues {
   name: string;
   username: string;
@@ -41,6 +44,9 @@ export default function Identity() {
   const { state, handleSubmitStep } = useRegistration();
   const { colors } = useTheme();
   const [fieldDirty, setFieldDirty] = useState<{ [key: string]: boolean }>({});
+  const nameInputRef = useRef<TextInput>(null);
+  const usernameInputRef = useRef<TextInput>(null);
+  const insets = useSafeAreaInsets();
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -72,7 +78,6 @@ export default function Identity() {
 
   const username = formik.values.username;
   const [debouncedUsername] = useDebounce(username, 500);
-  const latestCheckedUsername = useRef('');
 
   const shouldCheck = debouncedUsername.length >= 3 && !formik.errors.username;
   const { data: isAvailable, isFetching } = useUsernameAvailability(
@@ -90,7 +95,6 @@ export default function Identity() {
     [formik],
   );
 
-  // If not available, set field error
   useEffect(() => {
     // Whenever the debouncedUsername changes, clear the error to prevent flicker
     if (shouldCheck) {
@@ -122,84 +126,96 @@ export default function Identity() {
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.formContainer}>
-        <Header
-          title="Your identity"
-          subtitle="Start shaping your identity with your name and a unique username"
-          icon={<IdentityIcon size={32} color={colors.text} />}
-        />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <KeyboardAwareScrollView
+        style={{ backgroundColor: colors.background }}
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bottomOffset={insets.bottom + 210}
+      >
+        <View style={styles.formContainer}>
+          <Header
+            title="Your identity"
+            subtitle="Start shaping your identity with your name and a unique username"
+            icon={<IdentityIcon size={32} color={colors.text} />}
+          />
 
-        <EcohInput
-          label="Name"
-          name="name"
-          formik={formik}
-          dirty={!!fieldDirty['name']}
-          onChangeText={(text) => {
-            formik.setFieldValue('name', text);
-            markDirty('name');
-          }}
-          icon={(color) => <NameIcon size={24} color={color} />}
-          helperText="How you’ll appear on your profile."
-        />
+          <EcohInput
+            ref={nameInputRef}
+            label="Name"
+            name="name"
+            formik={formik}
+            dirty={!!fieldDirty['name']}
+            onChangeText={(text) => {
+              formik.setFieldValue('name', text);
+              markDirty('name');
+            }}
+            icon={(color) => <NameIcon size={24} color={color} />}
+            helperText="How you’ll appear on your profile."
+          />
 
-        <EcohInput
-          label="Username"
-          name="username"
-          formik={formik}
-          dirty={!!fieldDirty['username']}
-          onChangeText={(text) => {
-            handleUsernameChange(text);
-          }}
-          icon={(color) => <UserNameIcon size={24} color={color} />}
-          rightAccessory={
-            <UsernameAvailabilityIndicator
-              isAvailable={isAvailable}
-              isChecking={isFetching}
-              error={
-                formik.touched.username && !!fieldDirty['username']
-                  ? formik.errors.username
-                  : undefined
-              }
-              value={formik.values.username}
-            />
-          }
-          helperText="How others find you on Ecoh"
-        />
+          <EcohInput
+            ref={usernameInputRef}
+            label="Username"
+            name="username"
+            formik={formik}
+            dirty={!!fieldDirty['username']}
+            onChangeText={(text) => {
+              handleUsernameChange(text);
+            }}
+            icon={(color) => <UserNameIcon size={24} color={color} />}
+            rightAccessory={() => (
+              <UsernameAvailabilityIndicator
+                isAvailable={isAvailable}
+                isChecking={isFetching}
+                error={
+                  formik.touched.username && !!fieldDirty['username']
+                    ? formik.errors.username
+                    : undefined
+                }
+                value={formik.values.username}
+              />
+            )}
+            helperText="How others find you on Ecoh"
+          />
 
-        <DateOfBirth
-          label="Date of Birth"
-          value={formik.values.dateOfBirth}
-          onChange={(date) => formik.setFieldValue('dateOfBirth', date)}
-          error={
-            formik.touched.dateOfBirth ? formik.errors.dateOfBirth : undefined
-          }
-          helperText="Used to verify your age. It won’t appear on your profile"
-          setFieldError={formik.setFieldError}
-          setFieldTouched={formik.setFieldTouched}
+          <DateOfBirth
+            label="Date of Birth"
+            value={formik.values.dateOfBirth}
+            onChange={(date) => formik.setFieldValue('dateOfBirth', date)}
+            error={
+              formik.touched.dateOfBirth ? formik.errors.dateOfBirth : undefined
+            }
+            helperText="Used to verify your age. It won’t appear on your profile"
+            setFieldError={formik.setFieldError}
+            setFieldTouched={formik.setFieldTouched}
+          />
+        </View>
+      </KeyboardAwareScrollView>
+      <View style={styles.buttonBar}>
+        <Button
+          variant="primary"
+          gradientColors={['#00c6ff', '#0072ff']}
+          onPress={handleContinuePress}
+          disabled={formik.isSubmitting || isDisabled}
+          title={'Continue'}
+          size="large"
         />
       </View>
-
-      <Button
-        variant="primary"
-        gradientColors={['#00c6ff', '#0072ff']}
-        onPress={handleContinuePress}
-        disabled={formik.isSubmitting || isDisabled}
-        title={'Continue'}
-        size="large"
-      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: 16,
-    paddingVertical: 20,
+    marginTop: 14,
+    justifyContent: 'flex-start',
   },
   formContainer: {
-    flex: 1,
+    flexGrow: 1,
     gap: 21,
   },
   icon: {
@@ -209,5 +225,9 @@ const styles = StyleSheet.create({
   status: {
     alignSelf: 'center',
     marginEnd: 6,
+  },
+  buttonBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 });

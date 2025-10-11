@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useRegistration } from '@/src/context/RegistrationContext';
 import AnimatedProgressRing from './AnimatedProgressRing';
 import HeaderWithBack from '@/src/components/layout/HeaderWithBack';
+import * as Haptics from 'expo-haptics';
 
 const RegistrationHeader: React.FC = () => {
   const { prevStep, state, clearFormData, steps } = useRegistration();
@@ -21,6 +22,7 @@ const RegistrationHeader: React.FC = () => {
   }, []);
 
   const showAlert = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (state.currentStep === 0) {
       Alert.alert(
         'Do you want to stop creating your account?',

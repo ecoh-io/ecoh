@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, LayoutChangeEvent } from 'react-native';
+import { View, LayoutChangeEvent, Pressable } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -16,6 +16,8 @@ import PhoneIcon from '@/src/icons/PhoneIcon';
 import MobileNumberInput from '../MobileNumber/MobileNumber';
 import SegmentedToggle from '../SegmentedToggle';
 import { EcohInput } from '../../atoms/EcohInput/EcohInput';
+import RefreshArrowIcon from '@/src/icons/RefreshIcon';
+import SwitchArrowsIcon from '@/src/icons/SwitchIcon';
 
 const Identifier: React.FC<IdentifierProps> = ({
   isEmail,
@@ -66,16 +68,7 @@ const Identifier: React.FC<IdentifierProps> = ({
   };
 
   return (
-    <View style={styles.wrapper}>
-      <SegmentedToggle
-        options={[
-          { label: 'Mobile', icon: <PhoneIcon size={18} /> },
-          { label: 'Email', icon: <MailIcon size={18} /> },
-        ]}
-        activeIndex={isEmail ? 1 : 0}
-        onChange={handleToggle}
-      />
-
+    <View>
       <View
         style={{ height: containerHeight || undefined, position: 'relative' }}
       >
@@ -94,7 +87,11 @@ const Identifier: React.FC<IdentifierProps> = ({
             textContentType="emailAddress"
             autoComplete="email"
             importantForAutofill="yes"
-            helperText="Email"
+            rightAccessory={(color) => (
+              <Pressable onPress={() => toggleInputMode()}>
+                <SwitchArrowsIcon size={24} color={color} />
+              </Pressable>
+            )}
           />
         </Animated.View>
 
@@ -108,6 +105,11 @@ const Identifier: React.FC<IdentifierProps> = ({
             formik={formik}
             initialCountry="GB"
             onCountryChange={onCountryChange}
+            rightAccessory={(color) => (
+              <Pressable onPress={() => toggleInputMode()}>
+                <SwitchArrowsIcon size={24} color={color} />
+              </Pressable>
+            )}
           />
         </Animated.View>
       </View>

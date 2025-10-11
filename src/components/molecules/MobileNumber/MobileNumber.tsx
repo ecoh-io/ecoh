@@ -1,11 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
 import Animated, {
   useSharedValue,
   useDerivedValue,
   useAnimatedStyle,
   interpolateColor,
   withTiming,
+  useAnimatedProps,
+  useAnimatedReaction,
+  runOnJS,
 } from 'react-native-reanimated';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { CountryPicker } from 'react-native-country-codes-picker';
@@ -13,6 +22,7 @@ import { AsYouType } from 'libphonenumber-js';
 import { CountryCode } from 'libphonenumber-js/types';
 import { MobileNumberInputProps, ICountryCode } from './types';
 import { styles } from './styles';
+import MailIcon from '@/src/icons/MailIcon';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -22,6 +32,7 @@ const MobileNumberInput: React.FC<MobileNumberInputProps> = ({
   formik,
   initialCountry = 'GB',
   onCountryChange,
+  rightAccessory,
   ...rest
 }) => {
   const { colors } = useTheme();
@@ -49,6 +60,7 @@ const MobileNumberInput: React.FC<MobileNumberInputProps> = ({
   const isTouched = touched[name];
   const hasError = !!(error && isTouched);
 
+  const [iconTint, setIconTint] = useState(colors.secondary);
   const [isFocused, setIsFocused] = useState(false);
   const focused = useSharedValue(false);
   const filled = useSharedValue(!!value);
@@ -60,17 +72,13 @@ const MobileNumberInput: React.FC<MobileNumberInputProps> = ({
   }, [value, hasError]);
 
   const visualState = useDerivedValue(() =>
-    withTiming(
-      hasErrorShared.value ? 3 : focused.value ? 2 : filled.value ? 1 : 0,
-      {
-        duration: 160,
-      },
-    ),
+    withTiming(hasErrorShared.value ? 3 : focused.value ? 2 : 1, {
+      duration: 160,
+    }),
   );
 
   const colorStates = {
     default: colors.default,
-    filled: colors.filled,
     focused: colors.focused,
     error: colors.error,
   };
@@ -78,13 +86,8 @@ const MobileNumberInput: React.FC<MobileNumberInputProps> = ({
   const borderStyle = useAnimatedStyle(() => ({
     borderColor: interpolateColor(
       visualState.value,
-      [0, 1, 2, 3],
-      [
-        colorStates.default,
-        colorStates.filled,
-        colorStates.focused,
-        colorStates.error,
-      ],
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
     ),
     borderWidth: 2,
   }));
@@ -92,40 +95,52 @@ const MobileNumberInput: React.FC<MobileNumberInputProps> = ({
   const labelStyle = useAnimatedStyle(() => ({
     color: interpolateColor(
       visualState.value,
-      [0, 1, 2, 3],
-      [
-        colorStates.default,
-        colorStates.filled,
-        colorStates.focused,
-        colorStates.error,
-      ],
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
     ),
   }));
 
   const textColor = useAnimatedStyle(() => ({
     color: interpolateColor(
       visualState.value,
-      [0, 1, 2, 3],
-      [
-        colorStates.default,
-        colorStates.filled,
-        colorStates.focused,
-        colorStates.error,
-      ],
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
     ),
   }));
 
   const dividerColor = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
       visualState.value,
-      [0, 1, 2, 3],
-      [
-        colorStates.default,
-        colorStates.filled,
-        colorStates.focused,
-        colorStates.error,
-      ],
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
     ),
+  }));
+
+  const animatedPlaceholderColor = useDerivedValue(() =>
+    interpolateColor(
+      visualState.value,
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
+    ),
+  );
+
+  const animatedIconColor = useDerivedValue(() =>
+    interpolateColor(
+      visualState.value,
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
+    ),
+  );
+  useAnimatedReaction(
+    () => animatedIconColor.value,
+    (current, previous) => {
+      if (current !== previous) runOnJS(setIconTint)(current);
+    },
+    [],
+  );
+
+  const animatedInputProps = useAnimatedProps(() => ({
+    placeholderTextColor: animatedPlaceholderColor.value,
   }));
 
   const handleFocus = () => {
@@ -191,13 +206,16 @@ const MobileNumberInput: React.FC<MobileNumberInputProps> = ({
             onFocus={handleFocus}
             onBlur={handleBlur}
             placeholder={!isFocused && !value ? label : ''}
-            placeholderTextColor={colors.secondary}
+            animatedProps={animatedInputProps}
             style={[styles.input, textColor]}
             keyboardType="phone-pad"
             accessibilityLabel={label}
             accessible
             {...rest}
           />
+          {rightAccessory && (
+            <View style={{ marginRight: 4 }}>{rightAccessory(iconTint)}</View>
+          )}
         </View>
       </Animated.View>
 

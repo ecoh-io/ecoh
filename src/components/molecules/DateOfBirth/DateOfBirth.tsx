@@ -12,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as Localization from 'expo-localization';
 import Animated, {
+  FadeIn,
+  FadeOut,
   interpolateColor,
   runOnJS,
   useAnimatedReaction,
@@ -23,7 +25,6 @@ import Animated, {
 import { useTheme } from '@/src/theme/ThemeContext';
 import { styles } from './styles';
 import { DateOfBirthProps } from './types';
-import AnimatedWrapper from '@/src/animation/AnimatedWrapper';
 
 if (
   Platform.OS === 'android' &&
@@ -58,15 +59,13 @@ const DateInput: React.FC<DateOfBirthProps> = ({
 
   // 0 = default, 1 = filled, 2 = focused, 3 = error
   const animatedVisualState = useDerivedValue(() =>
-    withTiming(
-      hasErrorShared.value ? 3 : focused.value ? 2 : filled.value ? 1 : 0,
-      { duration: 160 },
-    ),
+    withTiming(hasErrorShared.value ? 3 : focused.value ? 2 : 1, {
+      duration: 160,
+    }),
   );
 
   const colorStates = {
     default: colors.default,
-    filled: colors.filled,
     focused: colors.focused,
     error: colors.error,
   };
@@ -76,13 +75,8 @@ const DateInput: React.FC<DateOfBirthProps> = ({
     borderWidth: 2,
     borderColor: interpolateColor(
       animatedVisualState.value,
-      [0, 1, 2, 3],
-      [
-        colorStates.default,
-        colorStates.filled,
-        colorStates.focused,
-        colorStates.error,
-      ],
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
     ),
   }));
 
@@ -90,13 +84,8 @@ const DateInput: React.FC<DateOfBirthProps> = ({
   const labelStyle = useAnimatedStyle(() => ({
     color: interpolateColor(
       animatedVisualState.value,
-      [0, 1, 2, 3],
-      [
-        colorStates.default,
-        colorStates.filled,
-        colorStates.focused,
-        colorStates.error,
-      ],
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
     ),
   }));
 
@@ -104,13 +93,8 @@ const DateInput: React.FC<DateOfBirthProps> = ({
   const textStyle = useAnimatedStyle(() => ({
     color: interpolateColor(
       animatedVisualState.value,
-      [0, 1, 2, 3],
-      [
-        colorStates.default,
-        colorStates.filled,
-        colorStates.focused,
-        colorStates.error,
-      ],
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
     ),
   }));
 
@@ -119,13 +103,8 @@ const DateInput: React.FC<DateOfBirthProps> = ({
   const animatedIconColor = useDerivedValue(() =>
     interpolateColor(
       animatedVisualState.value,
-      [0, 1, 2, 3],
-      [
-        colorStates.default,
-        colorStates.filled,
-        colorStates.focused,
-        colorStates.error,
-      ],
+      [1, 2, 3],
+      [colorStates.default, colorStates.focused, colorStates.error],
     ),
   );
   useAnimatedReaction(
@@ -140,14 +119,11 @@ const DateInput: React.FC<DateOfBirthProps> = ({
   const helperColor = useDerivedValue(() =>
     interpolateColor(
       animatedVisualState.value,
-      [0, 1, 2],
-      [colorStates.default, colorStates.filled, colorStates.focused],
+      [1, 2],
+      [colorStates.default, colorStates.focused],
     ),
   );
   const helperTextStyle = useAnimatedStyle(() => ({
-    color: helperColor.value,
-  }));
-  const helperIconStyle = useAnimatedStyle(() => ({
     color: helperColor.value,
   }));
 
@@ -193,6 +169,9 @@ const DateInput: React.FC<DateOfBirthProps> = ({
 
   const [isPickerVisible, setPickerVisible] = useState(false);
 
+  const showErrorMsg = !!error && !!error.length;
+  const showHelperMsg = !!helperText && !showErrorMsg;
+
   return (
     <View style={styles.container}>
       {label && (
@@ -226,25 +205,40 @@ const DateInput: React.FC<DateOfBirthProps> = ({
         </TouchableOpacity>
       </Animated.View>
 
-      {error ? (
-        <AnimatedWrapper
-          visible
-          animation="fade-in"
-          exitAnimation="fade-out"
-          duration={250}
+      {(showErrorMsg || showHelperMsg) && (
+        <Animated.View
+          key={showErrorMsg ? 'error' : 'helper'}
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut.duration(200)}
+          style={showErrorMsg ? undefined : undefined}
         >
-          <Text style={styles.errorText}>{error}</Text>
-        </AnimatedWrapper>
-      ) : helperText ? (
-        <View style={styles.helperTextRow}>
-          <Animated.View>
-            <Ionicons name="alert-circle-outline" size={16} color={iconColor} />
-          </Animated.View>
-          <Animated.Text style={[styles.helperText, helperTextStyle]}>
-            {helperText}
-          </Animated.Text>
-        </View>
-      ) : null}
+          {showErrorMsg ? (
+            <View style={styles.helperTextRow}>
+              <Animated.View>
+                <Ionicons
+                  name="alert-circle-outline"
+                  size={16}
+                  color={iconColor}
+                />
+              </Animated.View>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : (
+            <View style={styles.helperTextRow}>
+              <Animated.View>
+                <Ionicons
+                  name="alert-circle-outline"
+                  size={16}
+                  color={iconColor}
+                />
+              </Animated.View>
+              <Animated.Text style={[styles.helperText, helperTextStyle]}>
+                {helperText}
+              </Animated.Text>
+            </View>
+          )}
+        </Animated.View>
+      )}
 
       <DateTimePickerModal
         isVisible={isPickerVisible}
@@ -253,6 +247,7 @@ const DateInput: React.FC<DateOfBirthProps> = ({
         onCancel={() => {
           setPickerVisible(false);
           focused.value = false;
+          Keyboard.dismiss();
         }}
         maximumDate={new Date()}
         minimumDate={new Date(1900, 0, 1)}

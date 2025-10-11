@@ -7,6 +7,8 @@ import queryClient from '@/src/utils/queryClient';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { ActivityIndicator, View } from 'react-native';
 import { WithFonts } from './components/WithFonts';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   const loading = useAuthStore((state) => state.loading);
@@ -28,9 +30,13 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <WithFonts>
-          <Slot />
-        </WithFonts>
+        <SafeAreaProvider>
+          <KeyboardProvider>
+            <WithFonts>
+              <Slot />
+            </WithFonts>
+          </KeyboardProvider>
+        </SafeAreaProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

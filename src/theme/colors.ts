@@ -49,9 +49,8 @@ export const lightColors = {
 
   gradient: ['#00c6ff', '#0072ff'],
 
-  default: '#D1D5DB',
-  filled: '#999999',
-  focused: 'black',
+  default: '#999999',
+  focused: '#2C2C2E',
 };
 
 export const darkColors = {

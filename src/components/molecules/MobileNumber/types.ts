@@ -14,4 +14,5 @@ export interface MobileNumberInputProps extends TextInputProps {
   formik: FormikValues & FormikHelpers<any>;
   initialCountry?: CountryCode;
   onCountryChange?: (country: ICountryCode) => void;
+  rightAccessory?: (color: string) => React.ReactNode;
 }

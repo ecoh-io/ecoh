@@ -1,32 +1,19 @@
-import { useTheme } from '@/src/theme/ThemeContext';
 import { Stack } from 'expo-router';
 import { UnauthenticatedRoute } from '../components/UnauthenticatedRoute';
-import Screen from '@/src/components/layout/Screen';
 
 export default function Layout() {
-  const { colors, isDark } = useTheme();
   return (
     <UnauthenticatedRoute>
-      <Screen
-        preset="fixed"
-        safeAreaEdges={['top', 'bottom']}
-        backgroundColor={colors.background}
-        contentContainerStyle={{
-          flex: 1,
+      <Stack
+        initialRouteName="index"
+        screenOptions={{
+          headerShown: false,
         }}
-        statusBarStyle={isDark ? 'light' : 'dark'}
       >
-        <Stack
-          initialRouteName="index"
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="login" />
-          <Stack.Screen name="register" />
-        </Stack>
-      </Screen>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" />
+      </Stack>
     </UnauthenticatedRoute>
   );
 }
