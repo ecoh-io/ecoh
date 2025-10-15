@@ -4,8 +4,8 @@ export const lightColors = {
   onPrimary: '#FFFFFF', // Text/icon color on primary background
 
   // Secondary Colors
-  secondary: '#D1D5DB', // Secondary brand color
-  onSecondary: '#9CA3AF', // Text/icon color on secondary background
+  secondary: '#E0E0E0', // Secondary brand color
+  onSecondary: '#999999', // Text/icon color on secondary background
 
   // Background Colors
   background: '#FFFFFF', // Main background color
@@ -49,7 +49,8 @@ export const lightColors = {
 
   gradient: ['#00c6ff', '#0072ff'],
 
-  default: '#999999',
+  default: '#CFCFCF',
+  filled: '#999999',
   focused: '#2C2C2E',
 };
 

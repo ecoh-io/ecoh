@@ -139,7 +139,7 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
 }) => {
   const [state, dispatch] = useReducer(registrationReducer, initialState);
   const router = useRouter();
-  const steps = ['Identity', 'Password'];
+  const steps = ['Identity', 'Identifier', 'Password'];
 
   // Function to update form data
   const setFormData = useCallback((newData: Partial<FormData>) => {
@@ -197,7 +197,8 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
   // Function to navigate to the appropriate screen
   const goToNextScreen = useCallback(() => {
     const stepRoutes: Record<number, Href> = {
-      0: '/(auth)/register/security',
+      0: '/(auth)/register/identifier',
+      1: '/(auth)/register/security',
     };
 
     const nextRoute = stepRoutes[state.currentStep];
@@ -213,7 +214,6 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({
       router.push('/(auth)/register/one-time-passcode');
     },
     onError: (error: any) => {
-      // Example: handle server-side identifier (email/phone) error
       if (error.status === 409) {
         setFieldError('identifier', error.message.message);
         prevStep();

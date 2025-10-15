@@ -1,11 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Pressable,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
   useDerivedValue,
@@ -18,11 +12,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { CountryPicker } from 'react-native-country-codes-picker';
-import { AsYouType } from 'libphonenumber-js';
-import { CountryCode } from 'libphonenumber-js/types';
+import { AsYouType, CountryCode } from 'libphonenumber-js';
 import { MobileNumberInputProps, ICountryCode } from './types';
 import { styles } from './styles';
-import MailIcon from '@/src/icons/MailIcon';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 

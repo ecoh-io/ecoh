@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Platform, StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 import _ from 'lodash';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { useRegistration } from '@/src/context/RegistrationContext';
@@ -14,10 +14,7 @@ import UsernameAvailabilityIndicator from '@/src/components/atoms/UsernameAvaila
 import { EcohInput } from '@/src/components/atoms/EcohInput/EcohInput';
 import { useUsernameAvailability } from '@/src/api/authentication/authenticationQuery';
 import { useDebounce } from 'use-debounce';
-import {
-  KeyboardAvoidingView,
-  KeyboardAwareScrollView,
-} from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = Yup.object().shape({
@@ -152,7 +149,7 @@ export default function Identity() {
               markDirty('name');
             }}
             icon={(color) => <NameIcon size={24} color={color} />}
-            helperText="How you’ll appear on your profile."
+            helperText="Displayed on your profile and visible to others"
           />
 
           <EcohInput
@@ -177,7 +174,7 @@ export default function Identity() {
                 value={formik.values.username}
               />
             )}
-            helperText="How others find you on Ecoh"
+            helperText="Your unique handle for mentions and search"
           />
 
           <DateOfBirth
@@ -216,7 +213,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flexGrow: 1,
-    gap: 21,
+    gap: 26,
   },
   icon: {
     alignSelf: 'center',

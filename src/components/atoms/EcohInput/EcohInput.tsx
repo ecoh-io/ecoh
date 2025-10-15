@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, forwardRef } from 'react';
-import { Text, View, Pressable, TextInputProps, TextInput } from 'react-native';
+import { Text, View, Pressable, TextInput } from 'react-native';
 import Animated, {
   useSharedValue,
   useDerivedValue,
@@ -11,14 +11,12 @@ import Animated, {
   withTiming,
   FadeIn,
   FadeOut,
-  withDelay,
 } from 'react-native-reanimated';
 import { styles } from './styles';
 import { EcohInputProps } from './types';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/src/theme/ThemeContext';
 
-// create an animated TextInput
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 export const EcohInput = forwardRef<TextInput, EcohInputProps>(
@@ -77,17 +75,25 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
       [],
     );
 
-    // 0 = default, 1 = filled, 2 = focused, 3 = error
+    // 0 = default, 1 = filled, 2 = focused, 3 = filled, 3 = error
     const animatedVisualState = useDerivedValue(() =>
-      withTiming(hasErrorShared.value ? 3 : focused.value ? 2 : 1, {
-        duration: 160,
-      }),
+      withTiming(
+        hasErrorShared.value
+          ? 4 // error has top priority
+          : focused.value
+            ? 2 // focused overrides filled/default
+            : value !== ''
+              ? 3 // filled (has content but not focused)
+              : 1, // default (empty and not focused)
+        { duration: 160 },
+      ),
     );
 
     // your four color states
     const colorStates = {
       default: colors.default,
       focused: colors.focused,
+      filled: colors.success,
       error: colors.error,
     };
 
@@ -95,8 +101,13 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
     const borderAnimatedStyle = useAnimatedStyle(() => ({
       borderColor: interpolateColor(
         animatedVisualState.value,
-        [1, 2, 3],
-        [colorStates.default, colorStates.focused, colorStates.error],
+        [1, 2, 3, 4],
+        [
+          colorStates.default,
+          colorStates.focused,
+          colorStates.filled,
+          colorStates.error,
+        ],
       ),
       borderWidth: 2,
     }));
@@ -105,8 +116,13 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
     const labelAnimatedStyle = useAnimatedStyle(() => ({
       color: interpolateColor(
         animatedVisualState.value,
-        [1, 2, 3],
-        [colorStates.default, colorStates.focused, colorStates.error],
+        [1, 2, 3, 4],
+        [
+          colorStates.default,
+          colorStates.focused,
+          colorStates.filled,
+          colorStates.error,
+        ],
       ),
     }));
 
@@ -114,8 +130,13 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
     const inputAnimatedStyle = useAnimatedStyle(() => ({
       color: interpolateColor(
         animatedVisualState.value,
-        [1, 2, 3],
-        [colorStates.default, colorStates.focused, colorStates.error],
+        [1, 2, 3, 4],
+        [
+          colorStates.default,
+          colorStates.focused,
+          colorStates.filled,
+          colorStates.error,
+        ],
       ),
     }));
 
@@ -123,8 +144,13 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
     const animatedIconColor = useDerivedValue(() =>
       interpolateColor(
         animatedVisualState.value,
-        [1, 2, 3],
-        [colorStates.default, colorStates.focused, colorStates.error],
+        [1, 2, 3, 4],
+        [
+          colorStates.default,
+          colorStates.focused,
+          colorStates.filled,
+          colorStates.error,
+        ],
       ),
     );
     useAnimatedReaction(
@@ -138,8 +164,13 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
     const helperColor = useDerivedValue(() =>
       interpolateColor(
         animatedVisualState.value,
-        [1, 2], // ignore the error-state for helper
-        [colorStates.default, colorStates.focused],
+        [1, 2, 3, 4], // ignore the error-state for helper
+        [
+          colorStates.default,
+          colorStates.focused,
+          colorStates.filled,
+          colorStates.error,
+        ],
       ),
     );
 
@@ -152,8 +183,13 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
     const animatedPlaceholderColor = useDerivedValue(() =>
       interpolateColor(
         animatedVisualState.value,
-        [1, 2, 3],
-        [colorStates.default, colorStates.focused, colorStates.error],
+        [1, 2, 3, 4],
+        [
+          colorStates.default,
+          colorStates.focused,
+          colorStates.filled,
+          colorStates.error,
+        ],
       ),
     );
 
@@ -232,6 +268,19 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
             {!secureTextEntry && rightAccessory && (
               <View style={{ marginRight: 4 }}>{rightAccessory(iconTint)}</View>
             )}
+            {isTouched && (
+              <Animated.View
+                entering={FadeIn.duration(200)}
+                exiting={FadeOut.duration(200)}
+                style={{ marginLeft: 8 }}
+              >
+                <Ionicons
+                  name={error ? 'close-circle' : 'checkmark-circle'}
+                  size={20}
+                  color={error ? colors.error : colors.success}
+                />
+              </Animated.View>
+            )}
           </View>
         </Animated.View>
 
@@ -240,7 +289,6 @@ export const EcohInput = forwardRef<TextInput, EcohInputProps>(
             key={showErrorMsg ? 'error' : 'helper'}
             entering={FadeIn.duration(200)}
             exiting={FadeOut.duration(200)}
-            style={showErrorMsg ? undefined : undefined}
           >
             {showErrorMsg ? (
               <View style={styles.helperTextRow}>

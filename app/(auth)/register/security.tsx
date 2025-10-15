@@ -1,32 +1,24 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRegistration } from '@/src/context/RegistrationContext';
 import { useTheme } from '@/src/theme/ThemeContext';
 import LockIcon from '@/src/icons/LockIcon';
-import Identifier from '@/src/components/molecules/Indetfier/Identifier';
 import { Button, Header } from '@/src/components/atoms';
 import { EcohInput } from '@/src/components/atoms/EcohInput/EcohInput';
-import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import { ICountryCode } from '@/src/components/molecules/MobileNumber';
-import { CountryCode } from 'libphonenumber-js/types';
-import * as Localization from 'expo-localization';
-import { countryMap } from '@/src/lib/countryMap';
 import { typography } from '@/src/theme/typography';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import PasswordStrengthMeter from '@/src/components/atoms/PasswordStrength/PasswordStrength';
 
 interface FormValues {
-  email: string;
-  mobile: string;
   password: string;
   confirmPassword: string;
 }
 
 // 🔐 Validation Schemas
-const passwordSchema = Yup.object().shape({
+const securitySchema = Yup.object().shape({
   password: Yup.string()
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters')
@@ -39,75 +31,27 @@ const passwordSchema = Yup.object().shape({
     .required('Confirm your password'),
 });
 
-const getInitialCountry = (): ICountryCode => {
-  const region = Localization.getLocales()[0].regionCode || 'GB';
-  return countryMap[region] || countryMap['GB'];
-};
-
-const PasswordTipBar = () => (
-  <View style={styles.tipBar}>
-    <Text style={styles.tipText}>
-      Use 8+ characters with uppercase, lowercase, number, and symbol.
-    </Text>
-  </View>
-);
-
-// 🧠 Component
 export default function Security() {
   const { colors } = useTheme();
   const { handleSubmitStep, isSubmitting } = useRegistration();
   const [fieldDirty, setFieldDirty] = useState<{ [key: string]: boolean }>({});
-
-  const [isEmail, setIsEmail] = useState(false);
-  const [mobileCountry, setMobileCountry] = useState<ICountryCode>(() =>
-    getInitialCountry(),
-  );
 
   const emailRef = useRef<TextInput>(null);
   const mobileRef = useRef<TextInput>(null);
   const scrollViewRef = useRef<any>(null);
   const insets = useSafeAreaInsets();
 
-  const getValidationSchema = (isEmail: boolean, country: CountryCode) =>
-    Yup.object().shape({
-      email: isEmail
-        ? Yup.string().email('Invalid email').required('Email is required')
-        : Yup.string(),
-      mobile: isEmail
-        ? Yup.string()
-        : Yup.string()
-            .required('Mobile number is required')
-            .test('is-valid-mobile', 'Enter a valid mobile number', (value) => {
-              if (!value) return false;
-              try {
-                const parsed = parsePhoneNumberWithError(value, country);
-                return parsed.isValid() && parsed.getType() === 'MOBILE';
-              } catch {
-                return false;
-              }
-            }),
-      password: passwordSchema.fields.password,
-      confirmPassword: passwordSchema.fields.confirmPassword,
-    });
-
   const formik = useFormik<FormValues>({
     initialValues: {
-      email: '',
-      mobile: '',
       password: '',
       confirmPassword: '',
     },
-    validationSchema: getValidationSchema(isEmail, mobileCountry.country),
+    validationSchema: securitySchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        await handleSubmitStep(
-          getValidationSchema(isEmail, mobileCountry.country),
-          ['identifier', 'password'],
-          {
-            identifier: isEmail ? values.email : values.mobile,
-            password: values.password,
-          },
-        );
+        await handleSubmitStep(securitySchema, ['password'], {
+          password: values.password,
+        });
       } catch (error) {
         console.error('Error submitting password:', error);
       } finally {
@@ -118,10 +62,6 @@ export default function Security() {
     validateOnChange: true,
   });
 
-  const toggleInputMode = useCallback(() => {
-    setIsEmail((prev) => !prev);
-  }, [formik]);
-
   const handleContinuePress = useCallback(() => {
     formik.handleSubmit();
   }, [formik]);
@@ -130,11 +70,7 @@ export default function Security() {
     setFieldDirty((prev) => ({ ...prev, [name]: true }));
   }, []);
 
-  const isDisabled =
-    !formik.values.email ||
-    !formik.values.mobile ||
-    !formik.values.password ||
-    !formik.values.confirmPassword;
+  const isDisabled = !formik.values.password || !formik.values.confirmPassword;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -151,15 +87,6 @@ export default function Security() {
             title="Your security"
             subtitle="Set up how you'll sign in and keep your account protected."
             icon={<LockIcon size={32} color={colors.text} />}
-          />
-
-          <Identifier
-            emailRef={emailRef}
-            mobileRef={mobileRef}
-            formik={formik}
-            isEmail={isEmail}
-            toggleInputMode={toggleInputMode}
-            onCountryChange={(country) => setMobileCountry(country)}
           />
 
           <EcohInput

@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
   },
   inputWrapper: {
     position: 'relative',
-    height: 54, // same height as your other fields
+    height: 54,
     borderRadius: 16,
     backgroundColor: '#fff',
     paddingHorizontal: 14,
@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 4,
     zIndex: 1,
     fontSize: 12,
-    left: 14,
+    left: 12,
     color: '#333',
     fontFamily: typography.fontFamilies.poppins.medium,
     pointerEvents: 'none',
@@ -52,8 +52,6 @@ export const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    lineHeight: 23,
-    color: '#333',
     padding: 0,
     margin: 0,
     height: 54,

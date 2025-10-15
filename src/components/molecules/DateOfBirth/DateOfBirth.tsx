@@ -59,14 +59,23 @@ const DateInput: React.FC<DateOfBirthProps> = ({
 
   // 0 = default, 1 = filled, 2 = focused, 3 = error
   const animatedVisualState = useDerivedValue(() =>
-    withTiming(hasErrorShared.value ? 3 : focused.value ? 2 : 1, {
-      duration: 160,
-    }),
+    withTiming(
+      hasErrorShared.value
+        ? 4 // error has top priority
+        : focused.value
+          ? 2 // focused overrides filled/default
+          : filled.value
+            ? 3 // filled (has content but not focused)
+            : 1, // default (empty and not focused)
+      { duration: 160 },
+    ),
   );
 
+  // your four color states
   const colorStates = {
     default: colors.default,
     focused: colors.focused,
+    filled: colors.filled,
     error: colors.error,
   };
 
@@ -75,8 +84,13 @@ const DateInput: React.FC<DateOfBirthProps> = ({
     borderWidth: 2,
     borderColor: interpolateColor(
       animatedVisualState.value,
-      [1, 2, 3],
-      [colorStates.default, colorStates.focused, colorStates.error],
+      [1, 2, 3, 4],
+      [
+        colorStates.default,
+        colorStates.focused,
+        colorStates.filled,
+        colorStates.error,
+      ],
     ),
   }));
 
@@ -84,8 +98,13 @@ const DateInput: React.FC<DateOfBirthProps> = ({
   const labelStyle = useAnimatedStyle(() => ({
     color: interpolateColor(
       animatedVisualState.value,
-      [1, 2, 3],
-      [colorStates.default, colorStates.focused, colorStates.error],
+      [1, 2, 3, 4],
+      [
+        colorStates.default,
+        colorStates.focused,
+        colorStates.filled,
+        colorStates.error,
+      ],
     ),
   }));
 
@@ -93,8 +112,13 @@ const DateInput: React.FC<DateOfBirthProps> = ({
   const textStyle = useAnimatedStyle(() => ({
     color: interpolateColor(
       animatedVisualState.value,
-      [1, 2, 3],
-      [colorStates.default, colorStates.focused, colorStates.error],
+      [1, 2, 3, 4],
+      [
+        colorStates.default,
+        colorStates.focused,
+        colorStates.filled,
+        colorStates.error,
+      ],
     ),
   }));
 
@@ -103,8 +127,13 @@ const DateInput: React.FC<DateOfBirthProps> = ({
   const animatedIconColor = useDerivedValue(() =>
     interpolateColor(
       animatedVisualState.value,
-      [1, 2, 3],
-      [colorStates.default, colorStates.focused, colorStates.error],
+      [1, 2, 3, 4],
+      [
+        colorStates.default,
+        colorStates.focused,
+        colorStates.filled,
+        colorStates.error,
+      ],
     ),
   );
   useAnimatedReaction(
@@ -119,8 +148,13 @@ const DateInput: React.FC<DateOfBirthProps> = ({
   const helperColor = useDerivedValue(() =>
     interpolateColor(
       animatedVisualState.value,
-      [1, 2],
-      [colorStates.default, colorStates.focused],
+      [1, 2, 3, 4],
+      [
+        colorStates.default,
+        colorStates.focused,
+        colorStates.filled,
+        colorStates.error,
+      ],
     ),
   );
   const helperTextStyle = useAnimatedStyle(() => ({
@@ -202,6 +236,19 @@ const DateInput: React.FC<DateOfBirthProps> = ({
           <Animated.Text style={[styles.inputText, textStyle]}>
             {formattedDate || 'Date of Birth'}
           </Animated.Text>
+          {isTouched && (
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(200)}
+              style={{ marginLeft: 8 }}
+            >
+              <Ionicons
+                name={error ? 'close-circle' : 'checkmark-circle'}
+                size={20}
+                color={error ? colors.error : colors.success}
+              />
+            </Animated.View>
+          )}
         </TouchableOpacity>
       </Animated.View>
 

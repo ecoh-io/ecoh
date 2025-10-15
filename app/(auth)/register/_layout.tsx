@@ -30,6 +30,7 @@ export default function Layout() {
             }}
           >
             <Stack.Screen name="index" />
+            <Stack.Screen name="identifier" />
             <Stack.Screen name="security" />
             <Stack.Screen name="one-time-passcode" />
           </Stack>

@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     position: 'relative',
     height: 54, // same height as your other fields
     borderRadius: 16,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     paddingHorizontal: 14,
     justifyContent: 'center',
   },
@@ -25,28 +25,28 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     lineHeight: 23,
-    color: '#333',
     padding: 0,
     margin: 0,
     height: 54,
     fontFamily: typography.fontFamilies.poppins.medium,
   },
+
   floatingLabel: {
     position: 'absolute',
     top: -8, // sits just above the border
     backgroundColor: '#fff',
     paddingHorizontal: 4,
-    zIndex: 1,
+    zIndex: 2,
     fontSize: 12,
     left: 12,
-    color: '#333',
+
     fontFamily: typography.fontFamilies.poppins.medium,
     pointerEvents: 'none',
   },
   errorText: {
     fontSize: 12,
     lineHeight: 16,
-    color: 'red',
+    color: '#E54848',
     fontFamily: typography.fontFamilies.poppins.semiBold,
   },
   helperTextRow: {

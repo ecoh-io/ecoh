@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
   errorText: {
     fontSize: 12,
     lineHeight: 16,
-    color: 'red',
+    color: '#E54848',
     fontFamily: typography.fontFamilies.poppins.semiBold,
   },
 });
