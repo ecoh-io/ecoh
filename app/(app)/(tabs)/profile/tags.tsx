@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import { PostType } from '@/src/types/post';
+import { PostType } from '@/src/shared/types/post';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'react-native-collapsible-tab-view';
 import { Post } from '@/src/components/organisms/Posts';

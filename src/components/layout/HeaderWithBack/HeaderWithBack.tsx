@@ -11,7 +11,7 @@ const HeaderWithBack = ({ title, onBackPress, right }: HeaderWithBackProps) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
-        <Entypo name="chevron-left" size={32} color={colors.text} />
+        <Entypo name="chevron-left" size={28} color={colors.text} />
       </TouchableOpacity>
 
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>

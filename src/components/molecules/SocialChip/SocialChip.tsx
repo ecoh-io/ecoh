@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome6 } from '@expo/vector-icons';
-import { SOCIAL_PLATFORM_STYLES } from '@/src/constants/socialPlatformStyles';
+import { SOCIAL_PLATFORM_STYLES } from '@/src/features/profile/constants/socialPlatformStyles';
 import { SocialChipProps } from './types';
 import { styles } from './styles';
 

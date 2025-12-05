@@ -1,6 +1,6 @@
 import { useTheme } from '@/src/theme/ThemeContext';
-import { useLinkPreviews } from '@/src/hooks/useLinkPreviews';
-import { extractUrls } from '@/src/utils/urlHelpers';
+import { useLinkPreviews } from '@/src/shared/hooks/useLinkPreviews';
+import { extractUrls } from '@/src/shared/lib/url';
 import { styles } from './styles';
 import { TextPostProps } from './types';
 import LinkPreview from '@/src/components/molecules/Posts/LinkPreview/LinkPreview';

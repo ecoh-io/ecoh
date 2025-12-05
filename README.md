@@ -11,13 +11,13 @@ Each layer has a clear responsibility, following the flow:
 <summary><strong>🧭 Folder Structure Overview</strong></summary>
 
 ```plaintext
-src/
-│
-├── app/                        # Expo Router entry points (navigation, layouts)
+-app/                        # Expo Router entry points (navigation, layouts)
 │   ├── (auth)/                 # Route groups for features
 │   ├── (dashboard)/
 │   ├── _layout.tsx
 │   └── +not-found.tsx
+│
+-src/
 │
 ├── features/                   # Core business domains (authentication, feed, etc.)
 │   ├── authentication/
@@ -55,6 +55,4 @@ src/
 │   ├── useTheme.ts
 │   ├── useKeyboard.ts
 │   └── useNetworkStatus.ts
-│
-└── index.ts                    # App entrypoint
 ```

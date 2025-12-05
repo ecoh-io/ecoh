@@ -10,14 +10,14 @@ import Animated, {
 import { styles } from './styles';
 import { IdentifierProps } from './types';
 
-import MailIcon from '@/src/icons/MailIcon';
-import PhoneIcon from '@/src/icons/PhoneIcon';
+import MailIcon from '@/src/components/ui/icons/MailIcon';
+import PhoneIcon from '@/src/components/ui/icons/PhoneIcon';
 
 import MobileNumberInput from '../MobileNumber/MobileNumber';
 import SegmentedToggle from '../SegmentedToggle';
 import { EcohInput } from '../../atoms/EcohInput/EcohInput';
-import RefreshArrowIcon from '@/src/icons/RefreshIcon';
-import SwitchArrowsIcon from '@/src/icons/SwitchIcon';
+import RefreshArrowIcon from '@/src/components/ui/icons/RefreshIcon';
+import SwitchArrowsIcon from '@/src/components/ui/icons/SwitchIcon';
 
 const Identifier: React.FC<IdentifierProps> = ({
   isEmail,

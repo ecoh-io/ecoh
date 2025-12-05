@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
   inputWrapper: {
     position: 'relative',
     height: 54, // same height as your other fields
-    borderRadius: 16,
+    borderRadius: 18,
     backgroundColor: 'transparent',
     paddingHorizontal: 14,
     justifyContent: 'center',
@@ -61,5 +61,18 @@ export const styles = StyleSheet.create({
   },
   helperIcon: {
     marginRight: 2,
+  },
+  validationIconContainer: {
+    width: 24,
+    height: 24,
+    marginLeft: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  validationIcon: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -8,7 +8,7 @@ import { View } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { styles } from './styles';
 import { MediaVideoItemProps } from './types';
-import { VideoRefHandle } from '@/src/hoc/withFeedManger';
+import { VideoRefHandle } from '@/src/features/feed/hoc/withFeedManger';
 
 const MediaVideoItem = forwardRef<VideoRefHandle, MediaVideoItemProps>(
   ({ uri, isAutoplay = true, onVideoRefReady }, ref) => {

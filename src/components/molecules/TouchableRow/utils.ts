@@ -1,4 +1,4 @@
-import { Location } from '@/src/types/location';
+import { Location } from '@/src/shared/types/location';
 
 const isLocation = (value: any): value is Location =>
   value?.type === 'Point' &&

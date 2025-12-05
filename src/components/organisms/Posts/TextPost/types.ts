@@ -1,5 +1,5 @@
 import { ActionBarProps } from '@/src/components/molecules/Posts/ActionBar';
-import { TextPost } from '@/src/types/post';
+import { TextPost } from '@/src/shared/types/post';
 
 export interface TextPostProps
   extends Omit<ActionBarProps, 'likes' | 'commentsCount' | 'echoCount'> {

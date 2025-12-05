@@ -1,4 +1,4 @@
-import { Media } from '@/src/types/Media';
+import { Media } from '@/src/shared/types/Media';
 
 export interface MediaItemProps {
   item: Media;

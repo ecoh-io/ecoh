@@ -1,10 +1,10 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import { SOCIAL_PLATFORMS } from '@/src/constants/SocialPlatforms';
+import { SOCIAL_PLATFORMS } from '@/src/features/profile/constants/SocialPlatforms';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { typography } from '@/src/theme/typography';
-import { useEdit } from '@/src/context/EditContext';
+import { useEdit } from '@/src/features/profile/context/EditContext';
 import { FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Button, Input } from '@/src/components/atoms';

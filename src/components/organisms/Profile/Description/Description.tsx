@@ -10,9 +10,9 @@ import {
 import { useRouter } from 'expo-router';
 import { Entypo } from '@expo/vector-icons';
 import { typography } from '@/src/theme/typography';
-import { SOCIAL_PLATFORMS } from '@/src/constants/SocialPlatforms';
-import { useAlbums } from '@/src/api/album/useAlbumQuries';
-import { Album } from '@/src/types/Album';
+import { SOCIAL_PLATFORMS } from '@/src/features/profile/constants/SocialPlatforms';
+import { useAlbums } from '@/src/features/profile/api/useAlbumQuries';
+import { Album } from '@/src/shared/types/Album';
 import { DescriptionProps } from './types';
 import { styles } from './styles';
 import SocialChip from '@/src/components/molecules/SocialChip';

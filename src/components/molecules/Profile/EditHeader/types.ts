@@ -1,4 +1,4 @@
-import { Colors } from '@/src/types/color';
+import { Colors } from '@/src/shared/types/color';
 
 export interface EditHeaderProps {
   title: string;

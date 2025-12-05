@@ -2,7 +2,7 @@ import React, { memo, useCallback, useRef, useState } from 'react';
 import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 import ProfileTabBar from '@/app/components/ProfileTabBar';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { useAuthStore } from '@/src/store/AuthStore';
+import { useAuthStore } from '@/src/shared/store/AuthStore';
 import { Tabs } from 'react-native-collapsible-tab-view';
 import PostsScreen from './posts';
 import MediaScreen from './media';

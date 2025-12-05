@@ -1,5 +1,5 @@
-import { Colors } from '@/src/types/color';
-import { ILocation } from '@/src/interfaces/location';
+import { Colors } from '@/src/shared/types/color';
+import { ILocation } from '@/src/shared/interfaces/location';
 
 export interface LocationSearchProps {
   onSelect: (item: ILocation) => void;

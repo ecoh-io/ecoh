@@ -1,6 +1,6 @@
 import { LayoutChangeEvent } from 'react-native';
-import { PostData } from '@/src/types/post';
-import { VideoRefHandle } from '@/src/hoc/withFeedManger';
+import { PostData } from '@/src/shared/types/post';
+import { VideoRefHandle } from '@/src/features/feed/hoc/withFeedManger';
 
 export interface PostProps {
   post: PostData;

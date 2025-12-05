@@ -1,0 +1,80 @@
+import { typography } from '@/src/theme/typography';
+import { StyleSheet, Platform } from 'react-native';
+
+export const styles = StyleSheet.create({
+  container: {
+    marginBottom: 0,
+    flexDirection: 'column',
+    gap: 10,
+  },
+  inputWrapper: {
+    position: 'relative',
+    height: 54, // same height as your other fields
+    borderRadius: 18,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 14,
+    justifyContent: 'center',
+    borderWidth: 1.5,
+  },
+  innerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 54,
+  },
+  iconContainer: {
+    // leave empty or size your icon here
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    lineHeight: 23,
+    padding: 0,
+    margin: 0,
+    height: 54,
+    fontFamily: typography.fontFamilies.poppins.medium,
+  },
+
+  floatingLabel: {
+    position: 'absolute',
+    top: -8, // sits just above the border
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    zIndex: 2,
+    fontSize: 12,
+    left: 12,
+    fontFamily: typography.fontFamilies.poppins.medium,
+    pointerEvents: 'none',
+  },
+  errorText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#E54848',
+    fontFamily: typography.fontFamilies.poppins.semiBold,
+  },
+  helperTextRow: {
+    flexDirection: 'row',
+    width: '90%',
+    gap: 4,
+    alignItems: 'center',
+  },
+  helperText: {
+    fontSize: 12,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
+  },
+  helperIcon: {
+    marginRight: 2,
+  },
+  validationIconContainer: {
+    width: 24,
+    height: 24,
+    marginLeft: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  validationIcon: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { PostProps } from './types';
 import { styles } from './styles';
 import { postReducer } from './reducer';
-import { PostType, TextPost, MediaPost } from '@/src/types/post';
+import { PostType, TextPost, MediaPost } from '@/src/shared/types/post';
 import { PostHeader } from '@/src/components/molecules/Posts';
 import { MediaPostComponent, TextPostComponent } from '..';
 import ActionBar from '@/src/components/molecules/Posts/ActionBar';

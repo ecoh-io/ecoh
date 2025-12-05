@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import CustomTabBar from '@/app/components/CustomTabBar';
-import { ScrollProvider } from '@/src/context/ScrollContext';
+import { ScrollProvider } from '@/src/shared/context/ScrollContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ProtectedRoute from '@/app/components/ProtectedRoute';
 

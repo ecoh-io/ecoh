@@ -1,4 +1,4 @@
-import { User } from '@/src/types/post';
+import { User } from '@/src/shared/types/post';
 
 export interface PostHeaderProps {
   user: User;

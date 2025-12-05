@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingViewProps,
 } from 'react-native';
 import { StatusBarProps } from 'expo-status-bar';
-import { ExtendedEdge } from '@/src/utils/useSafeAreaInsetsStyle';
+import { ExtendedEdge } from '@/src/shared/hooks/useSafeAreaInsetsStyle';
 
 export type preset = 'fixed' | 'scroll' | 'auto';
 

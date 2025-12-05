@@ -12,11 +12,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontFamily: typography.fontFamilies.poppins.bold,
+    fontFamily: typography.fontFamilies.poppins.semiBold,
     fontSize: typography.fontSizes.title,
+    alignSelf: 'flex-end',
   },
   subtitle: {
-    fontFamily: typography.fontFamilies.poppins.semiBold,
-    fontSize: typography.fontSizes.body,
+    fontFamily: typography.fontFamilies.poppins.medium,
+    fontSize: typography.fontSizes.button,
   },
 });

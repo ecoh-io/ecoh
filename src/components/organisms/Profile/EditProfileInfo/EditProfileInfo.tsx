@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Colors } from '@/src/types/color';
+import { Colors } from '@/src/shared/types/color';
 import {
   Text,
   View,
@@ -11,14 +11,14 @@ import {
 import { memo } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { useEdit } from '@/src/context/EditContext';
+import { useEdit } from '@/src/features/profile/context/EditContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { useMediaUploader } from '@/src/hooks/useMediaUploader';
-import { User } from '@/src/types/user';
 import { Button, CircularProgressIndicator } from '@/src/components/atoms';
 import { styles } from './styles';
+import { User } from '@/src/shared/types/user';
+import { useMediaUploader } from '@/src/shared/hooks/useMediaUploader';
 
 const DEFAULT_PROFILE_IMAGE_URL = 'https://via.placeholder.com/100';
 

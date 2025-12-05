@@ -2,7 +2,7 @@ import React, { useMemo, memo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { formatNumber } from '@/src/lib/helpers';
+import { formatNumber } from '@/src/shared/lib/helpers';
 import { styles } from './styles';
 import { ActionWithCountProps, ActionBarProps } from './types';
 import { LikeButton, SaveButton } from '../../Animations';

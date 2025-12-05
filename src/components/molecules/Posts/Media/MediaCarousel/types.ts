@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Media } from '@/src/types/Media';
+import { Media } from '@/src/shared/types/Media';
 
 export interface MediaCarouselProps {
   data: Media[];

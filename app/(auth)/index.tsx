@@ -50,7 +50,7 @@ const Index: React.FC = () => {
             size="large"
             style={styles.button}
           />
-          <Text style={[styles.footer, { color: colors.text + '99' }]}>
+          <Text style={[styles.footer, { color: colors.secondary + '99' }]}>
             © {new Date().getFullYear()} Ecoh
           </Text>
         </View>

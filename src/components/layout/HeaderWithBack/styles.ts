@@ -5,10 +5,8 @@ export const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: 8,
+    height: 56,
     paddingHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
   },
   backButton: {
     flex: 0,
@@ -17,6 +15,5 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSizes.title,
     fontFamily: typography.fontFamilies.poppins.bold,
-    marginTop: 2,
   },
 });

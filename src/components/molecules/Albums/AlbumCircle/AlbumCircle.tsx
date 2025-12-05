@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AlbumCircleProps } from './types';
 import { getHaloColor, getGradientColors, hasHalo } from './utils';
 import { styles } from './styles';
-import { Visibility } from '@/src/enums/visibility.enum';
+import { Visibility } from '@/src/shared/enums/visibility.enum';
 
 const AlbumCircle: React.FC<AlbumCircleProps> = ({
   uri,

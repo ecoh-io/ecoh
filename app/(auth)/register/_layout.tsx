@@ -1,41 +1,28 @@
+import { AuthLayout } from '@/src/components/layout/AuthLayout';
 import RegistrationHeader from '@/src/components/organisms/RegistrationHeader';
-import { RegistrationProvider } from '@/src/context/RegistrationContext';
-import { useTheme } from '@/src/theme/ThemeContext';
+import { RegistrationProvider } from '@/src/features/authentication/registration/context/RegistrationContext';
 import { Stack } from 'expo-router';
-import { Platform } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Layout() {
-  const { colors } = useTheme();
   return (
     <RegistrationProvider>
-      <SafeAreaView
-        edges={['top', 'bottom']}
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}
-      >
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      <AuthLayout>
+        <RegistrationHeader />
+        <Stack
+          initialRouteName="index"
+          screenOptions={{
+            headerShown: false,
+            animation: 'fade',
+          }}
         >
-          <RegistrationHeader />
-          <Stack
-            initialRouteName="index"
-            screenOptions={{
-              headerShown: false,
-              animation: 'fade',
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="identifier" />
-            <Stack.Screen name="security" />
-            <Stack.Screen name="one-time-passcode" />
-          </Stack>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="identity" />
+          <Stack.Screen name="mobile" />
+          <Stack.Screen name="email" />
+          <Stack.Screen name="security" />
+          <Stack.Screen name="one-time-passcode" />
+        </Stack>
+      </AuthLayout>
     </RegistrationProvider>
   );
 }

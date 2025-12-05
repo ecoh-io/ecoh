@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { PostType } from '@/src/types/post';
+import { PostType } from '@/src/shared/types/post';
 import { Tabs } from 'react-native-collapsible-tab-view';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { posts } from '@/src/lib/data';

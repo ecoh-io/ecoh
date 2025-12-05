@@ -15,9 +15,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { ScrollContext } from '@/src/context/ScrollContext';
+import { ScrollContext } from '@/src/shared/context/ScrollContext';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { useAuthStore } from '@/src/store/AuthStore';
+import { useAuthStore } from '@/src/shared/store/AuthStore';
 
 // Define your icon mappings based on route names
 const ICONS: Record<

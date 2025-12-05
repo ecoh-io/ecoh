@@ -1,4 +1,4 @@
-import { VideoRefHandle } from '@/src/hoc/withFeedManger';
+import { VideoRefHandle } from '@/src/features/feed/hoc/withFeedManger';
 
 export interface MediaVideoItemProps {
   uri: string;

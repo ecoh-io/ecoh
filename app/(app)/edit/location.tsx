@@ -1,10 +1,10 @@
 import LocationSearchBar from '@/src/components/molecules/LocationSearchBar';
 import { EditHeader } from '@/src/components/molecules/Profile';
-import { useEdit } from '@/src/context/EditContext';
-import { ILocation } from '@/src/interfaces/location';
+import { useEdit } from '@/src/features/profile/context/EditContext';
+import { ILocation } from '@/src/shared/interfaces/location';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import { Location } from '@/src/types/location';
+import { Location } from '@/src/shared/types/location';
 import { useCallback, useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';

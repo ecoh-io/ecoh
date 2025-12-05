@@ -2,12 +2,12 @@ import React, { useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useRegistration } from '@/src/context/RegistrationContext';
+import { useRegistration } from '@/src/features/authentication/registration/context/RegistrationContext';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { useConfirmUser } from '@/src/api/authentication/useAuthenticationMutations';
 import Button from '@/src/components/atoms/Button';
 import OTP from '@/src/components/molecules/OTP';
 import { Header } from '@/src/components/atoms';
+import { useConfirmUser } from '@/src/features/authentication/registration/api/useAuthenticationMutations';
 
 interface FormValues {
   OTP: string;

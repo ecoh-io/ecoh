@@ -1,6 +1,6 @@
 import { Input, UsernameAvailabilityIndicator } from '@/src/components/atoms';
 import { EditHeader } from '@/src/components/molecules/Profile';
-import { useEdit } from '@/src/context/EditContext';
+import { useEdit } from '@/src/features/profile/context/EditContext';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFormik } from 'formik';

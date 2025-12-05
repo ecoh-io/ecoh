@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Alert, Animated } from 'react-native';
 import { router } from 'expo-router';
-import { useRegistration } from '@/src/context/RegistrationContext';
+import { useRegistration } from '@/src/features/authentication/registration/context/RegistrationContext';
 import AnimatedProgressRing from './AnimatedProgressRing';
 import HeaderWithBack from '@/src/components/layout/HeaderWithBack';
 import * as Haptics from 'expo-haptics';

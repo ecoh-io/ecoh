@@ -10,18 +10,18 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { posts } from '@/src/lib/data';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
 import { debounce } from 'lodash';
-import { PostData, PostType } from '@/src/types/post';
+import { PostData, PostType } from '@/src/shared/types/post';
 
-import { MediaType } from '@/src/enums/media-type.enum';
+import { MediaType } from '@/src/shared/enums/media-type.enum';
 import { Post } from '@/src/components/organisms/Posts';
-import { withFeedManager } from '@/src/hoc/withFeedManger';
+import { withFeedManager } from '@/src/features/feed/hoc/withFeedManger';
+import { posts } from '@/src/shared/constants/data';
 
 // Extra props provided by the feed manager HOC
 // Production-level constants

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { getShortTimeAgo } from '@/src/lib/timeHelpers';
+import { getShortTimeAgo } from '@/src/shared/lib/time';
 import { styles } from './styles';
 import { PostHeaderProps } from './types';
 import { RelationshipBadge, VerifiedBadge } from '@/src/components/atoms';

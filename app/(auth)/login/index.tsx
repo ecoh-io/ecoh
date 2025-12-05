@@ -13,13 +13,13 @@ import * as Yup from 'yup';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
-import { useLoginUser } from '@/src/api/authentication/useAuthenticationMutations';
-import MailIcon from '@/src/icons/MailIcon';
-import LockIcon from '@/src/icons/LockIcon';
-import AccountIcon from '@/src/icons/AccountIcon';
+import MailIcon from '@/src/components/ui/icons/MailIcon';
+import LockIcon from '@/src/components/ui/icons/LockIcon';
+import AccountIcon from '@/src/components/ui/icons/AccountIcon';
 import Button from '@/src/components/atoms/Button';
 import Input from '@/src/components/atoms/Input';
 import { Header } from '@/src/components/atoms';
+import { useLoginUser } from '@/src/features/authentication/registration/api/useAuthenticationMutations';
 
 interface FormValues {
   identifier: string;

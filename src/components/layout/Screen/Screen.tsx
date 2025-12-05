@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useScrollToTop } from '@react-navigation/native';
-import { useSafeAreaInsetsStyle } from '@/src/utils/useSafeAreaInsetsStyle';
+import { useSafeAreaInsetsStyle } from '@/src/shared/hooks/useSafeAreaInsetsStyle';
 import { useAutoScrollToggle } from './useAutoScrollToggle';
 import { isFixed, ScreenProps } from './types';
 import { styles } from './styles';

@@ -1,7 +1,7 @@
 import { EditHeader } from '@/src/components/molecules/Profile';
 import RadioButtonGroup from '@/src/components/molecules/RadioButtonGroup';
-import { useEdit } from '@/src/context/EditContext';
-import { Gender, genderOptions } from '@/src/enums/gender.enum';
+import { useEdit } from '@/src/features/profile/context/EditContext';
+import { Gender, genderOptions } from '@/src/shared/enums/gender.enum';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import { useState } from 'react';

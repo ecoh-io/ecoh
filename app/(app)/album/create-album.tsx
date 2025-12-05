@@ -11,19 +11,19 @@ import { useRouter } from 'expo-router';
 import { typography } from '@/src/theme/typography';
 import { useTheme } from '@/src/theme/ThemeContext';
 import * as Yup from 'yup';
-import { Visibility } from '@/src/enums/visibility.enum';
+import { Visibility } from '@/src/shared/enums/visibility.enum';
 import { FormikProvider, useFormik } from 'formik';
 import { Entypo } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
-import { useMediaUploader } from '@/src/hooks/useMediaUploader';
-import { pickSingleImage } from '@/src/services/imagePicker';
-import { useAuthStore } from '@/src/store/AuthStore';
-import { useCreateAlbum } from '@/src/api/album/useAlbumMutations';
-import { MediaType } from '@/src/enums/media-type.enum';
+import { useAuthStore } from '@/src/shared/store/AuthStore';
+import { useCreateAlbum } from '@/src/features/profile/api/useAlbumMutations';
+import { MediaType } from '@/src/shared/enums/media-type.enum';
 import Input from '@/src/components/atoms/Input';
 import Button from '@/src/components/atoms/Button';
 import FormikEcohDropdown from '@/src/components/molecules/Dropdown/FormikWrapper';
+import { pickSingleImage } from '@/src/shared/services/imagePicker';
+import { useMediaUploader } from '@/src/shared/hooks/useMediaUploader';
 
 const CreateAlbumSchema = Yup.object().shape({
   name: Yup.string().required('Album name is required'),

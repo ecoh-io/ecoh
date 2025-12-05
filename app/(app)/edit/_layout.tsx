@@ -1,5 +1,5 @@
 import Screen from '@/src/components/layout/Screen';
-import { EditProvider } from '@/src/context/EditContext';
+import { EditProvider } from '@/src/features/profile/context/EditContext';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';

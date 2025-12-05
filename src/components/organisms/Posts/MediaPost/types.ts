@@ -1,6 +1,6 @@
-import { MediaPost } from '@/src/types/post';
+import { MediaPost } from '@/src/shared/types/post';
 import { ActionBarProps } from '@/src/components/molecules/Posts/ActionBar';
-import { VideoRefHandle } from '@/src/hoc/withFeedManger';
+import { VideoRefHandle } from '@/src/features/feed/hoc/withFeedManger';
 
 export interface MediaPostProps
   extends Omit<ActionBarProps, 'likes' | 'commentsCount' | 'echoCount'> {

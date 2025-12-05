@@ -1,4 +1,4 @@
-import { Visibility } from '@/src/enums/visibility.enum';
+import { Visibility } from '@/src/shared/enums/visibility.enum';
 
 export const getHaloColor = (visibility: Visibility): string | undefined => {
   switch (visibility) {

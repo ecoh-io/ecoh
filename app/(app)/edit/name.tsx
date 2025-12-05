@@ -1,6 +1,6 @@
 import { Input } from '@/src/components/atoms';
 import { EditHeader } from '@/src/components/molecules/Profile';
-import { useEdit } from '@/src/context/EditContext';
+import { useEdit } from '@/src/features/profile/context/EditContext';
 import { useTheme } from '@/src/theme/ThemeContext';
 import { typography } from '@/src/theme/typography';
 import { Ionicons } from '@expo/vector-icons';

@@ -13,7 +13,7 @@ import useLocationSearch from './useLocationSearchBar';
 import { Input } from '@/src/components/atoms';
 import { styles } from './styles';
 import { LocationSearchProps } from './types';
-import { ILocation } from '@/src/interfaces/location';
+import { ILocation } from '@/src/shared/interfaces/location';
 
 const LocationSearchBar: React.FC<LocationSearchProps> = ({
   onSelect,

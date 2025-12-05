@@ -52,6 +52,11 @@ export const lightColors = {
   default: '#CFCFCF',
   filled: '#999999',
   focused: '#2C2C2E',
+
+  valid: '#4CC47F',
+  validHelper: '#63C589',
+
+  subTitle: '#9B9B9B',
 };
 
 export const darkColors = {

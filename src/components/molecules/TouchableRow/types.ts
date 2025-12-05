@@ -1,5 +1,5 @@
-import { Colors } from '@/src/types/color';
-import { Location } from '@/src/types/location';
+import { Colors } from '@/src/shared/types/color';
+import { Location } from '@/src/shared/types/location';
 
 export interface TouchableRowProps {
   iconName: string;

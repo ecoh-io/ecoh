@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { Alert } from 'react-native';
 import ParsedText from 'react-native-parsed-text';
-import { truncateUrl } from '@/src/utils/urlHelpers';
+import { truncateUrl } from '@/src/shared/lib/url';
 import { styles } from './styles';
 import { ParsedTextContentProps } from './types';
 import { SecureUrlText } from '@/src/components/atoms';

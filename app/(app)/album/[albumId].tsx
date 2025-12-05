@@ -13,16 +13,16 @@ import {
 import { router, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '@/src/theme/ThemeContext';
-import { useAlbum } from '@/src/api/album/useAlbumQuries';
-import { useDeleteAlbum } from '@/src/api/album/useAlbumMutations';
-import { pickMultipleImages } from '@/src/services/imagePicker';
+import { useAlbum } from '@/src/features/profile/api/useAlbumQuries';
+import { useDeleteAlbum } from '@/src/features/profile/api/useAlbumMutations';
 import { typography } from '@/src/theme/typography';
-import { Media } from '@/src/types/Media';
-import { useMultipleMediaUploader } from '@/src/hooks/useMultipleMediaUploader';
-import { MediaType } from '@/src/enums/media-type.enum';
-import { useAuthStore } from '@/src/store/AuthStore';
+import { Media } from '@/src/shared/types/Media';
+import { MediaType } from '@/src/shared/enums/media-type.enum';
+import { useAuthStore } from '@/src/shared/store/AuthStore';
 import { Footer, GridItem, Header } from '@/src/components/molecules/Albums';
 import AnimatedWrapper from '@/src/animation/AnimatedWrapper';
+import { useMultipleMediaUploader } from '@/src/shared/hooks/useMultipleMediaUploader';
+import { pickMultipleImages } from '@/src/shared/services/imagePicker';
 
 // --- Constants & Grid Sizing ---
 const TOTAL_CELLS = 12;
